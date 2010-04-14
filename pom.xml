@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jvnet.hudson.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>1.340</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  
+  <artifactId>log-parser</artifactId>
+  <packaging>hpi</packaging>
+  <version>1.0.3-SNAPSHOT</version>
+  <name>Hudson LogParser plugin</name>
+ 
+ 
+
+ <reporting>
+ <plugins>
+ <plugin>
+  <groupId>org.apache.maven.plugins</groupId> 
+  <artifactId>maven-pmd-plugin</artifactId> 
+ <configuration>
+  <targetJdk>1.6</targetJdk> 
+ <rulesets>
+  <ruleset>/rulesets/basic.xml</ruleset> 
+  <ruleset>/rulesets/braces.xml</ruleset> 
+  <ruleset>/rulesets/clone.xml</ruleset> 
+  <ruleset>/rulesets/codesize.xml</ruleset> 
+  <ruleset>/rulesets/design.xml</ruleset> 
+  <ruleset>/rulesets/finalizers.xml</ruleset> 
+  <ruleset>/rulesets/imports.xml</ruleset> 
+  <ruleset>/rulesets/j2ee.xml</ruleset> 
+  <ruleset>/rulesets/optimizations.xml</ruleset> 
+  <ruleset>/rulesets/strictexception.xml</ruleset> 
+  <ruleset>/rulesets/strings.xml</ruleset> 
+  <ruleset>/rulesets/unusedcode.xml</ruleset> 
+  </rulesets>
+  </configuration>
+  </plugin>
+  </plugins>
+  </reporting>
+  
+   <!-- Hudson WIKI -->
+   <url>http://wiki.hudson-ci.org/display/HUDSON/Log+Parser</url>
+   <developers>
+    <developer>
+      <id>rgoren</id>
+      <name>Rinat Ailon</name>
+      <email>rgoren@cisco.com</email>
+    </developer>
+  </developers>
+ 
+  
+</project>

@@ -1,0 +1,18 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+
+    	<f:entry title="Fail Build on Error" help="/plugin/log-parser/fail_on_error.html">
+    		<f:checkbox name="log-parser.failBuildOnError" checked="${instance.failBuildOnError}"/>
+    	</f:entry>
+    	
+   		<f:entry title="Select Parsing Rules" field="currentRulePath" help="/plugin/log-parser/parse_rule_choice.html">
+        	<select name="log-parser.parsingRulesPath">
+        	
+	            <j:forEach var="i" items="${descriptor.parsingRulesGlobal}">
+    	            <f:option selected="${i.path == instance.parsingRulesPath}" value="${i.path}">${i.name}</f:option>
+               </j:forEach>
+			</select>
+        </f:entry>
+                            
+  
+</j:jelly>
