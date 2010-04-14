@@ -10,8 +10,8 @@
   
   <artifactId>log-parser</artifactId>
   <packaging>hpi</packaging>
-  <version>1.0.3-SNAPSHOT</version>
-  <name>Hudson LogParser plugin</name>
+  <version>1.0.4</version>
+  <name>Log Parser Plugin</name>
  
  
 
