@@ -12,8 +12,6 @@
   <packaging>hpi</packaging>
   <version>1.0.5-SNAPSHOT</version>
   <name>Log Parser Plugin</name>
- 
- 
 
  <reporting>
  <plugins>
@@ -42,7 +40,7 @@
   </reporting>
   
    <!-- Hudson WIKI -->
-   <url>http://wiki.hudson-ci.org/display/HUDSON/Log+Parser</url>
+   <url>http://wiki.hudson-ci.org/display/HUDSON/Log+Parser+Plugin</url>
    <developers>
     <developer>
       <id>rgoren</id>
