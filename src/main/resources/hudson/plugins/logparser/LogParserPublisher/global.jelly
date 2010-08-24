@@ -7,7 +7,7 @@
       <f:repeatable var="rule" items="${descriptor.parsingRulesGlobal}">
         <table width="100%">
         
-          <f:entry title="Project">
+          <f:entry title="Description">
             <f:textbox name="log-parser.name" value="${rule.name}" />
           </f:entry>
 

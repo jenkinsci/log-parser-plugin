@@ -16,7 +16,7 @@ import java.util.List;
 
 public final class LogParserWriter {
 
-	public static void writeHeaderTemplateToAllLinkFiles(final HashMap writers,final int sectionCounter) throws IOException {
+	public static void writeHeaderTemplateToAllLinkFiles(final HashMap<String,BufferedWriter> writers,final int sectionCounter) throws IOException {
 		final List<String> statuses = LogParserConsts.STATUSES_WITH_SECTIONS_IN_LINK_FILES;
 		final int statusesSize=statuses.size();
 		for (int i=0;i<statusesSize;i++){
@@ -45,13 +45,13 @@ public final class LogParserWriter {
     }
 
     public static void writeReferenceHtml(final String buildRefPath,
-			final ArrayList headerForSection,
-			final HashMap statusCountPerSection,
-			final HashMap iconTable,
-			final HashMap linkListDisplay,
-			final HashMap linkListDisplayPlural,
-			final HashMap statusCount,
-			final HashMap linkFiles
+			final ArrayList<String> headerForSection,
+			final HashMap<String,Integer> statusCountPerSection,
+			final HashMap<String,String> iconTable,
+			final HashMap<String,String> linkListDisplay,
+			final HashMap<String,String> linkListDisplayPlural,
+			final HashMap<String,Integer> statusCount,
+			final HashMap<String,String> linkFiles
 ) throws IOException {
     	
     	final String refStart = 	"<base target=\"content\">\n" +
@@ -79,13 +79,13 @@ public final class LogParserWriter {
 
     private static void writeLinks(final BufferedWriter writer, 
     						final String status,
-    						final ArrayList headerForSection,
-    						final HashMap statusCountPerSection,
-    						final HashMap iconTable,
-    						final HashMap linkListDisplay,
-    						final HashMap linkListDisplayPlural,
-    						final HashMap statusCount,
-    						final HashMap linkFiles
+    						final ArrayList<String> headerForSection,
+    						final HashMap<String,Integer> statusCountPerSection,
+    						final HashMap<String,String> iconTable,
+    						final HashMap<String,String> linkListDisplay,
+    						final HashMap<String,String> linkListDisplayPlural,
+    						final HashMap<String,Integer> statusCount,
+    						final HashMap<String,String> linkFiles
     						)  throws IOException {
     	final String statusIcon = (String)iconTable.get(status);
        	final String linkListDisplayStr = (String)linkListDisplay.get(status);

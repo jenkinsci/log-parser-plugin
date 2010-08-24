@@ -4,10 +4,10 @@ import java.util.HashMap;
 
 public class LogParserDisplayConsts {
 	
-	final private HashMap colorTable 			= new HashMap();
-	final private HashMap iconTable 			= new HashMap();
-	final private HashMap linkListDisplay 		= new HashMap();
-	final private HashMap linkListDisplayPlural = new HashMap();
+	final private HashMap<String,String> colorTable 			= new HashMap<String,String>();
+	final private HashMap<String,String> iconTable 				= new HashMap<String,String>();
+	final private HashMap<String,String> linkListDisplay 		= new HashMap<String,String>();
+	final private HashMap<String,String> linkListDisplayPlural 	= new HashMap<String,String>();
 
 	public LogParserDisplayConsts() {
 		// Color of each status
@@ -31,19 +31,19 @@ public class LogParserDisplayConsts {
 		linkListDisplayPlural.put(LogParserConsts.INFO, "Infos");
 	}
 
-	public HashMap getColorTable() {
+	public HashMap<String,String> getColorTable() {
 		return colorTable;
 	}
 
-	public HashMap getIconTable() {
+	public HashMap<String,String> getIconTable() {
 		return iconTable;
 	}
 
-	public HashMap getLinkListDisplay() {
+	public HashMap<String,String> getLinkListDisplay() {
 		return linkListDisplay;
 	}
 
-	public HashMap getLinkListDisplayPlural() {
+	public HashMap<String,String> getLinkListDisplayPlural() {
 		return linkListDisplayPlural;
 	}
 

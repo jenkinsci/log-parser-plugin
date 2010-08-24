@@ -18,8 +18,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -27,7 +28,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
     
 	public final boolean failBuildOnError;
     public final String parsingRulesPath;
-  
+
     @DataBoundConstructor
     public LogParserPublisher(final boolean failBuildOnError, final String parsingRulesPath) {
     	this.failBuildOnError = failBuildOnError;
@@ -39,19 +40,18 @@ public class LogParserPublisher extends Recorder implements Serializable {
     }
     
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
+    	final Logger logger = Logger.getLogger(getClass().getName());
+    	LogParserResult result = new LogParserResult();
     	try {
-    		final PrintStream logger = listener.getLogger();
+    		
     		final File logParsingRulesFile = new File(this.parsingRulesPath);
     		if (logParsingRulesFile.isFile()) { 
-    		
+    			
 	        	// Create a parser with the parsing rules as configured : colors, regular expressions, etc.
-	        	final LogParserParser parser = new LogParserParser(this.parsingRulesPath);
+	        	final LogParserParser parser = new LogParserParser(this.parsingRulesPath,launcher.getChannel());
 	        	// Parse the build's log according to these rules and get the result 
-	    		final LogParserResult result = parser.parseLog(build);
+	    		result = parser.parseLog(build);
 	        
-	    		// Add an action created with the above results
-	    		final LogParserAction action = new LogParserAction(build,result);
-	    		build.getActions().add(action);
 	    		
 	    		// Mark build as failed if necessary
 	    		if (this.failBuildOnError && result.getTotalErrors() > 0) {
@@ -59,15 +59,26 @@ public class LogParserPublisher extends Recorder implements Serializable {
 	    		}
     		} else {
     			// Parsing rules file cannot be found
-    			logger.println(LogParserConsts.CANNOT_PARSE+": Can't read parsing rules file:"+this.parsingRulesPath);
+    			// Write message to Hudson log and parsing result
+    			final String errorMsg = LogParserConsts.CANNOT_PARSE+": Can't read parsing rules file:"+this.parsingRulesPath;
+    			logger.log(Level.SEVERE,errorMsg);
+    			result.setFailedToParseError(errorMsg);
+
     		}
 
     		
     	} catch (Exception e) {
-    		// failure to parse should not fail the build
     		e.printStackTrace();
+    		// failure to parse should not fail the build - but should be handled as a serious error
+			final String errorMsg = e.getMessage();
+			logger.log(Level.SEVERE,errorMsg);
+			result.setFailedToParseError(errorMsg);
     	}
-        
+
+		// Add an action created with the above results
+		final LogParserAction action = new LogParserAction(build,result);
+		build.getActions().add(0, action);
+		
         return true;
     }
 

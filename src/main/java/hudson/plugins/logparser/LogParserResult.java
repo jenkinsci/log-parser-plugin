@@ -17,6 +17,28 @@ public class LogParserResult  {
 	private String parsedLogURL;
 	private String htmlLogPath;
 	
+	private String failedToParseError;
+	private String badParsingRulesError;
+
+	public String getBadParsingRulesError() {
+		return badParsingRulesError;
+	}
+
+	public String getBadParsingRulesErrorDisplay() {
+		return badParsingRulesError.replaceAll("\n", "<br/>");
+	}
+
+	public void setBadParsingRulesError(final String badParsingRulesError) {
+		this.badParsingRulesError = badParsingRulesError;
+	}
+
+	public String getFailedToParseError() {
+		return failedToParseError;
+	}
+
+	public void setFailedToParseError(final String failedToParseError) {
+		this.failedToParseError = failedToParseError;
+	}
 
 	public int getTotalErrors() {
 		return totalErrors;

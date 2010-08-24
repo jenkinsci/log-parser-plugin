@@ -1,18 +1,43 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+         
+<j:set var="parseSucceeded" value="${it.result.failedToParseError == null}"/>
+<j:set var="parseFailed" value="${it.result.failedToParseError != null}"/>
+<j:set var="badParseRules" value="${it.result.badParsingRulesError != null}"/>
+
+         
     <l:layout>
         <st:include it="${it.owner}" page="sidepanel.jelly" />
         <l:main-panel>
+
+			<j:if test="${parseSucceeded}">
+
 			<table width='100%'>
-			<tr>
-			<td width='100%'>
-					<h2>Parsed Console Output</h2>
-					<link type="text/css" rel="stylesheet" href="/hudson/css/style.css"></link>
-					<link type="text/css" rel="stylesheet" href="/hudson/css/color.css"></link>
- 			  		<iframe src="${it.result.parsedLogURL}" width="100%" height="600" scrolling="auto" frameborder="0" />
-			</td>
-			</tr>
+				<tr>
+					<td width='100%'>
+						<h2>Parsed Console Output</h2>
+						<link type="text/css" rel="stylesheet" href="/hudson/css/style.css"></link>
+						<link type="text/css" rel="stylesheet" href="/hudson/css/color.css"></link>
+ 			  			<iframe src="${it.result.parsedLogURL}" width="100%" height="600" scrolling="auto" frameborder="0" />
+					</td>
+				</tr>
 			</table>
+			
+			</j:if>
+
+			<j:if test="${badParseRules}">
+			<font color="red">NOTE:</font> Some bad parsing rules have been found:<br/>
+			${it.result.badParsingRulesErrorDisplay}<br/>
+			</j:if>
+
+			<j:if test="${parseFailed}">
+				<font color="red">ERROR:</font>Failed to parse console log :<br/>
+				${it.result.failedToParseError}
+			</j:if>
+
        </l:main-panel>
     </l:layout>
+    
+    
+    
 </j:jelly>

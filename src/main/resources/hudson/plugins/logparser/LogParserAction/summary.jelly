@@ -1,7 +1,17 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler"
          xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
          xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-    <t:summary icon="graph.gif">
-        ${it.result.totalErrors} errors, ${it.result.totalWarnings} warnings
-    </t:summary>
+
+<j:set var="parseSucceeded" value="${it.result.failedToParseError == null}"/>
+<j:set var="parseFailed" value="${it.result.failedToParseError != null}"/>
+
+			    <t:summary icon="graph.gif">
+				<j:if test="${parseSucceeded}">
+    	    			${it.result.totalErrors} errors, ${it.result.totalWarnings} warnings
+				</j:if>
+				<j:if test="${parseFailed}">
+    	    			Log parsing has failed 
+				</j:if>
+    			</t:summary>
+
 </j:jelly>

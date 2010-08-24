@@ -10,8 +10,10 @@
   
   <artifactId>log-parser</artifactId>
   <packaging>hpi</packaging>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.6</version>
   <name>Log Parser Plugin</name>
+ 
+ 
 
  <reporting>
  <plugins>
@@ -48,4 +50,12 @@
       <email>rgoren@cisco.com</email>
     </developer>
   </developers>
+ 
+  
+
+  <scm>
+    <connection>scm:svn:https://guest@svn.dev.java.net/svn/hudson/tags/log-parser-1.0.6</connection>
+    <developerConnection>scm:svn:https://svn.dev.java.net/svn/hudson/tags/log-parser-1.0.6</developerConnection>
+    <url>https://hudson.dev.java.net/source/browse/hudson/tags/log-parser-1.0.6</url>
+  </scm>
 </project>

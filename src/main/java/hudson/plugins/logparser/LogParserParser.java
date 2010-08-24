@@ -1,29 +1,43 @@
 package hudson.plugins.logparser;
 
 
+import hudson.FilePath;
 import hudson.model.AbstractBuild;
+import hudson.remoting.VirtualChannel;
+
 import java.io.*;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.*;
-import java.util.ArrayList;   
+import java.util.ArrayList; 
 
 public class LogParserParser  {
 
-	final private HashMap statusCount 	= new HashMap();
-	final private HashMap writers 		= new HashMap();
-	final private HashMap linkFiles 		= new HashMap();
+	final private HashMap<String,Integer> 			statusCount	= new HashMap<String,Integer>();
+	final private HashMap<String,BufferedWriter> 	writers 	= new HashMap<String,BufferedWriter>();
+	final private HashMap<String,String> 			linkFiles 	= new HashMap<String,String>();
 
     final private String[] parsingRulesArray;
     final private Pattern[] compiledPatterns;
+    final private CompiledPatterns  compiledPatternsPlusError;
     
     // if key is 3-ERROR it shows how many errors are in section 3
-	final private HashMap statusCountPerSection = new HashMap(); 
-	final private ArrayList headerForSection 		= new ArrayList();
+	final private HashMap<String,Integer> statusCountPerSection = new HashMap<String,Integer>(); 
+	final private ArrayList<String> headerForSection 		= new ArrayList<String>();
 	private int sectionCounter = 0;
-	
+
 	final private LogParserDisplayConsts displayConstants = new LogParserDisplayConsts();
+
+	final private VirtualChannel channel;
+
 	
-	public LogParserParser(final String parsingRulesPath) throws FileNotFoundException , IOException {
+	public LogParserParser(final String parsingRulesPath, final VirtualChannel channel) throws FileNotFoundException , IOException {
+		
+		// init logger
+		final Logger logger = Logger.getLogger(getClass().getName());
 		
 		// Count of lines in this status
 		statusCount.put(LogParserConsts.ERROR, 0);
@@ -33,8 +47,10 @@ public class LogParserParser  {
 		this.parsingRulesArray = LogParserUtils.readParsingRules(parsingRulesPath);
 		
 		// This causes each regular expression to be compiled once for better performance
-		this.compiledPatterns = LogParserUtils.compilePatterns(this.parsingRulesArray);
+		this.compiledPatternsPlusError = LogParserUtils.compilePatterns(this.parsingRulesArray,logger);
+		this.compiledPatterns = this.compiledPatternsPlusError.getCompiledPatterns() ;
 		
+		this.channel = channel;
 	} 
 	
 	
@@ -43,13 +59,17 @@ public class LogParserParser  {
 	 * It also creates the lists of links to these errors/warnings/info messages respectively : 
 	 * errorLinks.html, warningLinks.html, infoLinks.html 
 	 */
-    public LogParserResult parseLog(final AbstractBuild build) throws FileNotFoundException , IOException {
+    public LogParserResult parseLog(final AbstractBuild build) throws FileNotFoundException , IOException, InterruptedException {
         
 	
+		// init logger
+		final Logger logger = Logger.getLogger(getClass().getName());
+
 		// Get console log file
     	final File logFile = build.getLogFile();
         final String logDirectory = logFile.getParent();
-        final String filePath = logFile.getAbsolutePath();
+        final String logFileLocation = logFile.getAbsolutePath();
+        final FilePath filePath = new FilePath(new File(logFileLocation));
         
 		// Determine parsed log files
         final String parsedFilePath 		 = logDirectory+"/log_content.html"; 	
@@ -65,7 +85,6 @@ public class LogParserParser  {
         linkFiles.put(LogParserConsts.INFO, infoLinksFilePath);
         
         // Open console log for reading and all other files for writing
-        final BufferedReader reader = new BufferedReader(new FileReader(filePath));
         final BufferedWriter writer = new BufferedWriter(new FileWriter(parsedFilePath));
 
         // Record writers to links files in hash
@@ -82,20 +101,17 @@ public class LogParserParser  {
 		final String shortLink = " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
 		LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers,sectionCounter); // This enters a line which will later be replaced by the actual header and count for this header
 		headerForSection.add(shortLink);
-
 		writer.write(LogParserConsts.htmlOpen);
-        String line = null;
-        while ((line=reader.readLine()) != null) {
-        	final String status = getLineStatus(line);
-        	final String parsedLine = parseLine(line,status);
-        	// This is for displaying sections in the links part
-        	writer.write(parsedLine);
-            writer.newLine();   // Write system dependent end of line.
-        }
-		writer.write(LogParserConsts.htmlClose);
         
-        //... Close reader and writer.
-        reader.close();  // Close to unlock.
+		// Read bulks of lines , parse 
+  	  	final int linesInLog = LogParserUtils.countLines(logFileLocation);
+		parseLogBody(build,writer,filePath,logFileLocation,linesInLog,logger);
+    	
+		//Write parsed output, links, etc.
+		//writeLogBody();
+		
+		// Close html footer
+		writer.write(LogParserConsts.htmlClose);
         writer.close();  // Close to unlock and flush to disk.
 
         ((BufferedWriter)writers.get(LogParserConsts.ERROR)).close();
@@ -132,31 +148,14 @@ public class LogParserParser  {
         result.setInfoLinksFile(infoLinksFilePath);
         result.setParsedLogURL(parsedLogURL);
         result.setHtmlLogPath(logDirectory);
+        result.setBadParsingRulesError(this.compiledPatternsPlusError.getError());
+        
         return result;
         
     }
 
+  
     
-
-    
-    
-
-    
-    
-    public String getLineStatus(final String line) {
-    	
-    	for (int i=0;i<this.parsingRulesArray.length;i++){
-    		final String parsingRule = this.parsingRulesArray[i];
-    		if (!LogParserUtils.skipParsingRule(parsingRule) && 
-    			this.compiledPatterns[i] != null && 
-    			this.compiledPatterns[i].matcher(line).find()) { 
-	 	    		 final String status = parsingRule.split("\\s")[0]; 
-	    			 return LogParserUtils.standardizeStatus(status);
-    		}
-    	}
-
-    	return LogParserConsts.NONE;
-    }
 
     
 	public String parseLine(final String line) throws IOException {
@@ -166,7 +165,9 @@ public class LogParserParser  {
 	public String parseLine(final String line, final String status) throws IOException {
 		String parsedLine = line;
 		String effectiveStatus = status;
-		if (status.equals(LogParserConsts.START)) {
+		if (status == null) {
+			effectiveStatus = LogParserConsts.NONE;
+		} else if (status.equals(LogParserConsts.START)) {
 			effectiveStatus = LogParserConsts.INFO;
 		}
 		parsedLine = parsedLine.replaceAll("<", "&lt;"); // Allows < to be seen in log which is html
@@ -174,7 +175,7 @@ public class LogParserParser  {
 		if (effectiveStatus != null && !effectiveStatus.equals(LogParserConsts.NONE)) {
 			// Increment count of the status 
 			incrementCounter(effectiveStatus);
-			incrementCounterPerSection(status,sectionCounter);
+			incrementCounterPerSection(effectiveStatus,sectionCounter);
 			// Color line according to the status
 			final String parsedLineColored = colorLine(parsedLine,effectiveStatus);
 			
@@ -253,6 +254,45 @@ public class LogParserParser  {
 		return markedLine.toString();
 	}
 	
+
+
+
+	private void parseLogBody(final AbstractBuild build,final BufferedWriter writer,final FilePath filePath, final String logFileLocation, final int linesInLog, final Logger logger) throws IOException, InterruptedException {
+        // Logging information - start
+        final String signature = build.getParent().getName() + "_build_"+build.getNumber();
+    	logger.log(Level.INFO,"LogParserParser: Start parsing : "+signature);
+        final Calendar calendarStart = Calendar.getInstance();
+    	final Date startTime = new Date();
+    	calendarStart.setTime(startTime);
+
+    	final LogParserStatusComputer computer = new LogParserStatusComputer(channel, filePath, parsingRulesArray, compiledPatterns,linesInLog,signature);
+        final HashMap<String,String> lineStatusMatches = computer.getComputedStatusMatches(); 
+        
+       	// Read log file from start - line by line and apply the statuses as found by the threads.
+       	final BufferedReader reader2 = new BufferedReader(new FileReader(logFileLocation));
+       	String line;
+       	String status;
+       	int line_num = 0;
+       	while ((line=reader2.readLine()) != null) {        	
+        	status = (String)lineStatusMatches.get(String.valueOf(line_num));
+        	final String parsedLine = parseLine(line,status);
+        	// This is for displaying sections in the links part
+        	writer.write(parsedLine);
+            writer.newLine();   // Write system dependent end of line.      		
+       		line_num++;
+       	}
+
+
+        // Logging information - end
+        final Calendar calendarEnd = Calendar.getInstance();
+    	final Date endTime = new Date();
+    	calendarEnd.setTime(endTime);
+    	final long diffSeconds = (calendarEnd.getTimeInMillis()-calendarStart.getTimeInMillis()) / 1000;
+    	final long diffMinutes = diffSeconds / 60 ;
+    	logger.log(Level.INFO,"LogParserParser: Parsing took "+diffMinutes+" minutes ("+diffSeconds+") seconds.");
+
+	}
+
 
 
 }
