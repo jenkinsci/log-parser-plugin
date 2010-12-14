@@ -64,7 +64,7 @@ public final class LogParserWriter {
 
     	
     	final BufferedWriter writer = new BufferedWriter(new FileWriter(buildRefPath));
-    	writer.write(LogParserConsts.htmlOpen); // Hudson stylesheets
+    	writer.write(LogParserConsts.getHtmlOpeningTags()); // Hudson stylesheets
     	writer.write(refStart); // toggle links javascript
     	// Write Errors
     	writeLinks(writer,LogParserConsts.ERROR, headerForSection, statusCountPerSection, iconTable, linkListDisplay, linkListDisplayPlural, statusCount, linkFiles);
@@ -72,7 +72,7 @@ public final class LogParserWriter {
     	writeLinks(writer,LogParserConsts.WARNING,  headerForSection, statusCountPerSection, iconTable, linkListDisplay, linkListDisplayPlural, statusCount, linkFiles);
     	// Write Info
     	writeLinks(writer,LogParserConsts.INFO, headerForSection, statusCountPerSection, iconTable, linkListDisplay, linkListDisplayPlural, statusCount, linkFiles);
-    	writer.write(LogParserConsts.htmlClose);
+    	writer.write(LogParserConsts.getHtmlClosingTags());
     	writer.close();  // Close to unlock and flush to disk.
  
     }

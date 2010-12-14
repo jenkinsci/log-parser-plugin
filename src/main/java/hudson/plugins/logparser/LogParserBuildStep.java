@@ -9,6 +9,8 @@ import hudson.model.Action;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepMonitor;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 public class LogParserBuildStep implements BuildStep  {
 
@@ -30,5 +32,9 @@ public class LogParserBuildStep implements BuildStep  {
 	public Action getProjectAction(final AbstractProject<?, ?> project) {
 		return null;
 	}
+
+    public Collection<? extends Action> getProjectActions(AbstractProject<?, ?> project) {
+        return Collections.emptyList();
+    }
 }
 

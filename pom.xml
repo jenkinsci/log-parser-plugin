@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.340</version>
+    <version>1.349</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
@@ -45,9 +45,8 @@
    <url>http://wiki.hudson-ci.org/display/HUDSON/Log+Parser+Plugin</url>
    <developers>
     <developer>
-      <id>rgoren</id>
-      <name>Rinat Ailon</name>
-      <email>rgoren@cisco.com</email>
+      <id>jborghi</id>
+      <name>John Borghi</name>
     </developer>
   </developers>
 </project>

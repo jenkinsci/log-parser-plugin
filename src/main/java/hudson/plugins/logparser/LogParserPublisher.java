@@ -25,14 +25,15 @@ import java.util.logging.Logger;
 
 
 public class LogParserPublisher extends Recorder implements Serializable {
-    
+    public final boolean unstableOnWarning;
 	public final boolean failBuildOnError;
     public final String parsingRulesPath;
 
     @DataBoundConstructor
-    public LogParserPublisher(final boolean failBuildOnError, final String parsingRulesPath) {
-    	this.failBuildOnError = failBuildOnError;
-    	this.parsingRulesPath =  parsingRulesPath;
+    public LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError, final String parsingRulesPath) {
+        this.unstableOnWarning = unstableOnWarning;
+        this.failBuildOnError = failBuildOnError;
+        this.parsingRulesPath =  parsingRulesPath;
    }
 
     public boolean prebuild(final AbstractBuild<?,?> build, final BuildListener listener) {
@@ -53,9 +54,11 @@ public class LogParserPublisher extends Recorder implements Serializable {
 	    		result = parser.parseLog(build);
 	        
 	    		
-	    		// Mark build as failed if necessary
+	    		// Mark build as failed/unstable if necessary
 	    		if (this.failBuildOnError && result.getTotalErrors() > 0) {
-	    			build.setResult(Result.FAILURE);
+	    		    build.setResult(Result.FAILURE);
+	    		} else if (this.unstableOnWarning && result.getTotalWarnings() > 0) {
+	    		    build.setResult(Result.UNSTABLE);
 	    		}
     		} else {
     			// Parsing rules file cannot be found

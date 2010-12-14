@@ -16,8 +16,6 @@
 				<tr>
 					<td width='100%'>
 						<h2>Parsed Console Output</h2>
-						<link type="text/css" rel="stylesheet" href="/hudson/css/style.css"></link>
-						<link type="text/css" rel="stylesheet" href="/hudson/css/color.css"></link>
  			  			<iframe src="${it.result.parsedLogURL}" width="100%" height="600" scrolling="auto" frameborder="0" />
 					</td>
 				</tr>

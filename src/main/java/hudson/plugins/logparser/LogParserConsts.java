@@ -1,5 +1,7 @@
 package hudson.plugins.logparser;
 
+import hudson.model.Hudson;
+
 import java.util.Arrays;   
 import java.util.List;   
 
@@ -20,17 +22,22 @@ public class LogParserConsts  {
 	public static final List<String> STATUSES_WITH_LINK_FILES = Arrays.asList(ERROR, WARNING, INFO);
 	public static final List<String> STATUSES_WITH_SECTIONS_IN_LINK_FILES = Arrays.asList(ERROR, WARNING);
 
-	// Used for getting Hudson stylesheets for uniformity of look and feel .
-	public static final String htmlOpen = 	"<html>\n"+
-								"\t<head>\n"+
-								"\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"/hudson/css/style.css\"></link>\n"+
-								"\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"/hudson/css/color.css\"></link>\n"+
-								"\t</head>\n"+
-								"\t<body>\n";
+	public static String getHtmlOpeningTags () {
+	    final String hudsonRoot = Hudson.getInstance().getRootUrl();
+	    return 
+	    "<html>\n" +
+	    "\t<head>\n" +
+	    "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"" + hudsonRoot + "css/style.css\"></link>\n" +
+	    "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"" + hudsonRoot + "css/color.css\"></link>\n" +
+	    "\t</head>\n" +
+	    "\t<body>\n";
+	}
 
-	public static final String htmlClose = "\t</body>\n"+
-								"</html>\n";
-
+	public static final String getHtmlClosingTags() {
+	    return
+	    "\t</body>\n" +
+	    "</html>\n";
+	}
 
 	// Parsing in threads for perofrmance
 	public static final int LINES_PER_THREAD = 10000; // How many lines to parse in each thread

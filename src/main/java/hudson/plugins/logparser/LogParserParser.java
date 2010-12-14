@@ -2,17 +2,23 @@ package hudson.plugins.logparser;
 
 
 import hudson.FilePath;
+import hudson.console.ConsoleNote;
 import hudson.model.AbstractBuild;
 import hudson.remoting.VirtualChannel;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.*;
-import java.util.ArrayList; 
+import java.util.regex.Pattern;
 
 public class LogParserParser  {
 
@@ -101,7 +107,7 @@ public class LogParserParser  {
 		final String shortLink = " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
 		LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers,sectionCounter); // This enters a line which will later be replaced by the actual header and count for this header
 		headerForSection.add(shortLink);
-		writer.write(LogParserConsts.htmlOpen);
+		writer.write(LogParserConsts.getHtmlOpeningTags());
         
 		// Read bulks of lines , parse 
   	  	final int linesInLog = LogParserUtils.countLines(logFileLocation);
@@ -111,7 +117,7 @@ public class LogParserParser  {
 		//writeLogBody();
 		
 		// Close html footer
-		writer.write(LogParserConsts.htmlClose);
+		writer.write(LogParserConsts.getHtmlClosingTags());
         writer.close();  // Close to unlock and flush to disk.
 
         ((BufferedWriter)writers.get(LogParserConsts.ERROR)).close();
@@ -170,6 +176,9 @@ public class LogParserParser  {
 		} else if (status.equals(LogParserConsts.START)) {
 			effectiveStatus = LogParserConsts.INFO;
 		}
+		
+		// need to strip out for display also (in addition to parsing).
+		parsedLine = ConsoleNote.removeNotes(parsedLine);
 		parsedLine = parsedLine.replaceAll("<", "&lt;"); // Allows < to be seen in log which is html
 		parsedLine = parsedLine.replaceAll(">", "&gt;"); // Allows > to be seen in log which is html
 		if (effectiveStatus != null && !effectiveStatus.equals(LogParserConsts.NONE)) {
@@ -262,8 +271,6 @@ public class LogParserParser  {
         final String signature = build.getParent().getName() + "_build_"+build.getNumber();
     	logger.log(Level.INFO,"LogParserParser: Start parsing : "+signature);
         final Calendar calendarStart = Calendar.getInstance();
-    	final Date startTime = new Date();
-    	calendarStart.setTime(startTime);
 
     	final LogParserStatusComputer computer = new LogParserStatusComputer(channel, filePath, parsingRulesArray, compiledPatterns,linesInLog,signature);
         final HashMap<String,String> lineStatusMatches = computer.getComputedStatusMatches(); 
@@ -273,7 +280,7 @@ public class LogParserParser  {
        	String line;
        	String status;
        	int line_num = 0;
-       	while ((line=reader2.readLine()) != null) {        	
+        while ((line=reader2.readLine()) != null) {         
         	status = (String)lineStatusMatches.get(String.valueOf(line_num));
         	final String parsedLine = parseLine(line,status);
         	// This is for displaying sections in the links part
@@ -285,8 +292,6 @@ public class LogParserParser  {
 
         // Logging information - end
         final Calendar calendarEnd = Calendar.getInstance();
-    	final Date endTime = new Date();
-    	calendarEnd.setTime(endTime);
     	final long diffSeconds = (calendarEnd.getTimeInMillis()-calendarStart.getTimeInMillis()) / 1000;
     	final long diffMinutes = diffSeconds / 60 ;
     	logger.log(Level.INFO,"LogParserParser: Parsing took "+diffMinutes+" minutes ("+diffSeconds+") seconds.");
