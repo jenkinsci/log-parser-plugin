@@ -10,7 +10,7 @@
   
   <artifactId>log-parser</artifactId>
   <packaging>hpi</packaging>
-  <version>1.0.8</version>
+  <version>1.0.9-SNAPSHOT</version>
   <name>Log Parser Plugin</name>
  
  
@@ -69,8 +69,8 @@
 
     <!-- see http://groups.google.com/group/hudson-dev/browse_thread/thread/83e34c639eec470a for the rationale behind this -->
     <scm>
-        <connection>scm:svn:https://guest@svn.java.net/svn/hudson~svn/tags/log-parser-1.0.8</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/hudson~svn/tags/log-parser-1.0.8</developerConnection>
-      <url>https://hudson.dev.java.net/source/browse/hudson/tags/log-parser-1.0.8</url>
+        <connection>scm:svn:https://guest@svn.java.net/svn/hudson~svn/trunk/hudson/plugins/log-parser</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/hudson~svn/trunk/hudson/plugins/log-parser</developerConnection>
+      <url>https://hudson.dev.java.net/source/browse/hudson/trunk/hudson/plugins/log-parser</url>
   </scm>
 </project>
