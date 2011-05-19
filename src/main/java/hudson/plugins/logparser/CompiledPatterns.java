@@ -15,10 +15,10 @@ public class CompiledPatterns {
   }
 
   public void setError(final String errorMsg) {
-	  if (errorMsg != null && errorMsg.isEmpty()) {
+	  if (errorMsg == null || errorMsg.trim().length() == 0) {
 		  this.errorMsg = null;
 	  } else {
-		  this.errorMsg = errorMsg;
+		  this.errorMsg = errorMsg.trim();
 	  }
   }
 
