@@ -45,14 +45,16 @@
    <url>http://wiki.hudson-ci.org/display/HUDSON/Log+Parser+Plugin</url>
    <developers>
     <developer>
+      <id>jborghi</id>
+      <name>John Borghi</name>
+      <email>jborghi@java.net</email>
+    </developer>
+    <developer>
       <id>rgoren</id>
       <name>Rinat Ailon</name>
       <email>rgoren@cisco.com</email>
     </developer>
-    <developer>
-      <id>jborghi</id>
-      <name>John Borghi</name>
-    </developer>
+
   </developers>
 
     <!-- see http://groups.google.com/group/hudson-dev/browse_thread/thread/83e34c639eec470a for the rationale behind this -->

@@ -15,7 +15,7 @@ public class LogParserConsts  {
 	public static final String DEFAULT 	= NONE; 
 
 	// Error messages
-	public static final String CANNOT_PARSE 	= "log-parser plugin ERROR: Cannot parse log"; 
+	public static final String CANNOT_PARSE 	= "log-parser plugin ERROR: Cannot parse log "; 
 	public static final String NOT_INT			= " is not an integer - using default";
 	
 	public static final List<String> LEGAL_STATUS = Arrays.asList(ERROR, WARNING, INFO, NONE, START);   

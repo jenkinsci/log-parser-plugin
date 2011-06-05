@@ -29,8 +29,8 @@
 			</j:if>
 
 			<j:if test="${parseFailed}">
-				<font color="red">ERROR:</font>Failed to parse console log :<br/>
-				${it.result.failedToParseError}
+				<font color="red">ERROR:</font> Failed to parse console log
+				<p>${it.result.failedToParseError}</p>
 			</j:if>
 
        </l:main-panel>

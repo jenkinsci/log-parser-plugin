@@ -1,7 +1,6 @@
 package hudson.plugins.logparser;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -14,7 +13,7 @@ import java.util.regex.Pattern;
 public final class LogParserUtils {
 
 
-	public static String[] readParsingRules(final String parsingRulesPath) throws FileNotFoundException , IOException {
+	public static String[] readParsingRules(final String parsingRulesPath) throws IOException {
 		final StringBuffer result = new StringBuffer("");
 		final BufferedReader reader = new BufferedReader(new FileReader(parsingRulesPath));
         String line = null;

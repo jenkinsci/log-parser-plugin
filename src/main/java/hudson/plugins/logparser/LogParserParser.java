@@ -9,7 +9,6 @@ import hudson.remoting.VirtualChannel;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,7 +39,7 @@ public class LogParserParser  {
 	final private VirtualChannel channel;
 
 	
-	public LogParserParser(final String parsingRulesPath, final VirtualChannel channel) throws FileNotFoundException , IOException {
+	public LogParserParser(final String parsingRulesPath, final VirtualChannel channel) throws IOException {
 		
 		// init logger
 		final Logger logger = Logger.getLogger(getClass().getName());
@@ -65,7 +64,7 @@ public class LogParserParser  {
 	 * It also creates the lists of links to these errors/warnings/info messages respectively : 
 	 * errorLinks.html, warningLinks.html, infoLinks.html 
 	 */
-    public LogParserResult parseLog(final AbstractBuild build) throws FileNotFoundException , IOException, InterruptedException {
+    public LogParserResult parseLog(final AbstractBuild build) throws IOException, InterruptedException {
         
 	
 		// init logger

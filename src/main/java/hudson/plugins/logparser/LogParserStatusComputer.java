@@ -6,7 +6,6 @@ import hudson.remoting.VirtualChannel;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -32,34 +31,29 @@ public class LogParserStatusComputer implements Serializable {
     	this.compiledPatterns = compiledPatterns;
     	this.computedStatusMatches = computeStatusMatches(filePath,linesInLog,channel,signature);
     }
-    
+
 	private HashMap<String,String> computeStatusMatches(final FilePath filePath,final int linesInLog, final VirtualChannel channel,final String signature) throws IOException, InterruptedException {
 		HashMap<String,String> result = null;
-		
-		try {
-				result = channel.call(new Callable<HashMap<String,String>,RuntimeException>(){
-			    public HashMap<String,String> call() {
-			    	HashMap<String,String> result = null;
-			    	try {
-			    		result = computeStatusMatches(filePath,linesInLog,signature);
-			    	}catch (Exception e) {
-			    		e.printStackTrace();
-			    	}
-			    	return result;
-			    }
-			});
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
+
+		result = channel.call(new Callable<HashMap<String,String>,RuntimeException>(){
+			public HashMap<String,String> call() {
+				HashMap<String,String> result = null;
+				try {
+					result = computeStatusMatches(filePath,linesInLog,signature);
+
+				// rethrow any exception here to report why the parsing failed
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+				return result;
+			}
+		});
 		return result;
 	}
-	
-	private HashMap<String,String> computeStatusMatches(final FilePath filePath, final int linesInLog, final String signature) throws FileNotFoundException, IOException, InterruptedException {
+
+	private HashMap<String,String> computeStatusMatches(final FilePath filePath, final int linesInLog, final String signature) throws IOException, InterruptedException {
     	// SLAVE PART START
 
 		final Logger logger = Logger.getLogger(this.getClass().getName());
