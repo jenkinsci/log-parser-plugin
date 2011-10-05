@@ -2,10 +2,8 @@ package hudson.plugins.logparser;
 
 
 import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.Result;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.model.*;
+import hudson.plugins.logparser.action.LogParserProjectAction;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -38,7 +36,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
     public boolean prebuild(final AbstractBuild<?,?> build, final BuildListener listener) {
     	return true;
     }
-    
+
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
     	final Logger logger = Logger.getLogger(getClass().getName());
     	LogParserResult result = new LogParserResult();
@@ -128,6 +126,12 @@ public class LogParserPublisher extends Recorder implements Serializable {
 		// Get the descriptor which holds the global configurations and extract the available parsing rules from there 
 		return ((DescriptorImpl)this.getDescriptor()).getParsingRulesGlobal();
 	}
+
+    @Override
+    public Action getProjectAction(AbstractProject<?, ?> project) {
+
+            return new LogParserProjectAction(project);
+    }
 	
 }
 
