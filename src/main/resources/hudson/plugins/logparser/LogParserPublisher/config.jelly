@@ -6,6 +6,10 @@
         <f:entry title="Mark build Failed on Error" help="/plugin/log-parser/fail_on_error.html">
     		<f:checkbox name="log-parser.failBuildOnError" checked="${instance.failBuildOnError}"/>
     	</f:entry>
+    	<f:entry title="Show log parser graphs" help="/plugin/log-parser/parser_graphs.html">
+    		<f:checkbox name="log-parser.showGraphs" checked="${instance.showGraphs}"/>
+    	</f:entry>
+
     	
    		<f:entry title="Select Parsing Rules" field="currentRulePath" help="/plugin/log-parser/parse_rule_choice.html">
         	<select name="log-parser.parsingRulesPath">
