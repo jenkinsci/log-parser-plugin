@@ -2,10 +2,8 @@ package hudson.plugins.logparser;
 
 
 import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.Result;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.model.*;
+import hudson.plugins.logparser.action.LogParserProjectAction;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -25,51 +23,54 @@ import org.kohsuke.stapler.StaplerRequest;
 
 public class LogParserPublisher extends Recorder implements Serializable {
     public final boolean unstableOnWarning;
-	public final boolean failBuildOnError;
+    public final boolean failBuildOnError;
+    public final boolean showGraphs;
     public final String parsingRulesPath;
 
     @DataBoundConstructor
-    public LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError, final String parsingRulesPath) {
+    public LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError, final boolean showGraphs,
+                              final String parsingRulesPath) {
         this.unstableOnWarning = unstableOnWarning;
         this.failBuildOnError = failBuildOnError;
+        this.showGraphs = showGraphs;
         this.parsingRulesPath =  parsingRulesPath;
-   }
+    }
 
     public boolean prebuild(final AbstractBuild<?,?> build, final BuildListener listener) {
-    	return true;
+        return true;
     }
-    
+
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
-    	final Logger logger = Logger.getLogger(getClass().getName());
-    	LogParserResult result = new LogParserResult();
-    	try {
-    		// Create a parser with the parsing rules as configured : colors, regular expressions, etc.
-    		final LogParserParser parser = new LogParserParser(this.parsingRulesPath,launcher.getChannel());
-    		// Parse the build's log according to these rules and get the result 
-    		result = parser.parseLog(build);
+        final Logger logger = Logger.getLogger(getClass().getName());
+        LogParserResult result = new LogParserResult();
+        try {
+            // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
+            final LogParserParser parser = new LogParserParser(this.parsingRulesPath,launcher.getChannel());
+            // Parse the build's log according to these rules and get the result
+            result = parser.parseLog(build);
 
-    		// Mark build as failed/unstable if necessary
-    		if (this.failBuildOnError && result.getTotalErrors() > 0) {
-    			build.setResult(Result.FAILURE);
-    		} else if (this.unstableOnWarning && result.getTotalWarnings() > 0) {
-    			build.setResult(Result.UNSTABLE);
-    		}
+            // Mark build as failed/unstable if necessary
+            if (this.failBuildOnError && result.getTotalErrors() > 0) {
+                build.setResult(Result.FAILURE);
+            } else if (this.unstableOnWarning && result.getTotalWarnings() > 0) {
+                build.setResult(Result.UNSTABLE);
+            }
 
-    	} catch (IOException e) {
-    		// failure to parse should not fail the build - but should be handled as a serious error
-    		// this should catch all process problems during parsing, including parser file not found.
-			logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
-			result.setFailedToParseError(e.toString());
-    	} catch (InterruptedException e) {
-    		logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
-    		result.setFailedToParseError(e.toString());
-    		build.setResult(Result.ABORTED);
-    	}
+        } catch (IOException e) {
+            // failure to parse should not fail the build - but should be handled as a serious error
+            // this should catch all process problems during parsing, including parser file not found.
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
+            result.setFailedToParseError(e.toString());
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
+            result.setFailedToParseError(e.toString());
+            build.setResult(Result.ABORTED);
+        }
 
-    	// Add an action created with the above results
-		final LogParserAction action = new LogParserAction(build,result);
-		build.getActions().add(0, action);
-		
+        // Add an action created with the above results
+        final LogParserAction action = new LogParserAction(build,result);
+        build.getActions().add(0, action);
+
         return true;
     }
 
@@ -77,16 +78,16 @@ public class LogParserPublisher extends Recorder implements Serializable {
         return DescriptorImpl.DESCRIPTOR;
     }
 
-    
+
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
         private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
 
         private DescriptorImpl() {
             super(LogParserPublisher.class);
-			load();
-      }
-        
+            load();
+        }
+
         public String getDisplayName() {
             return "Console output (build log) parsing";
         }
@@ -98,36 +99,45 @@ public class LogParserPublisher extends Recorder implements Serializable {
         public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
             return true;
         }
-        
+
         public  ParserRuleFile[] getParsingRulesGlobal() {
-        	return parsingRulesGlobal;
+            return parsingRulesGlobal;
         }
 
-		@Override
-		public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-			parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class, "log-parser.")
-				.toArray(new ParserRuleFile[0]);
-			save();			
-	        return true;
-		}
+        @Override
+        public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
+            parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class, "log-parser.")
+                    .toArray(new ParserRuleFile[0]);
+            save();
+            return true;
+        }
 
     }
 
     private static final long serialVersionUID = 1L;
 
-	public BuildStepMonitor getRequiredMonitorService() {
-		return BuildStepMonitor.NONE ;
-	}
-	
-	/*
-	 * This is read by the config.jelly : ${instance.parserRuleChoices}
-	 * and displays the available choices of parsing rules which were configured in the global configurations
-	 * 
-	 */
-	public ParserRuleFile[] getParserRuleChoices() {
-		// Get the descriptor which holds the global configurations and extract the available parsing rules from there 
-		return ((DescriptorImpl)this.getDescriptor()).getParsingRulesGlobal();
-	}
-	
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.NONE ;
+    }
+
+    /*
+      * This is read by the config.jelly : ${instance.parserRuleChoices}
+      * and displays the available choices of parsing rules which were configured in the global configurations
+      *
+      */
+    public ParserRuleFile[] getParserRuleChoices() {
+        // Get the descriptor which holds the global configurations and extract the available parsing rules from there
+        return ((DescriptorImpl)this.getDescriptor()).getParsingRulesGlobal();
+    }
+
+    @Override
+    public Action getProjectAction(AbstractProject<?, ?> project) {
+
+        if (showGraphs)
+            return new LogParserProjectAction(project);
+        else
+            return null;
+    }
+
 }
 
