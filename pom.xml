@@ -42,17 +42,13 @@
   </reporting>
   
    <!-- Hudson WIKI -->
-   <url>http://wiki.hudson-ci.org/display/HUDSON/Log+Parser+Plugin</url>
+   <url>http://wiki.jenkins-ci.org/display/JENKINS/Log+Parser+Plugin</url>
+        
    <developers>
     <developer>
       <id>jborghi</id>
       <name>John Borghi</name>
       <email>jborghi@java.net</email>
-    </developer>
-    <developer>
-      <id>rgoren</id>
-      <name>Rinat Ailon</name>
-      <email>rgoren@cisco.com</email>
     </developer>
 
   </developers>
@@ -69,10 +65,9 @@
         </plugins>
     </build>
 
-    <!-- see http://groups.google.com/group/hudson-dev/browse_thread/thread/83e34c639eec470a for the rationale behind this -->
     <scm>
-        <connection>scm:svn:https://guest@svn.java.net/svn/hudson~svn/trunk/hudson/plugins/log-parser</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/hudson~svn/trunk/hudson/plugins/log-parser</developerConnection>
-      <url>https://hudson.dev.java.net/source/browse/hudson/trunk/hudson/plugins/log-parser</url>
-  </scm>
+        <connection>scm:git:git://github.com/jenkinsci/log-parser-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/log-parser-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/log-parser-plugin</url>
+    </scm>
 </project>
