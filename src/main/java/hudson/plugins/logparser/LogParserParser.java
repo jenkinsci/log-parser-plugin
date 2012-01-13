@@ -107,7 +107,7 @@ public class LogParserParser  {
 		LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers,sectionCounter); // This enters a line which will later be replaced by the actual header and count for this header
 		headerForSection.add(shortLink);
 		writer.write(LogParserConsts.getHtmlOpeningTags());
-        
+		writer.write("<pre>");        
 		// Read bulks of lines , parse 
   	  	final int linesInLog = LogParserUtils.countLines(logFileLocation);
 		parseLogBody(build,writer,filePath,logFileLocation,linesInLog,logger);
@@ -116,6 +116,7 @@ public class LogParserParser  {
 		//writeLogBody();
 		
 		// Close html footer
+		writer.write("</pre>");        
 		writer.write(LogParserConsts.getHtmlClosingTags());
         writer.close();  // Close to unlock and flush to disk.
 
@@ -192,7 +193,6 @@ public class LogParserParser  {
 			parsedLine = parsedLineColoredAndMarked;
 		}
 		final StringBuffer result = new StringBuffer(parsedLine);
-		result.append("<br/>\n");
 		return result.toString() ;
 	}
 	
