@@ -25,14 +25,16 @@ public class LogParserPublisher extends Recorder implements Serializable {
     public final boolean unstableOnWarning;
     public final boolean failBuildOnError;
     public final boolean showGraphs;
+    public final boolean preformattedHtml;
     public final String parsingRulesPath;
 
     @DataBoundConstructor
     public LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError, final boolean showGraphs,
-                              final String parsingRulesPath) {
+                              final boolean preformattedHtml, final String parsingRulesPath) {
         this.unstableOnWarning = unstableOnWarning;
         this.failBuildOnError = failBuildOnError;
         this.showGraphs = showGraphs;
+	this.preformattedHtml = preformattedHtml;
         this.parsingRulesPath =  parsingRulesPath;
     }
 
@@ -45,7 +47,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
         LogParserResult result = new LogParserResult();
         try {
             // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
-            final LogParserParser parser = new LogParserParser(this.parsingRulesPath,launcher.getChannel());
+            final LogParserParser parser = new LogParserParser(this.parsingRulesPath, preformattedHtml, launcher.getChannel());
             // Parse the build's log according to these rules and get the result
             result = parser.parseLog(build);
 
