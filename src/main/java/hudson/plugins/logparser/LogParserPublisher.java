@@ -28,8 +28,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
     public final String parsingRulesPath;
 
     @DataBoundConstructor
-    public LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError, final boolean showGraphs,
-                              final String parsingRulesPath) {
+    public LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError, final boolean showGraphs, final String parsingRulesPath) {
         this.unstableOnWarning = unstableOnWarning;
         this.failBuildOnError = failBuildOnError;
         this.showGraphs = showGraphs;
@@ -45,7 +44,8 @@ public class LogParserPublisher extends Recorder implements Serializable {
         LogParserResult result = new LogParserResult();
         try {
             // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
-            final LogParserParser parser = new LogParserParser(this.parsingRulesPath,launcher.getChannel());
+            boolean preformattedHtml = ! ((DescriptorImpl)getDescriptor()).getLegacyFormatting();
+            final LogParserParser parser = new LogParserParser(this.parsingRulesPath, preformattedHtml, launcher.getChannel());
             // Parse the build's log according to these rules and get the result
             result = parser.parseLog(build);
 
@@ -82,6 +82,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
         private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
+	private boolean useLegacyFormatting = false;
 
         private DescriptorImpl() {
             super(LogParserPublisher.class);
@@ -103,11 +104,16 @@ public class LogParserPublisher extends Recorder implements Serializable {
         public  ParserRuleFile[] getParsingRulesGlobal() {
             return parsingRulesGlobal;
         }
+	public boolean getLegacyFormatting() {
+            return useLegacyFormatting;
+        }
 
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
             parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class, "log-parser.")
                     .toArray(new ParserRuleFile[0]);
+       //     useLegacyFormatting = json.getBoolean("useLegacyFormatting");
+            useLegacyFormatting = json.getJSONObject("log-parser").getBoolean("useLegacyFormatting");
             save();
             return true;
         }
