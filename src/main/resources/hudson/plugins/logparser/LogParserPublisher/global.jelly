@@ -1,5 +1,5 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <f:section title="Console Output Parsing">
+  <f:section title="Console Output Parsing" name="log-parser">
 
 
     <f:entry title="Parsing Rules" help="/plugin/log-parser/global_config_help.html">
@@ -26,6 +26,11 @@
       
     </f:entry>
   
+    <f:advanced>
+      <f:entry title="Use Legacy Formatting (variable width font)" help="/plugin/log-parser/global_legacy_formatting.html">
+        <f:checkbox name="useLegacyFormatting" checked="${descriptor.getLegacyFormatting()}"/>
+      </f:entry>
+    </f:advanced>
 
   </f:section>
 </j:jelly>
