@@ -10,14 +10,23 @@
     		<f:checkbox name="log-parser.showGraphs" checked="${instance.showGraphs}"/>
     	</f:entry>
     	
-   	<f:entry title="Select Parsing Rules" field="currentRulePath" help="/plugin/log-parser/parse_rule_choice.html">
+    	<f:radioBlock title="Use global rule" name="log-parser.useProjectRule" value="false"
+    	              checked="${instance.useProjectRule==false}">
+   	      <f:entry title="Select Parsing Rules" field="currentRulePath" help="/plugin/log-parser/parse_rule_choice.html">
         	<select name="log-parser.parsingRulesPath">
         	
 	            <j:forEach var="i" items="${descriptor.parsingRulesGlobal}">
     	            <f:option selected="${i.path == instance.parsingRulesPath}" value="${i.path}">${i.name}</f:option>
                </j:forEach>
 			</select>
-        </f:entry>
-                            
-  
+          </f:entry>
+        </f:radioBlock>
+
+        <f:radioBlock title="Use project rule" name="log-parser.useProjectRule" value="true"
+                      checked="${instance.useProjectRule==true}">
+          <f:entry title="Path to rule file in workspace" field="projectRulePath">
+            <f:textbox/>
+          </f:entry>
+        </f:radioBlock>               
+
 </j:jelly>

@@ -1,5 +1,7 @@
 package hudson.plugins.logparser;
 
+import hudson.FilePath;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,17 +15,9 @@ import java.util.regex.Pattern;
 public final class LogParserUtils {
 
 
-	public static String[] readParsingRules(final String parsingRulesPath) throws IOException {
-		final StringBuffer result = new StringBuffer("");
-		final BufferedReader reader = new BufferedReader(new FileReader(parsingRulesPath));
-        String line = null;
-        while ((line=reader.readLine()) != null) {
-        	result.append(line);
-        	result.append('\n');
-        }
-        reader.close();
-		return result.toString().split("\n");
-	}
+    public static String[] readParsingRules(final FilePath parsingRulesFile) throws IOException {
+        return parsingRulesFile.readToString().split("\n");
+    }
 
 	
     public static boolean skipParsingRule(final String parsingRule){

@@ -10,7 +10,7 @@
   
   <artifactId>log-parser</artifactId>
   <packaging>hpi</packaging>
-  <version>1.0.9-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <name>Log Parser Plugin</name>
  
  
