@@ -25,10 +25,12 @@ public class LogParserConsts  {
 	public static String getHtmlOpeningTags () {
 	    final String hudsonRoot = Hudson.getInstance().getRootUrl();
 	    return 
+	    "<!DOCTYPE html>\n" +
 	    "<html>\n" +
 	    "\t<head>\n" +
-	    "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"" + hudsonRoot + "css/style.css\"></link>\n" +
-	    "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"" + hudsonRoot + "css/color.css\"></link>\n" +
+      "\t\t<title>log-parser plugin page</title>\n" +
+	    "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"" + hudsonRoot + "css/style.css\" />\n" +
+	    "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"" + hudsonRoot + "css/color.css\" />\n" +
 	    "\t</head>\n" +
 	    "\t<body>\n";
 	}
@@ -39,9 +41,9 @@ public class LogParserConsts  {
 	    "</html>\n";
 	}
 
-	// Parsing in threads for perofrmance
+	// Parsing in threads for performance
 	public static final int LINES_PER_THREAD = 10000; // How many lines to parse in each thread
-	public static final int MAX_THREADS = 2; // How many concurrent threads to run (unused when implementing chached thread pool) 
+	public static final int MAX_THREADS = 2; // How many concurrent threads to run (unused when implementing cached thread pool)
 	
 	
 	

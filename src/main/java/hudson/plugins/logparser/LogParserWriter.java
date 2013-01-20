@@ -1,7 +1,12 @@
 package hudson.plugins.logparser;
 
+import hudson.Functions;
 import hudson.PluginWrapper;
 import hudson.model.Hudson;
+
+import jenkins.model.Jenkins;
+
+import org.kohsuke.stapler.Stapler;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -54,8 +59,7 @@ public final class LogParserWriter {
 			final HashMap<String,String> linkFiles
 ) throws IOException {
     	
-    	final String refStart = 	"<base target=\"content\">\n" +
-    						"<script language=\"JavaScript\" type=\"text/javascript\">\n"+
+    	final String refStart = "<script type=\"text/javascript\">\n"+
     							"\tfunction toggleList(list){\n"+
     								"\t\telement = document.getElementById(list).style;\n"+
     								"\t\telement.display == 'none' ? element.display='block' : element.display='none';\n"+
@@ -93,12 +97,11 @@ public final class LogParserWriter {
        	final String linkListCount = ((Integer)statusCount.get(status)).toString();
        	
        	final String hudsonRoot = Hudson.getInstance().getRootUrl();
-		final PluginWrapper wrapper = Hudson.getInstance().getPluginManager().getPlugin(PluginImpl.class);
-		final String iconLocation  = "/plugin/" + wrapper.getShortName() + "/images/" ; 
-
-		final String linksStart = "<img src=\""+hudsonRoot+"/"+iconLocation+statusIcon+"\" style=\"margin: 2px;\" width=\"24\" alt=\"\" height=\"24\"></img>\n"+
-  							"<a href=\"javascript:toggleList('"+linkListDisplayStr+"')\" target=\"_self\"><STRONG>"+linkListDisplayStr+" ("+linkListCount+")</STRONG></a><br/>\n"+
-							"<ul id=\""+linkListDisplayStr+"\" type=\"disc\" style=\"display:none\">\n";
+        final PluginWrapper wrapper = Hudson.getInstance().getPluginManager().getPlugin(PluginImpl.class);
+		final String iconLocation = String.format("%s/images/16x16/", Functions.getResourcePath());
+		final String linksStart = "<img src=\""+hudsonRoot+"/"+iconLocation+statusIcon+"\" style=\"margin: 2px;\" width=\"24\" alt=\""+linkListDisplayStr+" Icon\" height=\"24\" />\n"+
+  							"<a href=\"javascript:toggleList('"+linkListDisplayStr+"')\" target=\"_self\"><STRONG>"+linkListDisplayStr+" ("+linkListCount+")</STRONG></a><br />\n"+
+							"<ul id=\""+linkListDisplayStr+"\" style=\"display:none; margin-left:0; padding-left:3em\">\n";
 
     	writer.write(linksStart); 
     	

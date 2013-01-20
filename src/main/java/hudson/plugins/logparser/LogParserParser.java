@@ -222,11 +222,11 @@ public class LogParserParser  {
 	
 	private String colorLine(final String line,final String status) {
 		final String color = (String)displayConstants.getColorTable().get(status);
-		final StringBuffer result = new StringBuffer("<font color=\"");
+		final StringBuffer result = new StringBuffer("<span style=\"color:");
 		result.append(color);
 		result.append("\">");
 		result.append(line);
-		result.append("</font>");
+		result.append("</span>");
 		return result.toString();
 	}
 
