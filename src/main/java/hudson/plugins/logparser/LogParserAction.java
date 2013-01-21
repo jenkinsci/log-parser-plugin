@@ -26,28 +26,31 @@ import hudson.model.AbstractBuild;
 
 public class LogParserAction implements Action {
 
-    final private AbstractBuild<?,?> build;
+    final private AbstractBuild<?, ?> build;
     final private LogParserResult result;
 
     private static String urlName = "parsed_console";
 
-    public LogParserAction(final AbstractBuild<?,?> build, final LogParserResult result) {
+    public LogParserAction(final AbstractBuild<?, ?> build,
+            final LogParserResult result) {
         this.build = build;
         this.result = result;
 
     }
-    public String getIconFileName(){
+
+    public String getIconFileName() {
         return "clipboard.gif";
     }
-    public String getDisplayName(){
+
+    public String getDisplayName() {
         return "Parsed Console Output";
     }
 
-    public String getUrlName(){
+    public String getUrlName() {
         return urlName;
     }
 
-    public static String getUrlNameStat(){
+    public static String getUrlNameStat() {
         return urlName;
     }
 
@@ -55,15 +58,16 @@ public class LogParserAction implements Action {
         return build;
     }
 
-    // Used by the summary.jelly of this class to show some totals from the result 
+    // Used by the summary.jelly of this class to show some totals from the
+    // result
     public LogParserResult getResult() {
         return result;
     }
 
     public LogParserAction getPreviousAction() {
-        AbstractBuild<?,?> build = this.getOwner();
+        AbstractBuild<?, ?> build = this.getOwner();
 
-        while(true) {
+        while (true) {
 
             build = build.getPreviousBuild();
 
@@ -75,89 +79,95 @@ public class LogParserAction implements Action {
         }
     }
 
-    public void doDynamic(final StaplerRequest req, final StaplerResponse rsp) throws IOException, ServletException, InterruptedException {
+    public void doDynamic(final StaplerRequest req, final StaplerResponse rsp)
+            throws IOException, ServletException, InterruptedException {
         final String dir = result.getHtmlLogPath();
         final String file = req.getRestOfPath();
         final String fileArray[] = file.split("/");
-        final String lastFileInPath = fileArray[fileArray.length-1];
-        final File f = new File (dir+"/"+lastFileInPath);
+        final String lastFileInPath = fileArray[fileArray.length - 1];
+        final File f = new File(dir + "/" + lastFileInPath);
         rsp.serveFile(req, f.toURI().toURL());
 
     }
 
-    public void doGraph( StaplerRequest req, StaplerResponse rsp) throws IOException {
-        if(ChartUtil.awtProblemCause!=null) {
+    public void doGraph(StaplerRequest req, StaplerResponse rsp)
+            throws IOException {
+        if (ChartUtil.awtProblemCause != null) {
             // not available. send out error message
-            rsp.sendRedirect2(req.getContextPath()+"/images/headless.png");
+            rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
             return;
         }
 
-        if(req.checkIfModified(getOwner().getTimestamp(), rsp))
+        if (req.checkIfModified(getOwner().getTimestamp(), rsp))
             return;
 
-        ChartUtil.generateGraph(req,rsp,createChart(req,buildDataSet()),calcDefaultSize());
+        ChartUtil.generateGraph(req, rsp, createChart(req, buildDataSet()),
+                calcDefaultSize());
     }
 
-    public void doGraphMap( StaplerRequest req, StaplerResponse rsp) throws IOException {
-        if(req.checkIfModified(this.getOwner().getTimestamp(),rsp))
+    public void doGraphMap(StaplerRequest req, StaplerResponse rsp)
+            throws IOException {
+        if (req.checkIfModified(this.getOwner().getTimestamp(), rsp))
             return;
-        ChartUtil.generateClickableMap(req,rsp,createChart(req,buildDataSet()),calcDefaultSize());
+        ChartUtil.generateClickableMap(req, rsp,
+                createChart(req, buildDataSet()), calcDefaultSize());
     }
-
 
     private Area calcDefaultSize() {
         Area res = Functions.getScreenResolution();
-        if(res!=null && res.width<=800)
-            return new Area(250,100);
+        if (res != null && res.width <= 800)
+            return new Area(250, 100);
         else
-            return new Area(500,200);
+            return new Area(500, 200);
     }
 
     private CategoryDataset buildDataSet() {
 
-        DataSetBuilder<String,ChartUtil.NumberOnlyBuildLabel> dsb = new DataSetBuilder<String,ChartUtil.NumberOnlyBuildLabel>();
+        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dsb = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
 
-        for( LogParserAction a=this; a!=null; a=a.getPreviousAction() ) {
-            dsb.add( a.result.getTotalErrors(), "errors", new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
-            dsb.add( a.result.getTotalWarnings(), "warnings", new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
-            dsb.add( a.result.getTotalInfos(),"infos", new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+        for (LogParserAction a = this; a != null; a = a.getPreviousAction()) {
+            dsb.add(a.result.getTotalErrors(), "errors",
+                    new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            dsb.add(a.result.getTotalWarnings(), "warnings",
+                    new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            dsb.add(a.result.getTotalInfos(), "infos",
+                    new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
         }
         return dsb.build();
     }
 
-
-    private JFreeChart createChart(StaplerRequest req,CategoryDataset dataset) {
+    private JFreeChart createChart(StaplerRequest req, CategoryDataset dataset) {
 
         final String relPath = getRelPath(req);
 
         final JFreeChart chart = ChartFactory.createStackedAreaChart(
-                null,                   // chart title
-                null,                   // unused
-                "count",                  // range axis label
-                dataset,                  // data
+                null, // chart title
+                null, // unused
+                "count", // range axis label
+                dataset, // data
                 PlotOrientation.VERTICAL, // orientation
-                false,                     // include legend
-                true,                     // tooltips
-                false                     // urls
-        );
+                false, // include legend
+                true, // tooltips
+                false // urls
+                );
 
         // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 
         // set the background color for the chart...
 
-//        final StandardLegend legend = (StandardLegend) chart.getLegend();
-//        legend.setAnchor(StandardLegend.SOUTH);
+        //final StandardLegend legend = (StandardLegend) chart.getLegend();
+        //legend.setAnchor(StandardLegend.SOUTH);
 
         chart.setBackgroundPaint(Color.white);
 
         final CategoryPlot plot = chart.getCategoryPlot();
 
-        // plot.setAxisOffset(new Spacer(Spacer.ABSOLUTE, 5.0, 5.0, 5.0, 5.0));
+        //plot.setAxisOffset(new Spacer(Spacer.ABSOLUTE, 5.0, 5.0, 5.0, 5.0));
         plot.setBackgroundPaint(Color.WHITE);
         plot.setOutlinePaint(null);
         plot.setForegroundAlpha(0.8f);
-//        plot.setDomainGridlinesVisible(true);
-//        plot.setDomainGridlinePaint(Color.white);
+        //plot.setDomainGridlinesVisible(true);
+        //plot.setDomainGridlinePaint(Color.white);
         plot.setRangeGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.black);
 
@@ -173,42 +183,46 @@ public class LogParserAction implements Action {
 
         StackedAreaRenderer ar = new StackedAreaRenderer2() {
             @Override
-            public String generateURL(CategoryDataset dataset, int row, int column) {
-                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset.getColumnKey(column);
-                return relPath+label.build.getNumber()+"/testReport/";
+            public String generateURL(CategoryDataset dataset, int row,
+                    int column) {
+                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset
+                        .getColumnKey(column);
+                return relPath + label.build.getNumber() + "/testReport/";
             }
 
             @Override
-            public String generateToolTip(CategoryDataset dataset, int row, int column) {
-                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset.getColumnKey(column);
-                AbstractTestResultAction a = label.build.getAction(AbstractTestResultAction.class);
+            public String generateToolTip(CategoryDataset dataset, int row,
+                    int column) {
+                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset
+                        .getColumnKey(column);
+                AbstractTestResultAction a = label.build
+                        .getAction(AbstractTestResultAction.class);
                 switch (row) {
-                    case 0:
-                        return "Errors: "+result.getTotalErrors();
-                    case 1:
-                        return "Warnings: "+result.getTotalWarnings();
-                    default:
-                        return "Infos: "+result.getTotalInfos();
+                case 0:
+                    return "Errors: " + result.getTotalErrors();
+                case 1:
+                    return "Warnings: " + result.getTotalWarnings();
+                default:
+                    return "Infos: " + result.getTotalInfos();
                 }
             }
         };
         plot.setRenderer(ar);
-        ar.setSeriesPaint(0, ColorPalette.RED); // error
-        ar.setSeriesPaint(1,ColorPalette.BLUE); // info
-        ar.setSeriesPaint(2,ColorPalette.YELLOW); // warning
+        ar.setSeriesPaint(0, ColorPalette.RED);    // error
+        ar.setSeriesPaint(1, ColorPalette.BLUE);   // info
+        ar.setSeriesPaint(2, ColorPalette.YELLOW); // warning
 
         // crop extra space around the graph
-        plot.setInsets(new RectangleInsets(0,0,0,5.0));
+        plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));
 
         return chart;
     }
 
     private String getRelPath(StaplerRequest req) {
         String relPath = req.getParameter("rel");
-        if(relPath==null)   return "";
+        if (relPath == null)
+            return "";
         return relPath;
     }
-
-
 
 }

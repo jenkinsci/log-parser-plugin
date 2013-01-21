@@ -1,6 +1,5 @@
 package hudson.plugins.logparser;
 
-
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.*;
@@ -21,8 +20,6 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-
-
 public class LogParserPublisher extends Recorder implements Serializable {
     public final boolean unstableOnWarning;
     public final boolean failBuildOnError;
@@ -33,44 +30,57 @@ public class LogParserPublisher extends Recorder implements Serializable {
 
     /**
      * Create new LogParserPublisher.
-     *
-     * @param unstableOnWarning mark build unstable if warnings found.
-     * @param failBuildOnError mark build failed if errors found.
-     * @param showGraphs show graphs on job page.
-     * @param parsingRulesPath path to the global parsing rules.
-     * @param useProjectRule true if we use a project specific rule.
-     * @param projectRulePath path to project specific rules relative to workspace root.
+     * 
+     * @param unstableOnWarning
+     *            mark build unstable if warnings found.
+     * @param failBuildOnError
+     *            mark build failed if errors found.
+     * @param showGraphs
+     *            show graphs on job page.
+     * @param parsingRulesPath
+     *            path to the global parsing rules.
+     * @param useProjectRule
+     *            true if we use a project specific rule.
+     * @param projectRulePath
+     *            path to project specific rules relative to workspace root.
      */
-    private LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError, final boolean showGraphs,
-            final String parsingRulesPath,
-            final boolean useProjectRule,
+    private LogParserPublisher(final boolean unstableOnWarning,
+            final boolean failBuildOnError, final boolean showGraphs,
+            final String parsingRulesPath, final boolean useProjectRule,
             final String projectRulePath) {
 
         this.unstableOnWarning = unstableOnWarning;
         this.failBuildOnError = failBuildOnError;
         this.showGraphs = showGraphs;
-        this.parsingRulesPath =  parsingRulesPath;
+        this.parsingRulesPath = parsingRulesPath;
         this.useProjectRule = useProjectRule;
         this.projectRulePath = projectRulePath;
     }
 
-    public boolean prebuild(final AbstractBuild<?,?> build, final BuildListener listener) {
+    public boolean prebuild(final AbstractBuild<?, ?> build,
+            final BuildListener listener) {
         return true;
     }
 
-    public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener) throws InterruptedException, IOException {
+    public boolean perform(final AbstractBuild<?, ?> build,
+            final Launcher launcher, final BuildListener listener)
+            throws InterruptedException, IOException {
         final Logger logger = Logger.getLogger(getClass().getName());
         LogParserResult result = new LogParserResult();
         try {
-            // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
-            boolean preformattedHtml = ! ((DescriptorImpl)getDescriptor()).getLegacyFormatting();
+            // Create a parser with the parsing rules as configured : colors,
+            // regular expressions, etc.
+            boolean preformattedHtml = !((DescriptorImpl) getDescriptor())
+                    .getLegacyFormatting();
             final FilePath parsingRulesFile;
             if (useProjectRule) {
-                parsingRulesFile = new FilePath(build.getWorkspace(), projectRulePath);
+                parsingRulesFile = new FilePath(build.getWorkspace(),
+                        projectRulePath);
             } else {
                 parsingRulesFile = new FilePath(new File(parsingRulesPath));
             }
-            final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml, launcher.getChannel());
+            final LogParserParser parser = new LogParserParser(
+                    parsingRulesFile, preformattedHtml, launcher.getChannel());
             // Parse the build's log according to these rules and get the result
             result = parser.parseLog(build);
 
@@ -82,8 +92,10 @@ public class LogParserPublisher extends Recorder implements Serializable {
             }
 
         } catch (IOException e) {
-            // failure to parse should not fail the build - but should be handled as a serious error
-            // this should catch all process problems during parsing, including parser file not found.
+            // failure to parse should not fail the build - but should be
+            // handled as a serious error
+            // this should catch all process problems during parsing, including
+            // parser file not found.
             logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
         } catch (InterruptedException e) {
@@ -93,7 +105,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
         }
 
         // Add an action created with the above results
-        final LogParserAction action = new LogParserAction(build,result);
+        final LogParserAction action = new LogParserAction(build, result);
         build.getActions().add(0, action);
 
         return true;
@@ -103,11 +115,11 @@ public class LogParserPublisher extends Recorder implements Serializable {
         return DescriptorImpl.DESCRIPTOR;
     }
 
-
-    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+    public static final class DescriptorImpl extends
+            BuildStepDescriptor<Publisher> {
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
         private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
-	private boolean useLegacyFormatting = false;
+        private boolean useLegacyFormatting = false;
 
         private DescriptorImpl() {
             super(LogParserPublisher.class);
@@ -122,42 +134,47 @@ public class LogParserPublisher extends Recorder implements Serializable {
             return "/plugin/log-parser/help.html";
         }
 
-        public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
+        public boolean isApplicable(
+                final Class<? extends AbstractProject> jobType) {
             return true;
         }
 
-        public  ParserRuleFile[] getParsingRulesGlobal() {
+        public ParserRuleFile[] getParsingRulesGlobal() {
             return parsingRulesGlobal;
         }
-	public boolean getLegacyFormatting() {
+
+        public boolean getLegacyFormatting() {
             return useLegacyFormatting;
         }
 
         @Override
-        public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-            parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class, "log-parser.")
-                    .toArray(new ParserRuleFile[0]);
-            useLegacyFormatting = json.getJSONObject("log-parser").getBoolean("useLegacyFormatting");
+        public boolean configure(final StaplerRequest req, final JSONObject json)
+                throws FormException {
+            parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class,
+                    "log-parser.").toArray(new ParserRuleFile[0]);
+            useLegacyFormatting = json.getJSONObject("log-parser").getBoolean(
+                    "useLegacyFormatting");
             save();
             return true;
         }
 
         /**
-         * Cannot use simple DataBoundConstructor due to radioBlock usage where a
-         * JSON object is returned holding the selected value of the block.
-         *
+         * Cannot use simple DataBoundConstructor due to radioBlock usage where
+         * a JSON object is returned holding the selected value of the block.
+         * 
          * {@inheritDoc}
          */
         @Override
-        public LogParserPublisher newInstance(StaplerRequest req, JSONObject json) throws FormException {
+        public LogParserPublisher newInstance(StaplerRequest req,
+                JSONObject json) throws FormException {
 
-            final boolean configuredUseProjectRule = json.getJSONObject("useProjectRule").getBoolean("value");
+            final boolean configuredUseProjectRule = json.getJSONObject(
+                    "useProjectRule").getBoolean("value");
             return new LogParserPublisher(json.getBoolean("unstableOnWarning"),
                     json.getBoolean("failBuildOnError"),
                     json.getBoolean("showGraphs"),
                     json.getString("parsingRulesPath"),
-                    configuredUseProjectRule,
-                    json.getString("projectRulePath"));
+                    configuredUseProjectRule, json.getString("projectRulePath"));
         }
 
     }
@@ -165,17 +182,18 @@ public class LogParserPublisher extends Recorder implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.NONE ;
+        return BuildStepMonitor.NONE;
     }
 
     /*
-      * This is read by the config.jelly : ${instance.parserRuleChoices}
-      * and displays the available choices of parsing rules which were configured in the global configurations
-      *
-      */
+     * This is read by the config.jelly : ${instance.parserRuleChoices} and
+     * displays the available choices of parsing rules which were configured in
+     * the global configurations
+     */
     public ParserRuleFile[] getParserRuleChoices() {
-        // Get the descriptor which holds the global configurations and extract the available parsing rules from there
-        return ((DescriptorImpl)this.getDescriptor()).getParsingRulesGlobal();
+        // Get the descriptor which holds the global configurations and extract
+        // the available parsing rules from there
+        return ((DescriptorImpl) this.getDescriptor()).getParsingRulesGlobal();
     }
 
     @Override
@@ -188,4 +206,3 @@ public class LogParserPublisher extends Recorder implements Serializable {
     }
 
 }
-
