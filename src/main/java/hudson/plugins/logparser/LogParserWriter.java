@@ -4,8 +4,6 @@ import hudson.Functions;
 import hudson.PluginWrapper;
 import hudson.model.Hudson;
 
-import jenkins.model.Jenkins;
-
 import org.kohsuke.stapler.Stapler;
 
 import java.io.BufferedReader;

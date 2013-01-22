@@ -168,13 +168,29 @@ public class LogParserPublisher extends Recorder implements Serializable {
         public LogParserPublisher newInstance(StaplerRequest req,
                 JSONObject json) throws FormException {
 
-            final boolean configuredUseProjectRule = json.getJSONObject(
-                    "useProjectRule").getBoolean("value");
+            JSONObject useProjectRuleJSON = json.getJSONObject("useProjectRule");
+            final boolean configuredUseProjectRule = useProjectRuleJSON.getBoolean("value");
+            final String configuredParsingRulesPath;
+            final String configuredProjectRulePath;
+
+            if (useProjectRuleJSON.containsKey("parsingRulesPath")) {
+                configuredParsingRulesPath = useProjectRuleJSON.getString("parsingRulesPath");
+            } else {
+                configuredParsingRulesPath = null;
+            }
+
+            if (useProjectRuleJSON.containsKey("projectRulePath")) {
+                configuredProjectRulePath = useProjectRuleJSON.getString("projectRulePath");
+            } else {
+                configuredProjectRulePath = null;
+            }
+
             return new LogParserPublisher(json.getBoolean("unstableOnWarning"),
                     json.getBoolean("failBuildOnError"),
                     json.getBoolean("showGraphs"),
-                    json.getString("parsingRulesPath"),
-                    configuredUseProjectRule, json.getString("projectRulePath"));
+                    configuredParsingRulesPath,
+                    configuredUseProjectRule,
+                    configuredProjectRulePath);
         }
 
     }
