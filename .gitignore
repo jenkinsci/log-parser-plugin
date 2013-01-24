@@ -1,6 +1,21 @@
 target
 work
+
+# IntelliJ project files
+*.iml
+*.iws
+*.ipr
+.idea
+out
+
+# eclipse project file
+.settings
 .classpath
 .project
-.settings
-.iml
+bin
+build
+
+# vim
+*~
+
+*.class

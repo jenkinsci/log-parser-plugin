@@ -1,16 +1,17 @@
 package hudson.plugins.logparser.action;
 
+import hudson.model.Action;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Action;
 import hudson.plugins.logparser.LogParserAction;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.io.IOException;
+
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Created by IntelliJ IDEA.
