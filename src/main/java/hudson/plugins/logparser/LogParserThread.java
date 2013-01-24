@@ -4,8 +4,8 @@ import hudson.console.ConsoleNote;
 
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 class LogParserThread extends Thread {
 
@@ -26,6 +26,7 @@ class LogParserThread extends Thread {
         this.logParserReader = logParserReader;
     }
 
+    @Override
     public void run() {
         try {
             // Synchronized method so as not to read from the same file from
@@ -78,7 +79,6 @@ class LogParserThread extends Thread {
                 + this.logPart.getLogPartNum());
 
         numOfLines = 0;
-        int numOfChars = 0;
         String[] result = new String[logPart.length];
         for (int i = 0; i < logPart.length; i++) {
             final String line = logPart[i];
@@ -86,7 +86,6 @@ class LogParserThread extends Thread {
                 continue;
             }
             numOfLines++;
-            numOfChars += line.length();
             final String status = getLineStatus(line);
             result[i] = status;
         }

@@ -2,7 +2,6 @@ package hudson.plugins.logparser;
 
 import hudson.FilePath;
 
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -30,7 +29,6 @@ public final class LogParserUtils {
             skip = true;
         }
         return skip;
-
     }
 
     public static String standardizeStatus(final String status) {
@@ -53,7 +51,6 @@ public final class LogParserUtils {
         }
 
         return result;
-
     }
 
     public static CompiledPatterns compilePatterns(
@@ -72,15 +69,14 @@ public final class LogParserUtils {
 
                     final int firstDash = parsingRule.indexOf('/');
                     final int lastDash = parsingRule.lastIndexOf('/');
-                    if (firstDash != -1 && firstDash != -1) {
+                    if (firstDash != -1 && lastDash != -1) {
                         regexp = parsingRule.substring(firstDash + 1, lastDash);
                         final Pattern p = Pattern.compile(regexp);
                         result[i] = p;
 
                     }
                 } catch (Exception e) {
-                    // Could not use rule for some reason - ignore rule and log
-                    // it
+                    // Could not use rule for some reason - ignore rule and log it
                     final String errorMsg = "Bad parsing rule:" + parsingRule
                             + ", Error:" + e.getMessage();
                     logger.log(Level.SEVERE, errorMsg);
@@ -126,10 +122,8 @@ public final class LogParserUtils {
                 result = (Integer.valueOf(linesByEnvStr)).intValue();
             } catch (Exception e) {
                 // Do nothing - use the default;
-                Logger.getLogger("getLinesPerThread").log(
-                        Level.FINEST,
-                        "HUDSON_LOG_PARSER_LINES_PER_THREAD"
-                                + LogParserConsts.NOT_INT);
+                Logger.getLogger("getLinesPerThread").log(Level.FINEST,
+                    "HUDSON_LOG_PARSER_LINES_PER_THREAD" + LogParserConsts.NOT_INT);
             }
         }
         return result;

@@ -1,14 +1,21 @@
 package hudson.plugins.logparser;
 
-import java.awt.*;
-import java.io.IOException;
+import hudson.Functions;
+import hudson.model.Action;
+import hudson.model.AbstractBuild;
+import hudson.util.Area;
+import hudson.util.ChartUtil;
+import hudson.util.ColorPalette;
+import hudson.util.DataSetBuilder;
+import hudson.util.ShiftedCategoryAxis;
+import hudson.util.StackedAreaRenderer2;
+
+import java.awt.Color;
 import java.io.File;
+import java.io.IOException;
+
 import javax.servlet.ServletException;
 
-import hudson.Functions;
-import hudson.node_monitors.Messages;
-import hudson.tasks.test.AbstractTestResultAction;
-import hudson.util.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -21,8 +28,6 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import hudson.model.Action;
-import hudson.model.AbstractBuild;
 
 public class LogParserAction implements Action {
 
@@ -182,6 +187,9 @@ public class LogParserAction implements Action {
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
         StackedAreaRenderer ar = new StackedAreaRenderer2() {
+
+            private static final long serialVersionUID = 1L;
+
             @Override
             public String generateURL(CategoryDataset dataset, int row,
                     int column) {
@@ -193,10 +201,6 @@ public class LogParserAction implements Action {
             @Override
             public String generateToolTip(CategoryDataset dataset, int row,
                     int column) {
-                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset
-                        .getColumnKey(column);
-                AbstractTestResultAction a = label.build
-                        .getAction(AbstractTestResultAction.class);
                 switch (row) {
                 case 0:
                     return "Errors: " + result.getTotalErrors();

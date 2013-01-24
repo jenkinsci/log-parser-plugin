@@ -1,10 +1,7 @@
 package hudson.plugins.logparser;
 
 import hudson.Functions;
-import hudson.PluginWrapper;
 import hudson.model.Hudson;
-
-import org.kohsuke.stapler.Stapler;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -103,8 +100,6 @@ public final class LogParserWriter {
                 .toString();
 
         final String hudsonRoot = Hudson.getInstance().getRootUrl();
-        final PluginWrapper wrapper = Hudson.getInstance().getPluginManager()
-                .getPlugin(PluginImpl.class);
         final String iconLocation = String.format("%s/images/16x16/",
                 Functions.getResourcePath());
         final String linksStart = "<img src=\"" + hudsonRoot + "/" + iconLocation + statusIcon

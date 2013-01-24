@@ -12,6 +12,7 @@ out
 .settings
 .classpath
 .project
+bin
 build
 
 # vim

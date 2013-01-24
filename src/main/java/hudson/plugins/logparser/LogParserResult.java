@@ -1,6 +1,10 @@
 package hudson.plugins.logparser;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.Reader;
 
 public class LogParserResult {
 

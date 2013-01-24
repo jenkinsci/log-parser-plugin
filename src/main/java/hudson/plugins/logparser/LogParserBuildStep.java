@@ -1,12 +1,13 @@
 package hudson.plugins.logparser;
 
 import hudson.Launcher;
+import hudson.model.Action;
+import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
-import hudson.model.Action;
 import hudson.tasks.BuildStep;
 import hudson.tasks.BuildStepMonitor;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,8 +24,6 @@ public class LogParserBuildStep implements BuildStep {
             throws InterruptedException, IOException {
         return true;
     }
-
-    private static final long serialVersionUID = 1L;
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;

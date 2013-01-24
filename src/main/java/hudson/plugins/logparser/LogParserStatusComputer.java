@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 public class LogParserStatusComputer implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     //private VirtualChannel channel;
     final private String[] parsingRulesArray;
     final private Pattern[] compiledPatterns;
@@ -43,6 +44,9 @@ public class LogParserStatusComputer implements Serializable {
 
         result = channel
                 .call(new Callable<HashMap<String, String>, RuntimeException>() {
+
+                    private static final long serialVersionUID = 1L;
+
                     public HashMap<String, String> call() {
                         HashMap<String, String> result = null;
                         try {
@@ -86,7 +90,6 @@ public class LogParserStatusComputer implements Serializable {
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(
                 tempFilePath.read()));
-        int counter = 0;
         int threadCounter = 0;
 
         final ArrayList<LogParserThread> runners = new ArrayList<LogParserThread>();
@@ -138,8 +141,6 @@ public class LogParserStatusComputer implements Serializable {
                 moreLineStatusMatches = getLineStatusMatches(
                         logParserThread.getLineStatuses(), i);
                 result.putAll(moreLineStatusMatches);
-                final int newLines = logParserThread.getNumOfLines();
-                counter += newLines;
             }
         }
 

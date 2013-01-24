@@ -2,7 +2,11 @@ package hudson.plugins.logparser;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.model.Action;
+import hudson.model.BuildListener;
+import hudson.model.Result;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.plugins.logparser.action.LogParserProjectAction;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -17,10 +21,10 @@ import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class LogParserPublisher extends Recorder implements Serializable {
+    private static final long serialVersionUID = 1L;
     public final boolean unstableOnWarning;
     public final boolean failBuildOnError;
     public final boolean showGraphs;
@@ -57,11 +61,13 @@ public class LogParserPublisher extends Recorder implements Serializable {
         this.projectRulePath = projectRulePath;
     }
 
+    @Override
     public boolean prebuild(final AbstractBuild<?, ?> build,
             final BuildListener listener) {
         return true;
     }
 
+    @Override
     public boolean perform(final AbstractBuild<?, ?> build,
             final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
@@ -90,14 +96,18 @@ public class LogParserPublisher extends Recorder implements Serializable {
             } else if (this.unstableOnWarning && result.getTotalWarnings() > 0) {
                 build.setResult(Result.UNSTABLE);
             }
-
         } catch (IOException e) {
-            // failure to parse should not fail the build - but should be
-            // handled as a serious error
-            // this should catch all process problems during parsing, including
-            // parser file not found.
+            // Failure to parse should not fail the build - but should be
+            // handled as a serious error.
+            // This should catch all process problems during parsing, including
+            // parser file not found..
             logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
+        } catch (NullPointerException e) {
+            // in case the rules path is null
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
+            result.setFailedToParseError(e.toString());
+            build.setResult(Result.ABORTED);
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
@@ -111,6 +121,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
         return true;
     }
 
+    @Override
     public BuildStepDescriptor<Publisher> getDescriptor() {
         return DescriptorImpl.DESCRIPTOR;
     }
@@ -126,14 +137,17 @@ public class LogParserPublisher extends Recorder implements Serializable {
             load();
         }
 
+        @Override
         public String getDisplayName() {
             return "Console output (build log) parsing";
         }
 
+        @Override
         public String getHelpFile() {
             return "/plugin/log-parser/help.html";
         }
 
+        @Override
         public boolean isApplicable(
                 final Class<? extends AbstractProject> jobType) {
             return true;
@@ -168,23 +182,22 @@ public class LogParserPublisher extends Recorder implements Serializable {
         public LogParserPublisher newInstance(StaplerRequest req,
                 JSONObject json) throws FormException {
 
+            String configuredParsingRulesPath = null;
+            String configuredProjectRulePath = null;
+            boolean configuredUseProjectRule = false;
             JSONObject useProjectRuleJSON = json.getJSONObject("useProjectRule");
-            final boolean configuredUseProjectRule = useProjectRuleJSON.getBoolean("value");
-            final String configuredParsingRulesPath;
-            final String configuredProjectRulePath;
 
-            if (useProjectRuleJSON.containsKey("parsingRulesPath")) {
-                configuredParsingRulesPath = useProjectRuleJSON.getString("parsingRulesPath");
-            } else {
-                configuredParsingRulesPath = null;
+            if (useProjectRuleJSON != null) {
+                configuredUseProjectRule = useProjectRuleJSON.getBoolean("value");
+
+                if (useProjectRuleJSON.containsKey("parsingRulesPath")) {
+                    configuredParsingRulesPath = useProjectRuleJSON.getString("parsingRulesPath");
+                }
+
+                if (useProjectRuleJSON.containsKey("projectRulePath")) {
+                    configuredProjectRulePath = useProjectRuleJSON.getString("projectRulePath");
+                }
             }
-
-            if (useProjectRuleJSON.containsKey("projectRulePath")) {
-                configuredProjectRulePath = useProjectRuleJSON.getString("projectRulePath");
-            } else {
-                configuredProjectRulePath = null;
-            }
-
             return new LogParserPublisher(json.getBoolean("unstableOnWarning"),
                     json.getBoolean("failBuildOnError"),
                     json.getBoolean("showGraphs"),
@@ -192,10 +205,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
                     configuredUseProjectRule,
                     configuredProjectRulePath);
         }
-
     }
-
-    private static final long serialVersionUID = 1L;
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;

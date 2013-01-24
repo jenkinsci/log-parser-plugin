@@ -149,16 +149,12 @@ public class LogParserParser {
                 displayConstants.getLinkListDisplay(),
                 displayConstants.getLinkListDisplayPlural(), statusCount,
                 linkFiles);
-        // Write the wrapping html for the reference page and the parsed log
-        // page
+        // Write the wrapping html for the reference page and the parsed log page
         LogParserWriter.writeWrapperHtml(buildWrapperPath);
 
-        // String hudsonRoot = Hudson.getInstance().getRootUrl() ; // hudson
-        // link
         final String buildUrlPath = build.getUrl(); // job/cat_log/58
         final String buildActionPath = LogParserAction.getUrlNameStat(); // "parsed_console";
-        final String parsedLogURL = buildUrlPath + buildActionPath
-                + "/log.html";
+        final String parsedLogURL = buildUrlPath + buildActionPath + "/log.html";
 
         // Create result class
         final LogParserResult result = new LogParserResult();
@@ -195,10 +191,11 @@ public class LogParserParser {
 
         // need to strip out for display also (in addition to parsing).
         parsedLine = ConsoleNote.removeNotes(parsedLine);
-        parsedLine = parsedLine.replaceAll("<", "&lt;"); // Allows < to be seen
-                                                         // in log which is html
-        parsedLine = parsedLine.replaceAll(">", "&gt;"); // Allows > to be seen
-                                                         // in log which is html
+        // Allows < to be seen in log which is html
+        parsedLine = parsedLine.replaceAll("<", "&lt;");
+        // Allows > to be seen in log which is html
+        parsedLine = parsedLine.replaceAll(">", "&gt;");
+
         if (effectiveStatus != null
                 && !effectiveStatus.equals(LogParserConsts.NONE)) {
             // Increment count of the status
@@ -283,10 +280,10 @@ public class LogParserParser {
         // Handle case where we are entering a new section
         if (status.equals(LogParserConsts.START)) {
             sectionCounter++;
-            LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers,
-                    sectionCounter); // This enters a line which will later be
-                                     // replaced by the actual header and count
-                                     // for this header
+            // This enters a line which will later be replaced by the actual
+            // header and count for this header
+            LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); 
+
             final StringBuffer brShortLink = new StringBuffer("<br/>");
             brShortLink.append(shortLink);
             headerForSection.add(brShortLink.toString());
@@ -313,12 +310,12 @@ public class LogParserParser {
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        final BufferedReader reader2 = new BufferedReader(new FileReader(
+        final BufferedReader reader = new BufferedReader(new FileReader(
                 logFileLocation));
         String line;
         String status;
         int line_num = 0;
-        while ((line = reader2.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             status = (String) lineStatusMatches.get(String.valueOf(line_num));
             final String parsedLine = parseLine(line, status);
             // This is for displaying sections in the links part
@@ -326,6 +323,7 @@ public class LogParserParser {
             writer.newLine(); // Write system dependent end of line.
             line_num++;
         }
+        reader.close();
 
         // Logging information - end
         final Calendar calendarEnd = Calendar.getInstance();
