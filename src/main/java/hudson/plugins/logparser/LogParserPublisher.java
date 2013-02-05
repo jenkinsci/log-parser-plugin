@@ -185,17 +185,15 @@ public class LogParserPublisher extends Recorder implements Serializable {
             String configuredParsingRulesPath = null;
             String configuredProjectRulePath = null;
             boolean configuredUseProjectRule = false;
-            JSONObject useProjectRuleJSON = json.getJSONObject("useProjectRule");
+            final JSONObject useProjectRuleJSON = json.getJSONObject("useProjectRule");
 
             if (useProjectRuleJSON != null) {
                 configuredUseProjectRule = useProjectRuleJSON.getBoolean("value");
 
-                if (useProjectRuleJSON.containsKey("parsingRulesPath")) {
-                    configuredParsingRulesPath = useProjectRuleJSON.getString("parsingRulesPath");
-                }
-
-                if (useProjectRuleJSON.containsKey("projectRulePath")) {
-                    configuredProjectRulePath = useProjectRuleJSON.getString("projectRulePath");
+                if (!configuredUseProjectRule && json.containsKey("parsingRulesPath")) {
+                    configuredParsingRulesPath = json.getString("parsingRulesPath");
+                } else if (configuredUseProjectRule && json.containsKey("projectRulePath")) {
+                    configuredProjectRulePath = json.getString("projectRulePath");
                 }
             }
             return new LogParserPublisher(json.getBoolean("unstableOnWarning"),
