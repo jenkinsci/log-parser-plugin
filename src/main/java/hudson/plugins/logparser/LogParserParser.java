@@ -272,9 +272,9 @@ public class LogParserParser {
         linkWriter.newLine(); // Write system dependent end of line.
 
         // Mark the line
-        final StringBuffer markedLine = new StringBuffer("<a name=\"");
+        final StringBuffer markedLine = new StringBuffer("<p><a name=\"");
         markedLine.append(marker);
-        markedLine.append("\"></a>");
+        markedLine.append("\"></a></p>");
         markedLine.append(line);
 
         // Handle case where we are entering a new section
