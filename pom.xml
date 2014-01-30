@@ -5,10 +5,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.jvnet.hudson.plugins</groupId>
+    <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.393</version>
-    <relativePath>../pom.xml</relativePath>
+    <version>1.455</version>
   </parent>
   <artifactId>log-parser</artifactId>
   <packaging>hpi</packaging>
