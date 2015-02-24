@@ -24,7 +24,7 @@ public class LogParserConsts {
     public static final List<String> STATUSES_WITH_LINK_FILES = Arrays.asList(
             ERROR, WARNING, PASS, INFO);
     public static final List<String> STATUSES_WITH_SECTIONS_IN_LINK_FILES = Arrays
-            .asList(ERROR, WARNING);
+            .asList(ERROR, WARNING, PASS);
 
     public static String getHtmlOpeningTags() {
         final String hudsonRoot = Hudson.getInstance().getRootUrl();
