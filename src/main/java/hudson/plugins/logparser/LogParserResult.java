@@ -10,11 +10,13 @@ public class LogParserResult {
 
     private int totalErrors = 0;
     private int totalWarnings = 0;
+    private int totalPasses = 0;
     private int totalInfos = 0;
 
     private String htmlLogFile;
     private String errorLinksFile;
     private String warningLinksFile;
+    private String passingLinksFile;
     private String infoLinksFile;
 
     private String parsedLogURL;
@@ -51,6 +53,10 @@ public class LogParserResult {
         return totalWarnings;
     }
 
+    public int getTotalPasses() {
+        return totalPasses;
+    }
+
     public int getTotalInfos() {
         return totalInfos;
     }
@@ -69,6 +75,10 @@ public class LogParserResult {
 
     public String getWarningLinksFile() {
         return warningLinksFile;
+    }
+
+    public String getPassingLinksFile() {
+        return passingLinksFile;
     }
 
     public String getInfoLinksFile() {
@@ -99,6 +109,10 @@ public class LogParserResult {
         return getReader(getWarningLinksFile());
     }
 
+    public Reader getPassingLinksReader() throws IOException {
+        return getReader(getPassingLinksFile());
+    }
+
     public Reader getInfoLinksReader() throws IOException {
         return getReader(getInfoLinksFile());
     }
@@ -119,6 +133,10 @@ public class LogParserResult {
         this.warningLinksFile = file;
     }
 
+    public void setPassingLinksFile(final String file) {
+        this.passingLinksFile = file;
+    }
+
     public void setInfoLinksFile(final String file) {
         this.infoLinksFile = file;
     }
@@ -129,6 +147,10 @@ public class LogParserResult {
 
     public void setTotalWarnings(final int totalWarnings) {
         this.totalWarnings = totalWarnings;
+    }
+
+    public void setTotalPasses(final int totalPasses) {
+        this.totalWarnings = totalPasses;
     }
 
     public void setTotalInfos(final int totalInfos) {

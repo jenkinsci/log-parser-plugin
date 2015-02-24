@@ -135,6 +135,8 @@ public class LogParserAction implements Action {
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
             dsb.add(a.result.getTotalWarnings(), "warnings",
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            dsb.add(a.result.getTotalPasses(), "passes",
+                    new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
             dsb.add(a.result.getTotalInfos(), "infos",
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
         }
@@ -206,6 +208,8 @@ public class LogParserAction implements Action {
                     return "Errors: " + result.getTotalErrors();
                 case 1:
                     return "Warnings: " + result.getTotalWarnings();
+                case 2:
+                    return "Passes: " + result.getTotalPasses();
                 default:
                     return "Infos: " + result.getTotalInfos();
                 }

@@ -75,6 +75,10 @@ public final class LogParserWriter {
         writeLinks(writer, LogParserConsts.WARNING, headerForSection,
                 statusCountPerSection, iconTable, linkListDisplay,
                 linkListDisplayPlural, statusCount, linkFiles);
+        // Write Warnings
+        writeLinks(writer, LogParserConsts.PASS, headerForSection,
+                statusCountPerSection, iconTable, linkListDisplay,
+                linkListDisplayPlural, statusCount, linkFiles);
         // Write Info
         writeLinks(writer, LogParserConsts.INFO, headerForSection,
                 statusCountPerSection, iconTable, linkListDisplay,
