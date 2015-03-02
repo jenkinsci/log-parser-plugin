@@ -217,8 +217,9 @@ public class LogParserAction implements Action {
         };
         plot.setRenderer(ar);
         ar.setSeriesPaint(0, ColorPalette.RED);    // error
-        ar.setSeriesPaint(1, ColorPalette.BLUE);   // info
-        ar.setSeriesPaint(2, ColorPalette.YELLOW); // warning
+        ar.setSeriesPaint(1, ColorPalette.YELLOW); // warning
+        ar.setSeriesPaint(2, new Color(140, 255, 100)); // pass
+        ar.setSeriesPaint(3, ColorPalette.BLUE);   // info
 
         // crop extra space around the graph
         plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));
