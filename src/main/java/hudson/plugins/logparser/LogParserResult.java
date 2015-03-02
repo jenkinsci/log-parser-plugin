@@ -150,7 +150,7 @@ public class LogParserResult {
     }
 
     public void setTotalPasses(final int totalPasses) {
-        this.totalWarnings = totalPasses;
+        this.totalPasses = totalPasses;
     }
 
     public void setTotalInfos(final int totalInfos) {
