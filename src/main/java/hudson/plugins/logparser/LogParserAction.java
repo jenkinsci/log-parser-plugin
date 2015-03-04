@@ -207,19 +207,20 @@ public class LogParserAction implements Action {
                 case 0:
                     return "Errors: " + result.getTotalErrors();
                 case 1:
-                    return "Warnings: " + result.getTotalWarnings();
+                    return "Infos: " + result.getTotalInfos();
                 case 2:
                     return "Passes: " + result.getTotalPasses();
                 default:
-                    return "Infos: " + result.getTotalInfos();
+                    return "Warnings: " + result.getTotalWarnings();
                 }
             }
         };
         plot.setRenderer(ar);
         ar.setSeriesPaint(0, ColorPalette.RED);    // error
-        ar.setSeriesPaint(1, ColorPalette.YELLOW); // warning
+        ar.setSeriesPaint(1, ColorPalette.BLUE);   // info
         ar.setSeriesPaint(2, new Color(140, 255, 100)); // pass
-        ar.setSeriesPaint(3, ColorPalette.BLUE);   // info
+        ar.setSeriesPaint(3, ColorPalette.YELLOW); // warning
+
 
         // crop extra space around the graph
         plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));
