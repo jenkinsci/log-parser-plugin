@@ -3,6 +3,7 @@ package hudson.plugins.logparser;
 import hudson.FilePath;
 import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
+import jenkins.security.MasterToSlaveCallable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,27 +43,25 @@ public class LogParserStatusComputer implements Serializable {
             throws IOException, InterruptedException {
         HashMap<String, String> result = null;
 
-        result = channel
-                .call(new Callable<HashMap<String, String>, RuntimeException>() {
+        result = channel.call(new MasterToSlaveCallable<HashMap<String, String>, RuntimeException>() {
 
-                    private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-                    public HashMap<String, String> call() {
-                        HashMap<String, String> result = null;
-                        try {
-                            result = computeStatusMatches(filePath, linesInLog,
-                                    signature);
+            public HashMap<String, String> call() {
+                HashMap<String, String> result = null;
+                try {
+                    result = computeStatusMatches(filePath, linesInLog, signature);
 
-                            // rethrow any exception here to report why the
-                            // parsing failed
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        return result;
-                    }
-                });
+                    // rethrow any exception here to report why the
+                    // parsing failed
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return result;
+            }
+        });
         return result;
     }
 

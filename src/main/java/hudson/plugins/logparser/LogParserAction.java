@@ -3,6 +3,7 @@ package hudson.plugins.logparser;
 import hudson.Functions;
 import hudson.model.Action;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.util.Area;
 import hudson.util.ChartUtil;
 import hudson.util.ColorPalette;
@@ -31,16 +32,20 @@ import org.kohsuke.stapler.StaplerResponse;
 
 public class LogParserAction implements Action {
 
-    final private AbstractBuild<?, ?> build;
+    //final private AbstractBuild<?, ?> build;
+    final private Run<?, ?> build;
     final private LogParserResult result;
 
     private static String urlName = "parsed_console";
 
-    public LogParserAction(final AbstractBuild<?, ?> build,
-            final LogParserResult result) {
+    @Deprecated
+    public LogParserAction(final AbstractBuild<?, ?> build, final LogParserResult result) {
+        this((Run<?, ?>) build, result);
+    }
+
+    public LogParserAction(final Run<?, ?> build, final LogParserResult result) {
         this.build = build;
         this.result = result;
-
     }
 
     public String getIconFileName() {
@@ -59,28 +64,33 @@ public class LogParserAction implements Action {
         return urlName;
     }
 
-    public AbstractBuild<?, ?> getOwner() {
+    /*public AbstractBuild<?, ?> getOwner() {
+        return (AbstractBuild<?, ?>) build;
+    }*/
+
+    public Run<?, ?> getOwner() {
         return build;
     }
 
-    // Used by the summary.jelly of this class to show some totals from the
-    // result
+    // Used by the summary.jelly of this class to show some totals from the result
     public LogParserResult getResult() {
         return result;
     }
 
     public LogParserAction getPreviousAction() {
-        AbstractBuild<?, ?> build = this.getOwner();
+        //AbstractBuild<?, ?> build = this.getOwner();
+        Run<?, ?> build = this.getOwner();
 
         while (true) {
-
             build = build.getPreviousBuild();
 
-            if (build == null)
+            if (build == null) {
                 return null;
+            }
             LogParserAction action = build.getAction(LogParserAction.class);
-            if (action != null)
+            if (action != null) {
                 return action;
+            }
         }
     }
 
@@ -127,16 +137,12 @@ public class LogParserAction implements Action {
     }
 
     private CategoryDataset buildDataSet() {
-
         DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dsb = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
 
         for (LogParserAction a = this; a != null; a = a.getPreviousAction()) {
-            dsb.add(a.result.getTotalErrors(), "errors",
-                    new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
-            dsb.add(a.result.getTotalWarnings(), "warnings",
-                    new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
-            dsb.add(a.result.getTotalInfos(), "infos",
-                    new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            dsb.add(a.result.getTotalErrors(), "errors", new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) a.getOwner()));
+            dsb.add(a.result.getTotalWarnings(), "warnings", new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) a.getOwner()));
+            dsb.add(a.result.getTotalInfos(), "infos", new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) a.getOwner()));
         }
         return dsb.build();
     }
