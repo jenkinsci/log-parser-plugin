@@ -19,7 +19,7 @@
     <project.build.outputEncoding>UTF-8</project.build.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <findbugs-maven-plugin.version>3.0.1</findbugs-maven-plugin.version>
-    <findbugs.failOnError>true</findbugs.failOnError>
+    <findbugs.failOnError>false</findbugs.failOnError>
     <workflow-jenkins-plugin.version>1.4</workflow-jenkins-plugin.version>
   </properties>
 
@@ -41,19 +41,7 @@
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-job</artifactId>
-      <version>${workflow-jenkins-plugin.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-cps</artifactId>
-      <version>${workflow-jenkins-plugin.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-basic-steps</artifactId>
+      <artifactId>workflow-aggregator</artifactId>
       <version>${workflow-jenkins-plugin.version}</version>
       <scope>test</scope>
     </dependency>
@@ -66,7 +54,7 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5.1</version>
       </plugin>
-      <!--<plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
         <version>${findbugs-maven-plugin.version}</version>
@@ -74,7 +62,6 @@
           <excludeFilterFile>src/findbugs/excludesFilter.xml</excludeFilterFile>
           <failOnError>${findbugs.failOnError}</failOnError>
           <xmlOutput>true</xmlOutput>
-          <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
         </configuration>
         <executions>
           <execution>
@@ -84,8 +71,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin> -->
-
+      </plugin>
     </plugins>
   </build>
 

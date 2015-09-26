@@ -33,8 +33,7 @@ public class LogParserStatusComputer implements Serializable {
             final String signature) throws IOException, InterruptedException {
         this.parsingRulesArray = parsingRulesArray;
         this.compiledPatterns = compiledPatterns;
-        this.computedStatusMatches = computeStatusMatches(filePath, linesInLog,
-                channel, signature);
+        this.computedStatusMatches = computeStatusMatches(filePath, linesInLog, channel, signature);
     }
 
     private HashMap<String, String> computeStatusMatches(

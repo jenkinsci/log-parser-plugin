@@ -32,7 +32,6 @@ import org.kohsuke.stapler.StaplerResponse;
 
 public class LogParserAction implements Action {
 
-    //final private AbstractBuild<?, ?> build;
     final private Run<?, ?> build;
     final private LogParserResult result;
 
@@ -64,10 +63,6 @@ public class LogParserAction implements Action {
         return urlName;
     }
 
-    /*public AbstractBuild<?, ?> getOwner() {
-        return (AbstractBuild<?, ?>) build;
-    }*/
-
     public Run<?, ?> getOwner() {
         return build;
     }
@@ -78,7 +73,6 @@ public class LogParserAction implements Action {
     }
 
     public LogParserAction getPreviousAction() {
-        //AbstractBuild<?, ?> build = this.getOwner();
         Run<?, ?> build = this.getOwner();
 
         while (true) {
@@ -96,6 +90,7 @@ public class LogParserAction implements Action {
 
     public void doDynamic(final StaplerRequest req, final StaplerResponse rsp)
             throws IOException, ServletException, InterruptedException {
+
         final String dir = result.getHtmlLogPath();
         final String file = req.getRestOfPath();
         final String fileArray[] = file.split("/");
@@ -105,44 +100,43 @@ public class LogParserAction implements Action {
 
     }
 
-    public void doGraph(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
+    public void doGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
         if (ChartUtil.awtProblemCause != null) {
             // not available. send out error message
             rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
             return;
         }
 
-        if (req.checkIfModified(getOwner().getTimestamp(), rsp))
+        if (req.checkIfModified(getOwner().getTimestamp(), rsp)) {
             return;
+        }
 
-        ChartUtil.generateGraph(req, rsp, createChart(req, buildDataSet()),
-                calcDefaultSize());
+        ChartUtil.generateGraph(req, rsp, createChart(req, buildDataSet()), calcDefaultSize());
     }
 
-    public void doGraphMap(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
-        if (req.checkIfModified(this.getOwner().getTimestamp(), rsp))
+    public void doGraphMap(StaplerRequest req, StaplerResponse rsp) throws IOException {
+        if (req.checkIfModified(this.getOwner().getTimestamp(), rsp)) {
             return;
-        ChartUtil.generateClickableMap(req, rsp,
-                createChart(req, buildDataSet()), calcDefaultSize());
+        }
+        ChartUtil.generateClickableMap(req, rsp, createChart(req, buildDataSet()), calcDefaultSize());
     }
 
     private Area calcDefaultSize() {
         Area res = Functions.getScreenResolution();
-        if (res != null && res.width <= 800)
+        if (res != null && res.width <= 800) {
             return new Area(250, 100);
-        else
+        } else {
             return new Area(500, 200);
+        }
     }
 
     private CategoryDataset buildDataSet() {
         DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dsb = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
 
         for (LogParserAction a = this; a != null; a = a.getPreviousAction()) {
-            dsb.add(a.result.getTotalErrors(), "errors", new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) a.getOwner()));
-            dsb.add(a.result.getTotalWarnings(), "warnings", new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) a.getOwner()));
-            dsb.add(a.result.getTotalInfos(), "infos", new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) a.getOwner()));
+            dsb.add(a.result.getTotalErrors(), "errors", new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            dsb.add(a.result.getTotalWarnings(), "warnings", new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            dsb.add(a.result.getTotalInfos(), "infos", new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
         }
         return dsb.build();
     }
@@ -197,16 +191,13 @@ public class LogParserAction implements Action {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public String generateURL(CategoryDataset dataset, int row,
-                    int column) {
-                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset
-                        .getColumnKey(column);
+            public String generateURL(CategoryDataset dataset, int row, int column) {
+                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset.getColumnKey(column);
                 return relPath + label.build.getNumber() + "/testReport/";
             }
 
             @Override
-            public String generateToolTip(CategoryDataset dataset, int row,
-                    int column) {
+            public String generateToolTip(CategoryDataset dataset, int row, int column) {
                 switch (row) {
                 case 0:
                     return "Errors: " + result.getTotalErrors();
@@ -230,8 +221,9 @@ public class LogParserAction implements Action {
 
     private String getRelPath(StaplerRequest req) {
         String relPath = req.getParameter("rel");
-        if (relPath == null)
+        if (relPath == null) {
             return "";
+        }
         return relPath;
     }
 

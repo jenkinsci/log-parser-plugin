@@ -50,7 +50,6 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
      * @param projectRulePath
      *            path to project specific rules relative to workspace root.
      */
-    @Deprecated
     private LogParserPublisher(final boolean unstableOnWarning,
             final boolean failBuildOnError, final boolean showGraphs,
             final String parsingRulesPath, final boolean useProjectRule,
@@ -91,7 +90,9 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull
+            TaskListener listener) throws InterruptedException, IOException {
+
         Logger logger = Logger.getLogger(getClass().getName());
         LogParserResult result = new LogParserResult();
         try {

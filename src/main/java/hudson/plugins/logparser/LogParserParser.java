@@ -189,23 +189,21 @@ public class LogParserParser {
         // Allows > to be seen in log which is html
         parsedLine = parsedLine.replaceAll(">", "&gt;");
 
-        if (effectiveStatus != null
-                && !effectiveStatus.equals(LogParserConsts.NONE)) {
+        if (effectiveStatus != null && !effectiveStatus.equals(LogParserConsts.NONE)) {
             // Increment count of the status
             incrementCounter(effectiveStatus);
             incrementCounterPerSection(effectiveStatus, sectionCounter);
             // Color line according to the status
-            final String parsedLineColored = colorLine(parsedLine,
-                    effectiveStatus);
+            final String parsedLineColored = colorLine(parsedLine, effectiveStatus);
 
             // Mark line and add to left side links of highlighted lines
-            final String parsedLineColoredAndMarked = addMarkerAndLink(
-                    parsedLineColored, effectiveStatus, status);
+            final String parsedLineColoredAndMarked = addMarkerAndLink(parsedLineColored, effectiveStatus, status);
             parsedLine = parsedLineColoredAndMarked;
         }
         final StringBuffer result = new StringBuffer(parsedLine);
-        if (!preformattedHtml)
+        if (!preformattedHtml) {
             result.append("<br/>\n");
+        }
         return result.toString();
     }
 
@@ -214,10 +212,8 @@ public class LogParserParser {
         statusCount.put(status, currentVal + 1);
     }
 
-    public void incrementCounterPerSection(final String status,
-            final int sectionNumber) {
-        final String key = LogParserUtils.getSectionCountKey(status,
-                sectionNumber);
+    public void incrementCounterPerSection(final String status, final int sectionNumber) {
+        final String key = LogParserUtils.getSectionCountKey(status, sectionNumber);
         Integer currentValInteger = (Integer) statusCountPerSection.get(key);
         // No value - entered yet - initialize with 0
         if (currentValInteger == null) {
@@ -228,8 +224,7 @@ public class LogParserParser {
     }
 
     private String colorLine(final String line, final String status) {
-        final String color = (String) displayConstants.getColorTable().get(
-                status);
+        final String color = (String) displayConstants.getColorTable().get(status);
         final StringBuffer result = new StringBuffer("<span style=\"color:");
         result.append(color);
         result.append("\">");
@@ -238,17 +233,13 @@ public class LogParserParser {
         return result.toString();
     }
 
-    private String addMarkerAndLink(final String line,
-            final String effectiveStatus, final String status)
-            throws IOException {
+    private String addMarkerAndLink(final String line, final String effectiveStatus, final String status) throws IOException {
         // Add marker
-        final String statusCountStr = ((Integer) statusCount
-                .get(effectiveStatus)).toString();
+        final String statusCountStr = ((Integer) statusCount.get(effectiveStatus)).toString();
         final String marker = effectiveStatus + statusCountStr;
 
         // Add link
-        final StringBuffer shortLink = new StringBuffer(
-                " <a target=\"content\" href=\"log_content.html#");
+        final StringBuffer shortLink = new StringBuffer(" <a target=\"content\" href=\"log_content.html#");
         shortLink.append(marker);
         shortLink.append("\">");
         shortLink.append(line);
@@ -259,8 +250,7 @@ public class LogParserParser {
         link.append(shortLink);
         link.append("</li><br/>");
 
-        final BufferedWriter linkWriter = (BufferedWriter) writers
-                .get(effectiveStatus);
+        final BufferedWriter linkWriter = (BufferedWriter) writers.get(effectiveStatus);
         linkWriter.write(link.toString());
         linkWriter.newLine(); // Write system dependent end of line.
 
