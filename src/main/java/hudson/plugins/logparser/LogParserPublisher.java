@@ -21,6 +21,7 @@ import net.sf.json.JSONObject;
 
 import org.apache.log4j.spi.LoggerFactory;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
@@ -63,13 +64,63 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         this.projectRulePath = projectRulePath;
     }
 
-    /**
-     * Constructor used from methods like {@link StaplerRequest#bindJSON(Class, JSONObject)} and
-     * {@link StaplerRequest#bindParameters(Class, String)}.
-     */
     @DataBoundConstructor
     public LogParserPublisher() {
         super();
+    }
+
+    @DataBoundSetter
+    public void setUnstableOnWarning(boolean unstableOnWarning) {
+        this.unstableOnWarning = unstableOnWarning;
+    }
+
+    public boolean isUnstableOnWarning() {
+        return unstableOnWarning;
+    }
+
+    @DataBoundSetter
+    public void setFailBuildOnError(boolean failBuildOnError) {
+        this.failBuildOnError = failBuildOnError;
+    }
+
+    public boolean isFailBuildOnError() {
+        return failBuildOnError;
+    }
+
+    @DataBoundSetter
+    public void setShowGraphs(boolean showGraphs) {
+        this.showGraphs = showGraphs;
+    }
+
+    public boolean isShowGraphs() {
+        return showGraphs;
+    }
+
+    @DataBoundSetter
+    public void setParsingRulesPath(String parsingRulesPath) {
+        this.parsingRulesPath = parsingRulesPath;
+    }
+
+    public String getParsingRulesPath() {
+        return parsingRulesPath;
+    }
+
+    @DataBoundSetter
+    public void setUseProjectRule(boolean useProjectRule) {
+        this.useProjectRule = useProjectRule;
+    }
+
+    public boolean isUseProjectRule() {
+        return useProjectRule;
+    }
+
+    @DataBoundSetter
+    public void setProjectRulePath(String projectRulePath) {
+        this.projectRulePath = projectRulePath;
+    }
+
+    public String getProjectRulePath() {
+        return projectRulePath;
     }
 
     @Override
