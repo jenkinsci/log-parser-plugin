@@ -11,7 +11,6 @@ import hudson.tasks.Recorder;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +18,6 @@ import java.util.logging.Logger;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 
-import org.apache.log4j.spi.LoggerFactory;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -97,30 +95,23 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @DataBoundSetter
-    public void setParsingRulesPath(String parsingRulesPath) {
+    public void setUseProjectRule(final JSONObject useProjectRule) {
+        this.useProjectRule = useProjectRule.getBoolean("value");
+        if (useProjectRule.getBoolean("value") && useProjectRule.containsKey("projectRulePath")) {
+            this.projectRulePath = useProjectRule.getString("projectRulePath");
+        } else if (this.useProjectRule && useProjectRule.containsKey("parsingRulesPath")) {
+            this.parsingRulesPath = useProjectRule.getString("parsingRulesPath");
+        }
+    }
+
+    @DataBoundSetter
+    public void setParsingRulesPath(final String parsingRulesPath) {
         this.parsingRulesPath = parsingRulesPath;
     }
 
-    public String getParsingRulesPath() {
-        return parsingRulesPath;
-    }
-
     @DataBoundSetter
-    public void setUseProjectRule(boolean useProjectRule) {
-        this.useProjectRule = useProjectRule;
-    }
-
-    public boolean isUseProjectRule() {
-        return useProjectRule;
-    }
-
-    @DataBoundSetter
-    public void setProjectRulePath(String projectRulePath) {
+    public void setProjectRulePath(final String projectRulePath) {
         this.projectRulePath = projectRulePath;
-    }
-
-    public String getProjectRulePath() {
-        return projectRulePath;
     }
 
     @Override
