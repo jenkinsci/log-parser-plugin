@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public final class LogParserUtils {
 
     public static String[] readParsingRules(final FilePath parsingRulesFile)
-            throws IOException {
+            throws IOException, InterruptedException {
         return parsingRulesFile.readToString().split("\n");
     }
 

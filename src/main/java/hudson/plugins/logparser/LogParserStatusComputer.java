@@ -3,6 +3,7 @@ package hudson.plugins.logparser;
 import hudson.FilePath;
 import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
+import jenkins.security.MasterToSlaveCallable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,7 +44,7 @@ public class LogParserStatusComputer implements Serializable {
         HashMap<String, String> result = null;
 
         result = channel
-                .call(new Callable<HashMap<String, String>, RuntimeException>() {
+                .call(new MasterToSlaveCallable<HashMap<String, String>, RuntimeException>() {
 
                     private static final long serialVersionUID = 1L;
 

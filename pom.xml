@@ -7,12 +7,17 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.455</version>
+    <version>1.596.1</version>
   </parent>
   <artifactId>log-parser</artifactId>
   <packaging>hpi</packaging>
   <version>1.1-SNAPSHOT</version>
   <name>Log Parser Plugin</name>
+
+  <properties>
+    <workflow-jenkins-plugin.version>1.4</workflow-jenkins-plugin.version>
+  </properties>
+
   <reporting>
     <plugins>
       <plugin>
@@ -47,6 +52,15 @@
       <email>jborghi@java.net</email>
     </developer>
   </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-aggregator</artifactId>
+      <version>${workflow-jenkins-plugin.version}</version>
+     <scope>test</scope>
+    </dependency>
+  </dependencies>
   <!-- see http://groups.google.com/group/hudson-dev/browse_thread/thread/83e34c639eec470a 
     for the rationale behind this -->
   <build>
