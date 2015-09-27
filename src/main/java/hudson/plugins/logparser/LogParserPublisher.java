@@ -24,16 +24,18 @@ import java.util.logging.Logger;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class LogParserPublisher extends Recorder implements SimpleBuildStep, Serializable {
     private static final long serialVersionUID = 1L;
-    public final boolean unstableOnWarning;
-    public final boolean failBuildOnError;
-    public final boolean showGraphs;
-    public final String parsingRulesPath;
-    public final boolean useProjectRule;
-    public final String projectRulePath;
+    public boolean unstableOnWarning;
+    public boolean failBuildOnError;
+    public boolean showGraphs;
+    public String parsingRulesPath;
+    public boolean useProjectRule;
+    public String projectRulePath;
 
     /**
      * Create new LogParserPublisher.
@@ -51,6 +53,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
      * @param projectRulePath
      *            path to project specific rules relative to workspace root.
      */
+    @Deprecated
     private LogParserPublisher(final boolean unstableOnWarning,
             final boolean failBuildOnError, final boolean showGraphs,
             final String parsingRulesPath, final boolean useProjectRule,
@@ -61,6 +64,41 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         this.showGraphs = showGraphs;
         this.parsingRulesPath = parsingRulesPath;
         this.useProjectRule = useProjectRule;
+        this.projectRulePath = projectRulePath;
+    }
+
+    @DataBoundConstructor
+    public LogParserPublisher() {
+        super();
+    }
+
+    @DataBoundSetter
+    public void setUnstableOnWarning(boolean unstableOnWarning) {
+        this.unstableOnWarning = unstableOnWarning;
+    }
+
+    @DataBoundSetter
+    public void setFailBuildOnError(boolean failBuildOnError) {
+        this.failBuildOnError = failBuildOnError;
+    }
+
+    @DataBoundSetter
+    public void setShowGraphs(boolean showGraphs) {
+        this.showGraphs = showGraphs;
+    }
+
+    @DataBoundSetter
+    public void setUseProjectRule(final boolean useProjectRule) {
+        this.useProjectRule = useProjectRule;
+    }
+
+    @DataBoundSetter
+    public void setParsingRulesPath(final String parsingRulesPath) {
+        this.parsingRulesPath = parsingRulesPath;
+    }
+
+    @DataBoundSetter
+    public void setProjectRulePath(final String projectRulePath) {
         this.projectRulePath = projectRulePath;
     }
 
