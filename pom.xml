@@ -15,7 +15,7 @@
   <name>Log Parser Plugin</name>
 
   <properties>
-    <workflow-jenkins-plugin.version>1.4</workflow-jenkins-plugin.version>
+    <workflow-jenkins-plugin.version>1.7</workflow-jenkins-plugin.version>
   </properties>
 
   <reporting>
