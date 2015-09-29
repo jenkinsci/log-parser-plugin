@@ -68,8 +68,16 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @DataBoundConstructor
-    public LogParserPublisher() {
+    public LogParserPublisher(final boolean useProjectRule, final String parsingRulesPath, final String projectRulePath) {
         super();
+        if (useProjectRule) {
+            this.projectRulePath = projectRulePath;
+            this.parsingRulesPath = null;
+        } else {
+            this.projectRulePath = null;
+            this.parsingRulesPath = parsingRulesPath;
+        }
+        this.useProjectRule = useProjectRule;
     }
 
     @DataBoundSetter
@@ -85,21 +93,6 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     @DataBoundSetter
     public void setShowGraphs(boolean showGraphs) {
         this.showGraphs = showGraphs;
-    }
-
-    @DataBoundSetter
-    public void setUseProjectRule(final boolean useProjectRule) {
-        this.useProjectRule = useProjectRule;
-    }
-
-    @DataBoundSetter
-    public void setParsingRulesPath(final String parsingRulesPath) {
-        this.parsingRulesPath = parsingRulesPath;
-    }
-
-    @DataBoundSetter
-    public void setProjectRulePath(final String projectRulePath) {
-        this.projectRulePath = projectRulePath;
     }
 
     @Override
@@ -214,38 +207,6 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
                     "useLegacyFormatting");
             save();
             return true;
-        }
-
-        /**
-         * Cannot use simple DataBoundConstructor due to radioBlock usage where
-         * a JSON object is returned holding the selected value of the block.
-         * 
-         * {@inheritDoc}
-         */
-        @Override
-        public LogParserPublisher newInstance(StaplerRequest req,
-                JSONObject json) throws FormException {
-
-            String configuredParsingRulesPath = null;
-            String configuredProjectRulePath = null;
-            boolean configuredUseProjectRule = false;
-            final JSONObject useProjectRuleJSON = json.getJSONObject("useProjectRule");
-
-            if (useProjectRuleJSON != null) {
-                configuredUseProjectRule = useProjectRuleJSON.getBoolean("value");
-
-                if (!configuredUseProjectRule && useProjectRuleJSON.containsKey("parsingRulesPath")) {
-                    configuredParsingRulesPath = useProjectRuleJSON.getString("parsingRulesPath");
-                } else if (configuredUseProjectRule && useProjectRuleJSON.containsKey("projectRulePath")) {
-                    configuredProjectRulePath = useProjectRuleJSON.getString("projectRulePath");
-                }
-            }
-            return new LogParserPublisher(json.getBoolean("unstableOnWarning"),
-                    json.getBoolean("failBuildOnError"),
-                    json.getBoolean("showGraphs"),
-                    configuredParsingRulesPath,
-                    configuredUseProjectRule,
-                    configuredProjectRulePath);
         }
     }
 
