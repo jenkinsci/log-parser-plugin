@@ -41,7 +41,7 @@ public class LogParserParser {
 
     public LogParserParser(final FilePath parsingRulesFile,
             final boolean preformattedHtml, final VirtualChannel channel)
-            throws IOException, InterruptedException {
+            throws IOException {
 
         // init logger
         final Logger logger = Logger.getLogger(getClass().getName());

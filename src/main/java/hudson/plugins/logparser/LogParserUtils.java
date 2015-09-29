@@ -13,9 +13,12 @@ import java.util.regex.Pattern;
 
 public final class LogParserUtils {
 
-    public static String[] readParsingRules(final FilePath parsingRulesFile)
-            throws IOException, InterruptedException {
-        return parsingRulesFile.readToString().split("\n");
+    public static String[] readParsingRules(final FilePath parsingRulesFile) throws IOException {
+        try {
+            return parsingRulesFile.readToString().split("\n");
+        } catch (InterruptedException ie) {
+            throw new IOException(ie);
+        }
     }
 
     public static boolean skipParsingRule(final String parsingRule) {
