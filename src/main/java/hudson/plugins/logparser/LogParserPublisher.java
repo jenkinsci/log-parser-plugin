@@ -2,6 +2,7 @@ package hudson.plugins.logparser;
 
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -33,9 +34,9 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     public boolean unstableOnWarning;
     public boolean failBuildOnError;
     public boolean showGraphs;
-    public String parsingRulesPath;
+    public String parsingRulesPath = null;
     public boolean useProjectRule;
-    public String projectRulePath;
+    public String projectRulePath = null;
 
     /**
      * Create new LogParserPublisher.
@@ -68,14 +69,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @DataBoundConstructor
-    public LogParserPublisher(final boolean useProjectRule, final String parsingRulesPath, final String projectRulePath) {
+    public LogParserPublisher(boolean useProjectRule, String projectRulePath, String parsingRulesPath) {
         super();
         if (useProjectRule) {
-            this.projectRulePath = projectRulePath;
+            this.projectRulePath = Util.fixEmpty(projectRulePath);
             this.parsingRulesPath = null;
         } else {
+            this.parsingRulesPath = Util.fixEmpty(parsingRulesPath);
             this.projectRulePath = null;
-            this.parsingRulesPath = parsingRulesPath;
         }
         this.useProjectRule = useProjectRule;
     }
