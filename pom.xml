@@ -58,7 +58,7 @@
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-aggregator</artifactId>
       <version>${workflow-jenkins-plugin.version}</version>
-     <scope>test</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <!-- see http://groups.google.com/group/hudson-dev/browse_thread/thread/83e34c639eec470a 
