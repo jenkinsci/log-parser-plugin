@@ -297,13 +297,6 @@ public class LogParserParser {
         return markedLine.toString();
     }
 
-    @Deprecated
-    private void parseLogBody(final AbstractBuild build, final BufferedWriter writer, final FilePath filePath, final
-            String logFileLocation, final int linesInLog, final Logger logger) throws IOException, InterruptedException {
-
-        this.parseLogBody((Run<?, ?>) build, writer, filePath, logFileLocation, linesInLog, logger);
-    }
-
     private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final FilePath filePath, final
             String logFileLocation, final int linesInLog, final Logger logger) throws IOException, InterruptedException {
 
