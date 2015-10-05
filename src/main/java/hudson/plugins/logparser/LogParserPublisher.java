@@ -112,7 +112,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @Override
-    public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener) throws
+    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws
             InterruptedException, IOException {
 
         final Logger logger = Logger.getLogger(getClass().getName());
@@ -128,35 +128,35 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
             }
             final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml, launcher.getChannel());
             // Parse the build's log according to these rules and get the result
-            result = parser.parseLog(run);
+            result = parser.parseLog(build);
 
             // Mark build as failed/unstable if necessary
             if (this.failBuildOnError && result.getTotalErrors() > 0) {
-                run.setResult(Result.FAILURE);
+                build.setResult(Result.FAILURE);
             } else if (this.unstableOnWarning && result.getTotalWarnings() > 0) {
-                run.setResult(Result.UNSTABLE);
+                build.setResult(Result.UNSTABLE);
             }
         } catch (IOException e) {
             // Failure to parse should not fail the build - but should be
             // handled as a serious error.
             // This should catch all process problems during parsing, including
             // parser file not found..
-            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + run, e);
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
         } catch (NullPointerException e) {
             // in case the rules path is null
-            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + run, e);
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
-            run.setResult(Result.ABORTED);
+            build.setResult(Result.ABORTED);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + run, e);
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
-            run.setResult(Result.ABORTED);
+            build.setResult(Result.ABORTED);
         }
 
         // Add an action created with the above results
-        final LogParserAction action = new LogParserAction(run, result);
-        run.addAction(action);
+        final LogParserAction action = new LogParserAction(build, result);
+        build.addAction(action);
     }
 
     @Override
