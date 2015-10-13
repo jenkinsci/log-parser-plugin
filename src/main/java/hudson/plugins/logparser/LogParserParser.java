@@ -3,6 +3,7 @@ package hudson.plugins.logparser;
 import hudson.FilePath;
 import hudson.console.ConsoleNote;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
 
 import java.io.BufferedReader;
@@ -69,8 +70,12 @@ public class LogParserParser {
      * lists of links to these errors/warnings/info messages respectively :
      * errorLinks.html, warningLinks.html, infoLinks.html
      */
-    public LogParserResult parseLog(final AbstractBuild build)
-            throws IOException, InterruptedException {
+    @Deprecated
+    public LogParserResult parseLog(final AbstractBuild build) throws IOException, InterruptedException {
+        return this.parseLog((Run<?, ?>) build);
+    }
+
+    public LogParserResult parseLog(final Run<?, ?> build) throws IOException, InterruptedException {
 
         // init logger
         final Logger logger = Logger.getLogger(getClass().getName());
@@ -292,10 +297,9 @@ public class LogParserParser {
         return markedLine.toString();
     }
 
-    private void parseLogBody(final AbstractBuild build,
-            final BufferedWriter writer, final FilePath filePath,
-            final String logFileLocation, final int linesInLog,
-            final Logger logger) throws IOException, InterruptedException {
+    private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final FilePath filePath, final
+            String logFileLocation, final int linesInLog, final Logger logger) throws IOException, InterruptedException {
+
         // Logging information - start
         final String signature = build.getParent().getName() + "_build_"
                 + build.getNumber();

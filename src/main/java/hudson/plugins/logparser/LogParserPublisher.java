@@ -2,11 +2,14 @@ package hudson.plugins.logparser;
 
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.plugins.logparser.action.LogParserProjectAction;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -19,18 +22,21 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
-public class LogParserPublisher extends Recorder implements Serializable {
+public class LogParserPublisher extends Recorder implements SimpleBuildStep, Serializable {
     private static final long serialVersionUID = 1L;
-    public final boolean unstableOnWarning;
-    public final boolean failBuildOnError;
-    public final boolean showGraphs;
-    public final String parsingRulesPath;
-    public final boolean useProjectRule;
-    public final String projectRulePath;
+    public boolean unstableOnWarning;
+    public boolean failBuildOnError;
+    public boolean showGraphs;
+    public String parsingRulesPath = null;
+    public boolean useProjectRule;
+    public String projectRulePath = null;
 
     /**
      * Create new LogParserPublisher.
@@ -48,6 +54,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
      * @param projectRulePath
      *            path to project specific rules relative to workspace root.
      */
+    @Deprecated
     private LogParserPublisher(final boolean unstableOnWarning,
             final boolean failBuildOnError, final boolean showGraphs,
             final String parsingRulesPath, final boolean useProjectRule,
@@ -61,32 +68,65 @@ public class LogParserPublisher extends Recorder implements Serializable {
         this.projectRulePath = projectRulePath;
     }
 
+    @DataBoundConstructor
+    public LogParserPublisher(boolean useProjectRule, String projectRulePath, String parsingRulesPath) {
+        super();
+        if (useProjectRule) {
+            this.projectRulePath = Util.fixEmpty(projectRulePath);
+            this.parsingRulesPath = null;
+        } else {
+            this.parsingRulesPath = Util.fixEmpty(parsingRulesPath);
+            this.projectRulePath = null;
+        }
+        this.useProjectRule = useProjectRule;
+    }
+
+    @DataBoundSetter
+    public void setUnstableOnWarning(boolean unstableOnWarning) {
+        this.unstableOnWarning = unstableOnWarning;
+    }
+
+    @DataBoundSetter
+    public void setFailBuildOnError(boolean failBuildOnError) {
+        this.failBuildOnError = failBuildOnError;
+    }
+
+    @DataBoundSetter
+    public void setShowGraphs(boolean showGraphs) {
+        this.showGraphs = showGraphs;
+    }
+
     @Override
     public boolean prebuild(final AbstractBuild<?, ?> build,
             final BuildListener listener) {
         return true;
     }
 
+    @Deprecated
     @Override
-    public boolean perform(final AbstractBuild<?, ?> build,
-            final Launcher launcher, final BuildListener listener)
+    public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
+
+        this.perform((Run<?, ?>) build, build.getWorkspace(), launcher, listener);
+        return true;
+    }
+
+    @Override
+    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws
+            InterruptedException, IOException {
+
         final Logger logger = Logger.getLogger(getClass().getName());
         LogParserResult result = new LogParserResult();
         try {
-            // Create a parser with the parsing rules as configured : colors,
-            // regular expressions, etc.
-            boolean preformattedHtml = !((DescriptorImpl) getDescriptor())
-                    .getLegacyFormatting();
+            // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
+            boolean preformattedHtml = !((DescriptorImpl) getDescriptor()).getLegacyFormatting();
             final FilePath parsingRulesFile;
             if (useProjectRule) {
-                parsingRulesFile = new FilePath(build.getWorkspace(),
-                        projectRulePath);
+                parsingRulesFile = new FilePath(workspace, projectRulePath);
             } else {
                 parsingRulesFile = new FilePath(new File(parsingRulesPath));
             }
-            final LogParserParser parser = new LogParserParser(
-                    parsingRulesFile, preformattedHtml, launcher.getChannel());
+            final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml, launcher.getChannel());
             // Parse the build's log according to these rules and get the result
             result = parser.parseLog(build);
 
@@ -116,9 +156,7 @@ public class LogParserPublisher extends Recorder implements Serializable {
 
         // Add an action created with the above results
         final LogParserAction action = new LogParserAction(build, result);
-        build.getActions().add(0, action);
-
-        return true;
+        build.addAction(action);
     }
 
     @Override
@@ -170,38 +208,6 @@ public class LogParserPublisher extends Recorder implements Serializable {
                     "useLegacyFormatting");
             save();
             return true;
-        }
-
-        /**
-         * Cannot use simple DataBoundConstructor due to radioBlock usage where
-         * a JSON object is returned holding the selected value of the block.
-         * 
-         * {@inheritDoc}
-         */
-        @Override
-        public LogParserPublisher newInstance(StaplerRequest req,
-                JSONObject json) throws FormException {
-
-            String configuredParsingRulesPath = null;
-            String configuredProjectRulePath = null;
-            boolean configuredUseProjectRule = false;
-            final JSONObject useProjectRuleJSON = json.getJSONObject("useProjectRule");
-
-            if (useProjectRuleJSON != null) {
-                configuredUseProjectRule = useProjectRuleJSON.getBoolean("value");
-
-                if (!configuredUseProjectRule && useProjectRuleJSON.containsKey("parsingRulesPath")) {
-                    configuredParsingRulesPath = useProjectRuleJSON.getString("parsingRulesPath");
-                } else if (configuredUseProjectRule && useProjectRuleJSON.containsKey("projectRulePath")) {
-                    configuredProjectRulePath = useProjectRuleJSON.getString("projectRulePath");
-                }
-            }
-            return new LogParserPublisher(json.getBoolean("unstableOnWarning"),
-                    json.getBoolean("failBuildOnError"),
-                    json.getBoolean("showGraphs"),
-                    configuredParsingRulesPath,
-                    configuredUseProjectRule,
-                    configuredProjectRulePath);
         }
     }
 
