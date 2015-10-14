@@ -49,6 +49,7 @@ public class LogParserParser {
         // Count of lines in this status
         statusCount.put(LogParserConsts.ERROR, 0);
         statusCount.put(LogParserConsts.WARNING, 0);
+        statusCount.put(LogParserConsts.PASS, 0);
         statusCount.put(LogParserConsts.INFO, 0);
 
         this.parsingRulesArray = LogParserUtils
@@ -89,8 +90,8 @@ public class LogParserParser {
         // Determine parsed log files
         final String parsedFilePath = logDirectory + "/log_content.html";
         final String errorLinksFilePath = logDirectory + "/logerrorLinks.html";
-        final String warningLinksFilePath = logDirectory
-                + "/logwarningLinks.html";
+        final String warningLinksFilePath = logDirectory + "/logwarningLinks.html";
+        final String passingLinksFilePath = logDirectory + "/logpassLinks.html";
         final String infoLinksFilePath = logDirectory + "/loginfoLinks.html";
         final String buildRefPath = logDirectory + "/log_ref.html";
         final String buildWrapperPath = logDirectory + "/log.html";
@@ -98,6 +99,7 @@ public class LogParserParser {
         // Record file paths in hash
         linkFiles.put(LogParserConsts.ERROR, errorLinksFilePath);
         linkFiles.put(LogParserConsts.WARNING, warningLinksFilePath);
+        linkFiles.put(LogParserConsts.PASS, passingLinksFilePath);
         linkFiles.put(LogParserConsts.INFO, infoLinksFilePath);
 
         // Open console log for reading and all other files for writing
@@ -109,6 +111,8 @@ public class LogParserParser {
                 errorLinksFilePath)));
         writers.put(LogParserConsts.WARNING, new BufferedWriter(new FileWriter(
                 warningLinksFilePath)));
+        writers.put(LogParserConsts.PASS, new BufferedWriter(new FileWriter(
+                passingLinksFilePath)));
         writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
                 infoLinksFilePath)));
 
@@ -145,6 +149,7 @@ public class LogParserParser {
 
         ((BufferedWriter) writers.get(LogParserConsts.ERROR)).close();
         ((BufferedWriter) writers.get(LogParserConsts.WARNING)).close();
+        ((BufferedWriter) writers.get(LogParserConsts.PASS)).close();
         ((BufferedWriter) writers.get(LogParserConsts.INFO)).close();
 
         // Build the reference html from the warnings/errors/info html files
@@ -165,11 +170,12 @@ public class LogParserParser {
         final LogParserResult result = new LogParserResult();
         result.setHtmlLogFile(parsedFilePath);
         result.setTotalErrors((Integer) statusCount.get(LogParserConsts.ERROR));
-        result.setTotalWarnings((Integer) statusCount
-                .get(LogParserConsts.WARNING));
+        result.setTotalWarnings((Integer) statusCount.get(LogParserConsts.WARNING));
+        result.setTotalPasses((Integer) statusCount.get(LogParserConsts.PASS));
         result.setTotalInfos((Integer) statusCount.get(LogParserConsts.INFO));
         result.setErrorLinksFile(errorLinksFilePath);
         result.setWarningLinksFile(warningLinksFilePath);
+        result.setPassingLinksFile(passingLinksFilePath);
         result.setInfoLinksFile(infoLinksFilePath);
         result.setParsedLogURL(parsedLogURL);
         result.setHtmlLogPath(logDirectory);

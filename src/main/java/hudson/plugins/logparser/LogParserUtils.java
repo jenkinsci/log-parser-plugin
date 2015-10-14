@@ -40,9 +40,10 @@ public final class LogParserUtils {
             result = LogParserConsts.NONE;
         } else if (result.equalsIgnoreCase("end")) {
             result = LogParserConsts.INFO;
-        } else if (result.equalsIgnoreCase("warn")
-                || result.equalsIgnoreCase("end")) {
+        } else if (result.equalsIgnoreCase("warn")) {
             result = LogParserConsts.WARNING;
+        } else if (result.equalsIgnoreCase("pass")) {
+            result = LogParserConsts.PASS;
         } else {
             result = result.toUpperCase(Locale.ENGLISH);
         }

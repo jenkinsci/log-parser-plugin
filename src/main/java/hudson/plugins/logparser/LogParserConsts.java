@@ -9,6 +9,7 @@ public class LogParserConsts {
 
     public static final String ERROR = "ERROR";
     public static final String WARNING = "WARNING";
+    public static final String PASS = "PASS";
     public static final String INFO = "INFO";
     public static final String NONE = "NONE";
     public static final String START = "START"; // marks a beginning of a section
@@ -19,11 +20,11 @@ public class LogParserConsts {
     public static final String NOT_INT = " is not an integer - using default";
 
     public static final List<String> LEGAL_STATUS = Arrays.asList(ERROR,
-            WARNING, INFO, NONE, START);
+            WARNING, PASS, INFO, NONE, START);
     public static final List<String> STATUSES_WITH_LINK_FILES = Arrays.asList(
-            ERROR, WARNING, INFO);
+            ERROR, WARNING, PASS, INFO);
     public static final List<String> STATUSES_WITH_SECTIONS_IN_LINK_FILES = Arrays
-            .asList(ERROR, WARNING);
+            .asList(ERROR, WARNING, PASS);
 
     public static String getHtmlOpeningTags() {
         final String hudsonRoot = Hudson.getInstance().getRootUrl();

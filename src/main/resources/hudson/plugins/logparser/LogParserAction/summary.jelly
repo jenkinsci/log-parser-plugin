@@ -4,7 +4,7 @@
   <j:set var="parseFailed" value="${it.result.failedToParseError != null}"/>
   <t:summary icon="graph.gif">
     <j:if test="${parseSucceeded}">
-      ${it.result.totalErrors} errors, ${it.result.totalWarnings} warnings
+      ${it.result.totalErrors} errors, ${it.result.totalWarnings} warnings, ${it.result.totalPasses} passes
     </j:if>
     <j:if test="${parseFailed}">
       Log parsing has failed
