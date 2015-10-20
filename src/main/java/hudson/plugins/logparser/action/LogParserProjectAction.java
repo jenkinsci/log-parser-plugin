@@ -43,35 +43,39 @@ public class LogParserProjectAction implements Action {
     public LogParserAction getLastLogParserAction() {
         final AbstractBuild<?,?> tb = project.getLastSuccessfulBuild();
 
-        AbstractBuild<?,?> b=project.getLastBuild();
-        while(b!=null) {
+        AbstractBuild<?,?> b = project.getLastBuild();
+        while (b != null) {
             LogParserAction a = b.getAction(LogParserAction.class);
-            if(a!=null) return a;
-            if(b==tb)
+            if (a != null) {
+                return a;
+            }
+            if (b == tb) {
                 // if even the last successful build didn't produce the test result,
                 // that means we just don't have any tests configured.
                 return null;
+            }
             b = b.getPreviousBuild();
         }
 
         return null;
     }
 
-    public void doTrend(StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
-
+    public void doTrend(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         LogParserAction a = this.getLastLogParserAction();
-        if (a != null)
+        if (a != null) {
             a.doGraph(req, rsp);
-        else
+        } else {
             rsp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
-    public void doTrendMap( StaplerRequest req, StaplerResponse rsp ) throws IOException, ServletException {
+    public void doTrendMap( StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
         LogParserAction a = this.getLastLogParserAction();
-        if(a!=null)
-            a.doGraphMap(req,rsp);
-        else
+        if (a != null) {
+            a.doGraphMap(req, rsp);
+        } else {
             rsp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
 }

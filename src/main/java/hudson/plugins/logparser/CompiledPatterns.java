@@ -1,13 +1,16 @@
 package hudson.plugins.logparser;
 
+import javax.annotation.CheckForNull;
 import java.util.regex.Pattern;
 
 public class CompiledPatterns {
 
-    private String errorMsg = null;
-    private Pattern[] compiledPatterns = null;
+    private String errorMsg;
+    private Pattern[] compiledPatterns;
 
     public CompiledPatterns() {
+        this.errorMsg = null;
+        this.compiledPatterns = null;
     }
 
     public String getError() {
@@ -22,6 +25,7 @@ public class CompiledPatterns {
         }
     }
 
+    @CheckForNull
     public Pattern[] getCompiledPatterns() {
         return compiledPatterns;
     }
