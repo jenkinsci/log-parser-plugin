@@ -2,7 +2,14 @@ package hudson.plugins.logparser;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.Util;
+import hudson.model.Action;
+import hudson.model.BuildListener;
+import hudson.model.Result;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.plugins.logparser.action.LogParserProjectAction;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -22,16 +29,14 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.annotation.Nonnull;
-
 public class LogParserPublisher extends Recorder implements SimpleBuildStep, Serializable {
     private static final long serialVersionUID = 1L;
     public boolean unstableOnWarning;
     public boolean failBuildOnError;
     public boolean showGraphs;
-    public String parsingRulesPath;
+    public String parsingRulesPath = null;
     public boolean useProjectRule;
-    public String projectRulePath;
+    public String projectRulePath = null;
 
     /**
      * Create new LogParserPublisher.
@@ -49,6 +54,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
      * @param projectRulePath
      *            path to project specific rules relative to workspace root.
      */
+    @Deprecated
     private LogParserPublisher(final boolean unstableOnWarning,
             final boolean failBuildOnError, final boolean showGraphs,
             final String parsingRulesPath, final boolean useProjectRule,
@@ -63,8 +69,16 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @DataBoundConstructor
-    public LogParserPublisher() {
+    public LogParserPublisher(boolean useProjectRule, String projectRulePath, String parsingRulesPath) {
         super();
+        if (useProjectRule) {
+            this.projectRulePath = Util.fixEmpty(projectRulePath);
+            this.parsingRulesPath = null;
+        } else {
+            this.parsingRulesPath = Util.fixEmpty(parsingRulesPath);
+            this.projectRulePath = null;
+        }
+        this.useProjectRule = useProjectRule;
     }
 
     @DataBoundSetter
@@ -72,17 +86,9 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         this.unstableOnWarning = unstableOnWarning;
     }
 
-    public boolean isUnstableOnWarning() {
-        return unstableOnWarning;
-    }
-
     @DataBoundSetter
     public void setFailBuildOnError(boolean failBuildOnError) {
         this.failBuildOnError = failBuildOnError;
-    }
-
-    public boolean isFailBuildOnError() {
-        return failBuildOnError;
     }
 
     @DataBoundSetter
@@ -90,52 +96,26 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         this.showGraphs = showGraphs;
     }
 
-    public boolean isShowGraphs() {
-        return showGraphs;
-    }
-
-    @DataBoundSetter
-    public void setUseProjectRule(final JSONObject useProjectRule) {
-        this.useProjectRule = useProjectRule.getBoolean("value");
-        if (useProjectRule.getBoolean("value") && useProjectRule.containsKey("projectRulePath")) {
-            this.projectRulePath = useProjectRule.getString("projectRulePath");
-        } else if (this.useProjectRule && useProjectRule.containsKey("parsingRulesPath")) {
-            this.parsingRulesPath = useProjectRule.getString("parsingRulesPath");
-        }
-    }
-
-    @DataBoundSetter
-    public void setParsingRulesPath(final String parsingRulesPath) {
-        this.parsingRulesPath = parsingRulesPath;
-    }
-
-    @DataBoundSetter
-    public void setProjectRulePath(final String projectRulePath) {
-        this.projectRulePath = projectRulePath;
-    }
-
     @Override
-    public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
+    public boolean prebuild(final AbstractBuild<?, ?> build,
+            final BuildListener listener) {
         return true;
     }
 
     @Deprecated
+    @Override
     public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
 
-        if (build.getResult() == Result.SUCCESS) {
-            this.perform(build, build.getWorkspace(), launcher, listener);
-        } else {
-            listener.error("Skipping publisher since build result is " + build.getResult());
-        }
+        this.perform((Run<?, ?>) build, build.getWorkspace(), launcher, listener);
         return true;
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull
-            TaskListener listener) throws InterruptedException, IOException {
+    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws
+            InterruptedException, IOException {
 
-        Logger logger = Logger.getLogger(getClass().getName());
+        final Logger logger = Logger.getLogger(getClass().getName());
         LogParserResult result = new LogParserResult();
         try {
             // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
@@ -148,33 +128,35 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
             }
             final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml, launcher.getChannel());
             // Parse the build's log according to these rules and get the result
-            result = parser.parseLog(run);
+            result = parser.parseLog(build);
 
             // Mark build as failed/unstable if necessary
             if (this.failBuildOnError && result.getTotalErrors() > 0) {
-                run.setResult(Result.FAILURE);
+                build.setResult(Result.FAILURE);
             } else if (this.unstableOnWarning && result.getTotalWarnings() > 0) {
-                run.setResult(Result.UNSTABLE);
+                build.setResult(Result.UNSTABLE);
             }
         } catch (IOException e) {
-            // Failure to parse should not fail the build - but should be handled as a serious error.
-            // This should catch all process problems during parsing, including parser file not found..
-            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + run, e);
+            // Failure to parse should not fail the build - but should be
+            // handled as a serious error.
+            // This should catch all process problems during parsing, including
+            // parser file not found..
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
         } catch (NullPointerException e) {
             // in case the rules path is null
-            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + run, e);
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
-            run.setResult(Result.ABORTED);
+            build.setResult(Result.ABORTED);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + run, e);
+            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
-            run.setResult(Result.ABORTED);
+            build.setResult(Result.ABORTED);
         }
 
         // Add an action created with the above results
-        LogParserAction action = new LogParserAction(run, result);
-        run.addAction(action);
+        final LogParserAction action = new LogParserAction(build, result);
+        build.addAction(action);
     }
 
     @Override
@@ -182,8 +164,8 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         return DescriptorImpl.DESCRIPTOR;
     }
 
-    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-
+    public static final class DescriptorImpl extends
+            BuildStepDescriptor<Publisher> {
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
         private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
         private boolean useLegacyFormatting = false;
@@ -204,7 +186,8 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         }
 
         @Override
-        public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
+        public boolean isApplicable(
+                final Class<? extends AbstractProject> jobType) {
             return true;
         }
 
@@ -217,42 +200,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         }
 
         @Override
-        public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
-            parsingRulesGlobal = req.bindJSONToList(ParserRuleFile.class, "log-parser.").toArray(new ParserRuleFile[0]);
-            useLegacyFormatting = json.getJSONObject("log-parser").getBoolean("useLegacyFormatting");
+        public boolean configure(final StaplerRequest req, final JSONObject json)
+                throws FormException {
+            parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class,
+                    "log-parser.").toArray(new ParserRuleFile[0]);
+            useLegacyFormatting = json.getJSONObject("log-parser").getBoolean(
+                    "useLegacyFormatting");
             save();
             return true;
-        }
-
-        /**
-         * Cannot use simple DataBoundConstructor due to radioBlock usage where
-         * a JSON object is returned holding the selected value of the block.
-         * 
-         * {@inheritDoc}
-         */
-        @Override
-        public LogParserPublisher newInstance(StaplerRequest req, JSONObject json) throws FormException {
-
-            String configuredParsingRulesPath = null;
-            String configuredProjectRulePath = null;
-            boolean configuredUseProjectRule = false;
-            final JSONObject useProjectRuleJSON = json.getJSONObject("useProjectRule");
-
-            if (useProjectRuleJSON != null) {
-                configuredUseProjectRule = useProjectRuleJSON.getBoolean("value");
-
-                if (!configuredUseProjectRule && useProjectRuleJSON.containsKey("parsingRulesPath")) {
-                    configuredParsingRulesPath = useProjectRuleJSON.getString("parsingRulesPath");
-                } else if (configuredUseProjectRule && useProjectRuleJSON.containsKey("projectRulePath")) {
-                    configuredProjectRulePath = useProjectRuleJSON.getString("projectRulePath");
-                }
-            }
-            return new LogParserPublisher(json.getBoolean("unstableOnWarning"),
-                    json.getBoolean("failBuildOnError"),
-                    json.getBoolean("showGraphs"),
-                    configuredParsingRulesPath,
-                    configuredUseProjectRule,
-                    configuredProjectRulePath);
         }
     }
 
@@ -274,11 +229,10 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
 
-        if (showGraphs) {
+        if (showGraphs)
             return new LogParserProjectAction(project);
-        } else {
+        else
             return null;
-        }
     }
 
 }

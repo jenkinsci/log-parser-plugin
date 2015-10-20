@@ -33,7 +33,8 @@ public class LogParserStatusComputer implements Serializable {
             final String signature) throws IOException, InterruptedException {
         this.parsingRulesArray = parsingRulesArray;
         this.compiledPatterns = compiledPatterns;
-        this.computedStatusMatches = computeStatusMatches(filePath, linesInLog, channel, signature);
+        this.computedStatusMatches = computeStatusMatches(filePath, linesInLog,
+                channel, signature);
     }
 
     private HashMap<String, String> computeStatusMatches(
@@ -42,25 +43,27 @@ public class LogParserStatusComputer implements Serializable {
             throws IOException, InterruptedException {
         HashMap<String, String> result = null;
 
-        result = channel.call(new MasterToSlaveCallable<HashMap<String, String>, RuntimeException>() {
+        result = channel
+                .call(new MasterToSlaveCallable<HashMap<String, String>, RuntimeException>() {
 
-            private static final long serialVersionUID = 1L;
+                    private static final long serialVersionUID = 1L;
 
-            public HashMap<String, String> call() {
-                HashMap<String, String> result = null;
-                try {
-                    result = computeStatusMatches(filePath, linesInLog, signature);
+                    public HashMap<String, String> call() {
+                        HashMap<String, String> result = null;
+                        try {
+                            result = computeStatusMatches(filePath, linesInLog,
+                                    signature);
 
-                    // rethrow any exception here to report why the
-                    // parsing failed
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return result;
-            }
-        });
+                            // rethrow any exception here to report why the
+                            // parsing failed
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return result;
+                    }
+                });
         return result;
     }
 
