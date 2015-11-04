@@ -3,7 +3,7 @@ package hudson.plugins.logparser;
 import java.util.HashMap;
 
 public class LogParserDisplayConsts {
-
+	//comment
     final private HashMap<String, String> colorTable = new HashMap<String, String>();
     final private HashMap<String, String> iconTable = new HashMap<String, String>();
     final private HashMap<String, String> linkListDisplay = new HashMap<String, String>();

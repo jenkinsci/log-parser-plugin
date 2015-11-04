@@ -3,6 +3,7 @@ package hudson.plugins.logparser;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.XmlFile;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
@@ -29,11 +30,16 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import com.google.common.io.Files;
+
 public class LogParserPublisher extends Recorder implements SimpleBuildStep, Serializable {
     private static final long serialVersionUID = 1L;
     public boolean unstableOnWarning;
     public boolean failBuildOnError;
     public boolean showGraphs;
+    // whether to activate diff build functionality
+    //TODO
+    public boolean enableDiffBuild;
     public String parsingRulesPath = null;
     public boolean useProjectRule;
     public String projectRulePath = null;
@@ -96,6 +102,11 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         this.showGraphs = showGraphs;
     }
 
+    @DataBoundSetter
+    public void setEnableDiffBuild(boolean enableDiffBuild) {
+        this.enableDiffBuild = enableDiffBuild;
+    }
+
     @Override
     public boolean prebuild(final AbstractBuild<?, ?> build,
             final BuildListener listener) {
@@ -127,15 +138,20 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
                 parsingRulesFile = new FilePath(new File(parsingRulesPath));
             }
             final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml, launcher.getChannel());
+         
+            System.out.println("Succesfully created parser with parsing rules");
             // Parse the build's log according to these rules and get the result
             result = parser.parseLog(build);
-
+          
+            System.out.println("Succesfully parsed the build's log");
             // Mark build as failed/unstable if necessary
             if (this.failBuildOnError && result.getTotalErrors() > 0) {
                 build.setResult(Result.FAILURE);
             } else if (this.unstableOnWarning && result.getTotalWarnings() > 0) {
                 build.setResult(Result.UNSTABLE);
             }
+            
+            System.out.println("Succesfully marked build as failed/unstable if necessary");
         } catch (IOException e) {
             // Failure to parse should not fail the build - but should be
             // handled as a serious error.
@@ -155,8 +171,30 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         }
 
         // Add an action created with the above results
-        final LogParserAction action = new LogParserAction(build, result);
-        build.addAction(action);
+      
+        File buildFolder = null;
+		try {
+			buildFolder = createBuildFolder(build);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Successfully reached diffArchivePublisher");
+		saveConfigFile(buildFolder,build);
+		System.out.println("saving the config file");
+		//savePomFile(buildFolder, build);
+		//saveConsoleFile(buildFolder,build);
+		//saveTestFile(buildFolder,build);
+		
+		final LogParserAction action = new LogParserAction(build, result);
+	    build.addAction(action);
+        // Add the entry point for diff build functionality
+        //TODO
+        if (enableDiffBuild) {
+            final DiffBuildAction dbAction = new DiffBuildAction();
+            build.addAction(dbAction);
+        }
+	        
+	   System.out.println("Succesfully added an action created with results");
     }
 
     @Override
@@ -234,5 +272,68 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         else
             return null;
     }
+    private File createBuildFolder(Run<?, ?> run) throws Exception { //doesn't work.
+    	//create a build folder which is used to save the config file, pom file, console output and the test cases 
+    	//after each build under "Project_Name" called buildXX, where XX is the build number
+		int buildNumber = run.getNumber();
+		String folderName="build"+buildNumber;
+		String projectName=run.getParent().getName(); //hopefully get the name of the job
+		File f=new File(RootDiffArchiveConsts.ROOTDIR+"/"+projectName+"/"+folderName);
+		f.mkdirs();
+		return f;
+		
+	
+	}
 
+	private void saveConfigFile(File buildFolder, Run<?, ?> run) {
+		//locate the config file and save it to previously created build folder
+		XmlFile configFile=run.getParent().getConfigFile(); // should get the jobs config file
+		File originalConfig=configFile.getFile();
+		File archiveConfigFile=new File(buildFolder.getPath()+File.separator+"config.xml");
+		try {
+			Files.copy(originalConfig,archiveConfigFile);
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			throw new RuntimeException("Unable to copy and create a config file");
+		}
+	}
+
+/*	private void savePomFile(File buildFolder, Run<?, ?> run) {
+		//locate the pom file and save it to previously created build folder
+		//File pomFile=null; //still looking up how to get. Get from run to job to environment to maven module set. 
+		File originalPom = new File(run.getParent()+"workspace/pom.xml");
+		File archivePomFile = new File(buildFolder.getPath()+File.separator+"pom.xml");
+		try {
+			Files.copy(originalPom,archivePomFile);
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			throw new RuntimeException("Unable to copy and create a pom file");
+		}
+		//MavenModuleSet.getRootPom(EnvVars env);
+		//run.getParent();
+		
+	}
+
+	private void saveConsoleFile(File buildFolder, Run<?, ?> run) {
+		//locate where the console output is saved after each build and save it to previously created build folder
+		File originalConsole=run.getLogFile();
+		File archiveConsole=new File(buildFolder.getPath()+File.separator+"console.txt");
+		try {
+			Files.copy(originalConsole,archiveConsole);
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			throw new RuntimeException("Unable to copy and create a config file");
+		}
+		
+	}
+
+	private void saveTestFile(File buildFolder, Run<?,?> run) {
+		//need clarification of what the test cases are and where are they located. Are they part of the console log. 
+		//if it is should I make a new file with just the test cases.
+		
+	}
+*/
 }

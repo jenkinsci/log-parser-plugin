@@ -1,3 +1,4 @@
+
 package org.jenkinsci.plugins.logparser;
 
 import hudson.FilePath;
@@ -14,9 +15,9 @@ import org.jvnet.hudson.test.JenkinsRule;
 import static org.junit.Assert.assertEquals;
 
 /**
- * In this test suite we initialize the Job workspaces with a resource (maven-project1.zip) that contains a Maven
- * project.
- */
+ *  * In this test suite we initialize the Job workspaces with a resource (maven-project1.zip) that contains a Maven
+ *   * project.
+ *    */
 public class LogParserWorkflowTest {
 
     @ClassRule
@@ -30,11 +31,11 @@ public class LogParserWorkflowTest {
     }
 
     /**
-     * Run a workflow job using {@link LogParserPublisher} and check for success.
-     */
+ *      * Run a workflow job using {@link LogParserPublisher} and check for success.
+ *           */
     @Test
     public void logParserPublisherWorkflowStep() throws Exception {
-        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
+/*        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
         FilePath workspace = jenkinsRule.jenkins.getWorkspaceFor(job);
         workspace.unzipFrom(getClass().getResourceAsStream("./maven-project1.zip"));
         job.setDefinition(new CpsFlowDefinition(""
@@ -49,6 +50,21 @@ public class LogParserWorkflowTest {
         assertEquals(0, result.getResult().getTotalErrors());
         assertEquals(2, result.getResult().getTotalWarnings());
         assertEquals(0, result.getResult().getTotalInfos());
-    }
+    }*/
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
+        FilePath workspace = jenkinsRule.jenkins.getWorkspaceFor(job);
+        job.setDefinition(new CpsFlowDefinition("node{step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])}"));
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        WorkflowJob job2 = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep2");
+        job2.setDefinition(new CpsFlowDefinition("node{step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])}"));
+        jenkinsRule.assertBuildStatusSuccess(job2.scheduleBuild2(0));
+    	
+        LogParserAction result = job.getLastBuild().getAction(LogParserAction.class);
+        LogParserAction result2 = job2.getLastBuild().getAction(LogParserAction.class);
+
+        assertEquals(result.getResult().getTotalInfos(), result2.getResult().getTotalInfos());
+
+}
 
 }

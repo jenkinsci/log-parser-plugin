@@ -11,8 +11,10 @@ public class LogParserResult {
     private int totalErrors = 0;
     private int totalWarnings = 0;
     private int totalInfos = 0;
+    
+    private int totalDeltas = 0;
 
-    private String htmlLogFile;
+	private String htmlLogFile;
     private String errorLinksFile;
     private String warningLinksFile;
     private String infoLinksFile;
@@ -22,6 +24,14 @@ public class LogParserResult {
 
     private String failedToParseError;
     private String badParsingRulesError;
+    
+    public int getTotalDeltas() {
+		return totalDeltas;
+	}
+
+	public void setTotalDeltas(int totalDeltas) {
+		this.totalDeltas = totalDeltas;
+	}
 
     public String getBadParsingRulesError() {
         return badParsingRulesError;

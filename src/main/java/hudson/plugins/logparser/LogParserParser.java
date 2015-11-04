@@ -15,9 +15,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
 
 public class LogParserParser {
 
@@ -82,10 +85,12 @@ public class LogParserParser {
 
         // Get console log file
         final File logFile = build.getLogFile();
+        String previousLogFileLocation = ""; // added by zhesheng
+        if(build.getPreviousBuild() != null)
+        	previousLogFileLocation = build.getPreviousBuild().getLogFile().getAbsolutePath();
         final String logDirectory = logFile.getParent();
         final String logFileLocation = logFile.getAbsolutePath();
         final FilePath filePath = new FilePath(new File(logFileLocation));
-
         // Determine parsed log files
         final String parsedFilePath = logDirectory + "/log_content.html";
         final String errorLinksFilePath = logDirectory + "/logerrorLinks.html";
@@ -94,7 +99,14 @@ public class LogParserParser {
         final String infoLinksFilePath = logDirectory + "/loginfoLinks.html";
         final String buildRefPath = logDirectory + "/log_ref.html";
         final String buildWrapperPath = logDirectory + "/log.html";
-
+        final String lineDiffReportPath = logDirectory + "/line_diff.html";
+        
+        // do line diff between current build and previous build
+        // generate a html file and save it to log directory
+        
+        LogParserLineDiff d = new LogParserLineDiff();
+        int totalDeltas = d.lineDiff(previousLogFileLocation, logFileLocation, lineDiffReportPath);
+        
         // Record file paths in hash
         linkFiles.put(LogParserConsts.ERROR, errorLinksFilePath);
         linkFiles.put(LogParserConsts.WARNING, warningLinksFilePath);
@@ -156,11 +168,11 @@ public class LogParserParser {
                 linkFiles);
         // Write the wrapping html for the reference page and the parsed log page
         LogParserWriter.writeWrapperHtml(buildWrapperPath);
-
+	
         final String buildUrlPath = build.getUrl(); // job/cat_log/58
         final String buildActionPath = LogParserAction.getUrlNameStat(); // "parsed_console";
         final String parsedLogURL = buildUrlPath + buildActionPath + "/log.html";
-
+	System.out.println("Successfully generated the log html file");
         // Create result class
         final LogParserResult result = new LogParserResult();
         result.setHtmlLogFile(parsedFilePath);
@@ -175,6 +187,7 @@ public class LogParserParser {
         result.setHtmlLogPath(logDirectory);
         result.setBadParsingRulesError(this.compiledPatternsPlusError
                 .getError());
+        result.setTotalDeltas(totalDeltas);
 
         return result;
 
@@ -296,10 +309,15 @@ public class LogParserParser {
 
         return markedLine.toString();
     }
-
+    
     private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final FilePath filePath, final
             String logFileLocation, final int linesInLog, final Logger logger) throws IOException, InterruptedException {
-
+    	parseLogBody(build, writer, filePath, logFileLocation, linesInLog, logger, 1);
+    }
+    
+    private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final FilePath filePath, final
+            String logFileLocation, final int linesInLog, final Logger logger, int baseBuildNumber) throws IOException, InterruptedException {
+    	
         // Logging information - start
         final String signature = build.getParent().getName() + "_build_"
                 + build.getNumber();
@@ -319,16 +337,54 @@ public class LogParserParser {
         String line;
         String status;
         int line_num = 0;
+        //BufferedWriter wt = new BufferedWriter(new FileWriter(filePath.getParent() + "/text.txt"));
+        
+        // Get current console log sanitized
+        final List<String> currentBuildConsoleOuput = new ArrayList<String>();
         while ((line = reader.readLine()) != null) {
+        	
             status = (String) lineStatusMatches.get(String.valueOf(line_num));
             final String parsedLine = parseLine(line, status);
             // This is for displaying sections in the links part
             writer.write(parsedLine);
             writer.newLine(); // Write system dependent end of line.
+            
+            currentBuildConsoleOuput.add(ConsoleNote.removeNotes(line));
+            
+            //wt.write(ConsoleNote.removeNotes(line));
+            //wt.newLine();
+            
             line_num++;
         }
+        //wt.flush();
+        //wt.close();
         reader.close();
-
+        
+        
+        //get basebuild
+        Run<?,?> baseBuild = build;
+        for(int i=0;i<build.getNumber()-baseBuildNumber;++i)
+        	baseBuild = baseBuild.getPreviousBuild();
+        
+  
+        // Get previous console log sanitized
+        String previousBuildLogFilePath = baseBuild.getLogFile().getAbsolutePath();
+        final BufferedReader previousBuildLogReader = new BufferedReader(new FileReader(previousBuildLogFilePath));
+        final List<String> previousBuildConsoleOuput = new ArrayList<String>();
+        
+        while ((line = previousBuildLogReader.readLine()) != null) {            
+            previousBuildConsoleOuput.add(ConsoleNote.removeNotes(line));
+        }
+        previousBuildLogReader.close();
+        
+        RootSections sectionPre = new RootSections(baseBuild.getNumber(), previousBuildConsoleOuput);
+        RootSections sectionCur = new RootSections(build.getNumber(), currentBuildConsoleOuput);
+        
+        RootSectionsDiff newDiff = new RootSectionsDiff(sectionPre, sectionCur);
+        String newDiffJson = new Gson().toJson(newDiff);
+        System.out.println("@@@@@@@" + newDiffJson);
+        
+        System.out.println("Succesfully read the output");
         // Logging information - end
         final Calendar calendarEnd = Calendar.getInstance();
         final long diffSeconds = (calendarEnd.getTimeInMillis() - calendarStart

@@ -23,4 +23,7 @@
       <f:textbox/>
     </f:entry>
   </f:radioBlock>
+  <f:entry title="Enable diff build functionality" help="/plugin/log-parser/enable_diff_build.html">
+    <f:checkbox name="log-parser.enableDiffBuild" checked="${instance.enableDiffBuild}"/>
+  </f:entry>
 </j:jelly>

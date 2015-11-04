@@ -15,9 +15,11 @@ public class LogParserReader {
         this.reader = reader;
     }
 
-    public synchronized LogParserLogPart readLogPart(final int threadNum) throws IOException {
+    public synchronized LogParserLogPart readLogPart(final int threadNum)
+            throws IOException {
         final Logger logger = Logger.getLogger(this.getClass().getName());
-        logger.log(Level.INFO, "Start reading log part " + logPartNum + " in thread #" + threadNum);
+        logger.log(Level.INFO, "Start reading log part " + logPartNum
+                + " in thread #" + threadNum);
         final int numLines = LogParserUtils.getLinesPerThread();
         String[] lines = new String[numLines];
         final LogParserLogPart result = new LogParserLogPart();
@@ -34,7 +36,8 @@ public class LogParserReader {
         if (result.isEmpty()) {
             this.endOfFile = true;
         }
-        logPartNum++; // increment counter for next call of method by another thread
+        logPartNum++; // increment counter for next call of method by another
+                      // thread
 
         return result;
     }
