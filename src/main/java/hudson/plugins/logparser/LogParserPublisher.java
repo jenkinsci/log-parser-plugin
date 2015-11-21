@@ -157,6 +157,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         // Add an action created with the above results
         final LogParserAction action = new LogParserAction(build, result);
         build.addAction(action);
+        DiffBuildAction dbAction;
+        try {
+			dbAction = new DiffBuildAction(build);
+			build.addAction(dbAction);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @Override
