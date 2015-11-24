@@ -12,16 +12,16 @@ import difflib.InsertDelta;
 
 public class DiffToHtmlGenerator {
 
-    public List<Delta> deltas = null;
-    public List<String> prevText = null;
-    public String htmlString = null;
-    public int curr;
-    public int prev;
+    private List<Delta> deltas = null;
+    private List<String> prevText = null;
+    private String htmlString = null;
+    private int curr;
+    private int prev;
 
-    public static final int UNCHANGED = 0;
-    public static final int INSERTED = 1;
-    public static final int DELETED = 2;
-    public static final int CHANGED = 3;
+    private static final int UNCHANGED = 0;
+    private static final int INSERTED = 1;
+    private static final int DELETED = 2;
+    private static final int CHANGED = 3;
 
     public DiffToHtmlGenerator(List<Delta> deltas, List<String> prevText, int curr, int prev) {
         this.deltas = deltas;

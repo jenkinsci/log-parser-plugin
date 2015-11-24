@@ -16,8 +16,8 @@ import hudson.util.ListBoxModel.Option;
 public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
 
     final private Run<?, ?> build;
-    public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
-    public static ArrayList<Integer> prevBuildNum;
+    private static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
+    private static ArrayList<Integer> prevBuildNum;
 
     public DiffBuildAction(final Run<?, ?> build) throws Exception {
         this.build = build;
@@ -59,7 +59,6 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
 
     @Override
     public Descriptor<DiffBuildAction> getDescriptor() {
-        // TODO Auto-generated method stub
         return DESCRIPTOR;
     }
 

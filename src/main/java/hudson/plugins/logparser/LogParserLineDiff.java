@@ -12,7 +12,7 @@ import difflib.Patch;
 
 public class LogParserLineDiff {
 
-    public String htmlString = null;
+    private String htmlString = null;
     private List<Delta> deltas;
     private List<String> prevConsoleOutput = null;
     private List<String> currConsoleOutput = null;
