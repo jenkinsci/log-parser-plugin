@@ -75,8 +75,12 @@ public final class LogParserWriter {
         writeLinks(writer, LogParserConsts.WARNING, headerForSection,
                 statusCountPerSection, iconTable, linkListDisplay,
                 linkListDisplayPlural, statusCount, linkFiles);
-        // Write Info
+        // Write Infos
         writeLinks(writer, LogParserConsts.INFO, headerForSection,
+                statusCountPerSection, iconTable, linkListDisplay,
+                linkListDisplayPlural, statusCount, linkFiles);
+        // Write Debugs
+        writeLinks(writer, LogParserConsts.DEBUG, headerForSection,
                 statusCountPerSection, iconTable, linkListDisplay,
                 linkListDisplayPlural, statusCount, linkFiles);
         writer.write(LogParserConsts.getHtmlClosingTags());

@@ -11,11 +11,13 @@ public class LogParserResult {
     private int totalErrors = 0;
     private int totalWarnings = 0;
     private int totalInfos = 0;
+    private int totalDebugs = 0;
 
     private String htmlLogFile;
     private String errorLinksFile;
     private String warningLinksFile;
     private String infoLinksFile;
+    private String debugLinksFile;
 
     private String parsedLogURL;
     private String htmlLogPath;
@@ -55,6 +57,10 @@ public class LogParserResult {
         return totalInfos;
     }
 
+    public int getTotalDebugs() {
+        return totalDebugs;
+    }
+
     public String getHtmlLogFile() {
         return htmlLogFile;
     }
@@ -73,6 +79,10 @@ public class LogParserResult {
 
     public String getInfoLinksFile() {
         return infoLinksFile;
+    }
+
+    public String getDebugLinksFile() {
+        return debugLinksFile;
     }
 
     public String getParsedLogURL() {
@@ -103,6 +113,10 @@ public class LogParserResult {
         return getReader(getInfoLinksFile());
     }
 
+    public Reader getDebugLinkedReader() throws IOException {
+        return getReader(getDebugLinksFile());
+    }
+
     public void setHtmlLogFile(final String file) {
         this.htmlLogFile = file;
     }
@@ -123,6 +137,10 @@ public class LogParserResult {
         this.infoLinksFile = file;
     }
 
+    public void setDebugLinksFile(final String file) {
+        this.debugLinksFile = file;
+    }
+
     public void setTotalErrors(final int totalErrors) {
         this.totalErrors = totalErrors;
     }
@@ -133,6 +151,10 @@ public class LogParserResult {
 
     public void setTotalInfos(final int totalInfos) {
         this.totalInfos = totalInfos;
+    }
+
+    public void setTotalDebugs(final int totalDebugs) {
+        this.totalDebugs = totalDebugs;
     }
 
     public void setParsedLogURL(final String parsedLogURL) {
