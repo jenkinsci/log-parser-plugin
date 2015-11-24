@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.logparser;
 
 import hudson.FilePath;
+import hudson.model.AbstractBuild;
 import hudson.plugins.logparser.LogParserAction;
 import hudson.plugins.logparser.LogParserPublisher;
+import hudson.plugins.logparser.LogParserResult;
 import hudson.tasks.Maven;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -10,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
 
@@ -52,5 +55,15 @@ public class LogParserWorkflowTest {
         assertEquals(0, result.getResult().getTotalDebugs());
     }
 
+    @Test
+    public void logParserTestDebugTag() throws Exception {
+        LogParserResult newResult = new LogParserResult();
+        newResult.setTotalDebugs(2);
+        AbstractBuild build = Mockito.mock(AbstractBuild.class);
+        LogParserAction newAction = new LogParserAction(build, newResult);
+        Mockito.when(build.getAction(LogParserAction.class)).thenReturn(newAction);
+        LogParserAction result = build.getAction(LogParserAction.class);
+        assertEquals(2, result.getResult().getTotalDebugs());
+    }
 
 }
