@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <l:layout>
-  	<st:include it="${it.owner}" page="sidepanel.jelly"/>
+    <st:include it="${it.owner}" page="sidepanel.jelly"/>
     <l:main-panel>
       <f:entry>
-          ${it.html}
+        ${it.html}
       </f:entry>
     </l:main-panel>
   </l:layout>
