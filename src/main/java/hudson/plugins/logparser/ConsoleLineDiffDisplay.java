@@ -38,7 +38,7 @@ public class ConsoleLineDiffDisplay implements Action{
 	
 	public Run<?, ?> getOwner() {
         return this.currentBuild;
-    }
+	}
 	
 	public String getPrevBuild(){
 		return this.prevBuild;

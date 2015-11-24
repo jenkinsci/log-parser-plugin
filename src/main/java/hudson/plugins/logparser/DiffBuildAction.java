@@ -35,7 +35,7 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction>{
 	
 	public Run<?, ?> getOwner() {
         return this.build;
-    }
+	}
 	
 	// to invoke Console Line Diff output page
 	public ConsoleLineDiffDisplay getConsoleOutputLineDiff(){
@@ -101,6 +101,6 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction>{
         @Override
         public String getDisplayName() {
             return "Diff Build Action";
-        }
-    }
+		}
+	}
 }
