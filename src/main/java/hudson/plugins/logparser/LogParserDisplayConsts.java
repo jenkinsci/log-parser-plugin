@@ -32,7 +32,7 @@ public class LogParserDisplayConsts {
         linkListDisplayPlural.put(LogParserConsts.ERROR, "Errors");
         linkListDisplayPlural.put(LogParserConsts.WARNING, "Warnings");
         linkListDisplayPlural.put(LogParserConsts.INFO, "Infos");
-        linkListDisplayPlural.put(LogParserConsts.DEBUG, "DebugS");
+        linkListDisplayPlural.put(LogParserConsts.DEBUG, "Debugs");
     }
 
     public HashMap<String, String> getColorTable() {
