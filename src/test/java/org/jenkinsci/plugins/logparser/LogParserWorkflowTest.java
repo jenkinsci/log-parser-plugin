@@ -52,4 +52,5 @@ public class LogParserWorkflowTest {
         assertEquals(0, result.getResult().getTotalDebugs());
     }
 
+
 }
