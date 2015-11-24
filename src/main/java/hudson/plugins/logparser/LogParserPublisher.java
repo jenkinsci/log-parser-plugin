@@ -158,14 +158,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         final LogParserAction action = new LogParserAction(build, result);
         build.addAction(action);
         DiffBuildAction dbAction;
-        try {
+		try {
 			dbAction = new DiffBuildAction(build);
 			build.addAction(dbAction);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    }
+	}
 
     @Override
     public BuildStepDescriptor<Publisher> getDescriptor() {
