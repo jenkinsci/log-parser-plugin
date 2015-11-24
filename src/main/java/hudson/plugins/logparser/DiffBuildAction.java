@@ -67,13 +67,11 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
 	public static class DescriptorImpl extends Descriptor<DiffBuildAction> {
 
 		// display name for Choose Type of Diff dropdown
-		private static final String typeDiffDisplay[] = { "Console Output Line Diff", "Console Output Section Diff",
-				"Source Code Diff", "Configuration File Diff" };
+		private static final String typeDiffDisplay[] = { "Console Output Line Diff" };
 
 		// value for Choose Type of Diff dropdown, and these values have to
 		// match with the url or each output page
-		private static final String typeDiffValue[] = { "consoleOutputLineDiff", "consoleOutputSectionDiff",
-				"sourceCodeDiff", "configurationFileDiff" };
+		private static final String typeDiffValue[] = { "consoleOutputLineDiff" };
 
 		// fill data in Choose Another Build dropdown
 		public ListBoxModel doFillPrevBuildItems() {
