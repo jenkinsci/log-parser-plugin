@@ -40,7 +40,7 @@ public class LogParserWorkflowTest {
         job.setDefinition(new CpsFlowDefinition(""
                         + "node {\n"
                         + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"
-                        + "  sh \"${mvnHome}/bin/mvn clean install\"\n"
+                        + "  sh \"export M2_HOME=${mvnHome};${mvnHome}/bin/mvn clean install\"\n"
                         + "  step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])\n"
                         + "}\n", true)
         );
@@ -49,6 +49,7 @@ public class LogParserWorkflowTest {
         assertEquals(0, result.getResult().getTotalErrors());
         assertEquals(2, result.getResult().getTotalWarnings());
         assertEquals(0, result.getResult().getTotalInfos());
+        assertEquals(0, result.getResult().getTotalDebugs());
     }
 
 }
