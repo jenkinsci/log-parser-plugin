@@ -1,16 +1,20 @@
 package hudson.plugins.logparser;
 
 import javax.annotation.CheckForNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class CompiledPatterns {
 
     private String errorMsg;
     private Pattern[] compiledPatterns;
+    private List<String> extraTags;
 
     public CompiledPatterns() {
         this.errorMsg = null;
         this.compiledPatterns = null;
+        this.extraTags = new ArrayList<String>();
     }
 
     public String getError() {
@@ -34,4 +38,11 @@ public class CompiledPatterns {
         this.compiledPatterns = compiledPatterns;
     }
 
+    public List<String> getExtraTags() {
+        return extraTags;
+    }
+
+    public void setExtraTags(List<String> extraTags) {
+        this.extraTags = extraTags;
+    }
 }
