@@ -17,6 +17,9 @@ import difflib.InsertDelta;
 import difflib.Patch;
 
 /**
+ * 
+ * @since FIXME
+ * 
  * This class can generate a html page based on line diff result
  */
 

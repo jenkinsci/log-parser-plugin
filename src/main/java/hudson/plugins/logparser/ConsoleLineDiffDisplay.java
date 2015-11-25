@@ -8,6 +8,9 @@ import hudson.model.Action;
 import hudson.model.Run;
 
 /**
+ * 
+ * @since FIXME
+ * 
  * This class gets user input, calls DiffToHtmlGenerator to 
  * generate the diff result in html format, and then display 
  * the diff result on the build page
