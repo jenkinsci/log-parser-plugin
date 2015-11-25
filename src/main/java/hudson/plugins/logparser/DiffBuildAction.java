@@ -14,78 +14,110 @@ import hudson.util.ListBoxModel.Option;
  * DiffBuildAction is the entry point of the functionality of diff build.
  */
 public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
-
-    final private Run<?, ?> build;
+	
+	/**
+	 * The current build
+	 */
+    private final Run<?, ?> build;
+    
+    /**
+     * The descriptor of DiffBuildAction class
+     */
     private static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
-    private static ArrayList<Integer> prevBuildNum;
+    
+    /**
+     * All build numbers in the current job
+     */
+    private static ArrayList<Integer> allBuildNum;
 
+    /**
+     * The constructor for initializing fields and also get all build numbers in the current job 
+     */
     public DiffBuildAction(final Run<?, ?> build) throws Exception {
         this.build = build;
 
-        // get all previous builds from current build and put the results in the
-        // ArrayList
-        prevBuildNum = new ArrayList<Integer>();
-        prevBuildNum.add(build.number);
-        Run<?, ?> tmpBuild = build;
+        /**
+         * Get all previous builds from current build and put the results in the ArrayList
+         */
+        allBuildNum = new ArrayList<Integer>();
+        allBuildNum.add(build.number);
+        Run<?, ?> tmpBuild = build;	
         while (tmpBuild.getPreviousBuild() != null) {
             tmpBuild = tmpBuild.getPreviousBuild();
-            prevBuildNum.add(tmpBuild.number);
+            allBuildNum.add(tmpBuild.number);
         }
     }
-
+    
+    /**
+     * Get current build
+     */
     public Run<?, ?> getOwner() {
         return this.build;
     }
 
-    // to invoke Console Line Diff output page
+    /**
+     * To invoke Console Line Diff output page
+     */
     public ConsoleLineDiffDisplay getConsoleOutputLineDiff() {
         return new ConsoleLineDiffDisplay(build);
     }
 
-    @Override
+    /** * {@inheritDoc} */ @Override
     public String getIconFileName() {
         return "document.gif";
     }
 
-    @Override
+    /** * {@inheritDoc} */ @Override
     public String getDisplayName() {
         return "Diff Against Other Build";
     }
 
-    @Override
+    /** * {@inheritDoc} */ @Override
     public String getUrlName() {
         return "diffbuild";
     }
 
-    @Override
+    /** * {@inheritDoc} */ @Override
     public Descriptor<DiffBuildAction> getDescriptor() {
         return DESCRIPTOR;
     }
 
+    /**
+     * The descriptor class for DiffBuildAction class
+     * @author chanon
+     *
+     */
     @Extension
     public static class DescriptorImpl extends Descriptor<DiffBuildAction> {
 
-        // display name for Choose Type of Diff dropdown
+    	/**
+    	 * Display name for Choose Type of Diff dropdown
+    	 */
         private static final String TYPE_DIFF_DISPLAY[] = { "Console Output Line Diff" };
 
-        // value for Choose Type of Diff dropdown, and these values have to
-        // match with the url or each output page
+        /**
+         * Value for Choose Type of Diff dropdown, and these values have to match with the url or each output page
+         */
         private static final String TYPE_DIFF_VALUE[] = { "consoleOutputLineDiff" };
 
-        // fill data in Choose Another Build dropdown
-        public ListBoxModel doFillPrevBuildItems() {
+        /**
+         * Fill data in Choose Another Build dropdown
+         */
+        public ListBoxModel doFillAllBuildItems() {
             ListBoxModel items = new ListBoxModel();
-            for (int i = 0; i < prevBuildNum.size(); i++) {
+            for (int i = 0; i < allBuildNum.size(); i++) {
                 if (i == 0) {
-                    items.add(new Option("build" + " " + prevBuildNum.get(i), prevBuildNum.get(i) + "", true));
+                    items.add(new Option("build" + " " + allBuildNum.get(i), allBuildNum.get(i) + "", true));
                 } else {
-                    items.add(new Option("build" + " " + prevBuildNum.get(i), prevBuildNum.get(i) + "", false));
+                    items.add(new Option("build" + " " + allBuildNum.get(i), allBuildNum.get(i) + "", false));
                 }
             }
             return items;
         }
 
-        // fill data in Choose Type of Diff dropdown
+        /**
+         * Fill data in Choose Type of Diff dropdown
+         */
         public ListBoxModel doFillTypeDiffItems() {
             ListBoxModel items = new ListBoxModel();
             for (int i = 0; i < TYPE_DIFF_DISPLAY.length; i++) {
@@ -98,7 +130,7 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
             return items;
         }
 
-        @Override
+        /** * {@inheritDoc} */ @Override
         public String getDisplayName() {
             return "Diff Build Action";
         }

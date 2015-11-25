@@ -4,8 +4,8 @@
   <l:layout>
     <st:include it="${it.owner}" page="sidepanel.jelly"/>
     <l:main-panel>
-	  <f:entry field="prevBuild" title="Choose Another Build">
-        <f:select id="prevBuildSelect" />
+	  <f:entry field="allBuild" title="Choose Another Build">
+        <f:select id="allBuildSelect" />
       </f:entry>
       <br/>
       <br/>
@@ -19,7 +19,7 @@
       </f:entry>
       <script>
         function retrieveUrl(){
-          var ePrevBuild = document.getElementById("prevBuildSelect");
+          var ePrevBuild = document.getElementById("allBuildSelect");
           var prevBuild = ePrevBuild.options[ePrevBuild.selectedIndex].value;
           var eTypeDiff = document.getElementById("typeDiffSelect");
           var typeDiff = eTypeDiff.options[eTypeDiff.selectedIndex].value;
