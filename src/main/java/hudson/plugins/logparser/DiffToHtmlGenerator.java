@@ -22,17 +22,53 @@ import difflib.Patch;
 
 public class DiffToHtmlGenerator {
 
+    /**
+     * line diff results
+     */
     private List<Delta> deltas = null;
+    
+    /**
+     * previous and current console output text
+     */
     private List<String> prevText = null;
     private List<String> currText = null;
+    
+    /**
+     * generated html string
+     */
     private String htmlString = null;
+    
+    /**
+     * previous and current build number
+     */
     private int curr;
     private int prev;
 
+    /**
+     * four different tags for unchanged, inserted, deleted
+     * and changed text blocks.
+     */
+    
     private static final int UNCHANGED = 0;
     private static final int INSERTED = 1;
     private static final int DELETED = 2;
     private static final int CHANGED = 3;
+    
+    /**
+     * 
+     * create new DiffToHtmlGenerator object, get two console
+     * output files, diff them, and generate a html page
+     * 
+     * @param prevPath
+     *            previous console output path
+     * @param currPath
+     *            current console output path
+     * @param prevNum
+     *            previous build number
+     * @param currNum
+     *            current build number
+     * @throws IOException
+     */
     
     public DiffToHtmlGenerator(String prevPath, String currPath, int prevNum, int currNum) throws IOException {
         curr = currNum;
@@ -58,6 +94,12 @@ public class DiffToHtmlGenerator {
         }
         currReader.close();
     }
+    
+    /**
+     * generate a html string based on diff results
+     * 
+     * @return html string
+     */
 
     public String generateHtmlString() {
         StringBuilder res = new StringBuilder();
@@ -105,7 +147,7 @@ public class DiffToHtmlGenerator {
         return htmlString;
     }
 
-    public void generateHtmlFromDeltas(StringBuilder prev, StringBuilder curr) {
+    private void generateHtmlFromDeltas(StringBuilder prev, StringBuilder curr) {
         int last = -1;
         int prevIndex = 0, currIndex = 0;
         int prevNumOfRows = 0, currNumOfRows = 0;
@@ -177,7 +219,7 @@ public class DiffToHtmlGenerator {
         }
     }
 
-    public String generateTableRow(String s, int index, int typeNum) {
+    private String generateTableRow(String s, int index, int typeNum) {
         String type = "";
         String indexString = index >= 0 ? String.valueOf(index) : "";
 
@@ -204,7 +246,7 @@ public class DiffToHtmlGenerator {
         return res;
     }
 
-    public String generateHead() {
+    private String generateHead() {
         String res = "<head>\n" + "<meta charset='utf-8'>\n" + "<title>line diff between build" + prev + "and build "
                 + curr + "</title>\n" + "<link rel='stylesheet' type='text/css' href='style.css'>\n" + "<style>"
                 + generateCSS() + "</style>" + "</head>\n";
@@ -212,7 +254,7 @@ public class DiffToHtmlGenerator {
         return res;
     }
 
-    public String generateCSS() {
+    private String generateCSS() {
         String res = ".d2h-wrapper{display:block;margin:0 auto;"
                 + "text-align:left;width:100%}.d2h-file-wrapper{border:1px "
                 + "solid #ddd;border-radius:3px;margin-bottom:1em}"
@@ -242,18 +284,4 @@ public class DiffToHtmlGenerator {
 
         return res;
     }
-
-    public void writeToFile(String content, String savePath) {
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(savePath, "UTF-8");
-            writer.println(content);
-            writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

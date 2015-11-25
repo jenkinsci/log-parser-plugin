@@ -15,9 +15,27 @@ import hudson.model.Run;
 
 public class ConsoleLineDiffDisplay implements Action {
 
-    final private Run<?, ?> currentBuild;
+    /**
+     * the current build object
+     */
+    private final Run<?, ?> currentBuild;
+    
+    /**
+     * previous build number got from request
+     */
     private String prevBuild;
+    
+    /**
+     * html string that will be displayed on the page
+     */
     private String html;
+    
+    /**
+     * Create new ConsoleLineDiffDisplay object
+     * 
+     * @param build
+     *            current build object
+     */
     
     public ConsoleLineDiffDisplay(Run<?, ?> build) {
         this.currentBuild = build;
@@ -41,29 +59,44 @@ public class ConsoleLineDiffDisplay implements Action {
         html = d2h.generateHtmlString();
     }
 
+    /**
+     * returns the current build object
+     * 
+     * @return the current build object
+     */
     public Run<?, ?> getOwner() {
         return this.currentBuild;
     }
 
+    /**
+     * returns previous build number
+     * 
+     * @return previous build number
+     */
     public String getPrevBuild() {
         return this.prevBuild;
     }
 
+    /**
+     * returns html string
+     * 
+     * @return html string
+     */
     public String getHtml() {
         return this.html;
     }
 
-    @Override
+    /** * {@inheritDoc} */ @Override
     public String getDisplayName() {
         return "Console Line Diff Result Page";
     }
 
-    @Override
+    /** * {@inheritDoc} */ @Override
     public String getIconFileName() {
         return "";
     }
 
-    @Override
+    /** * {@inheritDoc} */ @Override
     public String getUrlName() {
         return "consoleLineDiffDisplay";
     }
