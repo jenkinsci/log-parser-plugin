@@ -66,11 +66,11 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
     public static class DescriptorImpl extends Descriptor<DiffBuildAction> {
 
         // display name for Choose Type of Diff dropdown
-        private static final String typeDiffDisplay[] = { "Console Output Line Diff" };
+        private static final String TYPE_DIFF_DISPLAY[] = { "Console Output Line Diff" };
 
         // value for Choose Type of Diff dropdown, and these values have to
         // match with the url or each output page
-        private static final String typeDiffValue[] = { "consoleOutputLineDiff" };
+        private static final String TYPE_DIFF_VALUE[] = { "consoleOutputLineDiff" };
 
         // fill data in Choose Another Build dropdown
         public ListBoxModel doFillPrevBuildItems() {
@@ -88,11 +88,11 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
         // fill data in Choose Type of Diff dropdown
         public ListBoxModel doFillTypeDiffItems() {
             ListBoxModel items = new ListBoxModel();
-            for (int i = 0; i < typeDiffDisplay.length; i++) {
+            for (int i = 0; i < TYPE_DIFF_DISPLAY.length; i++) {
                 if (i == 0) {
-                    items.add(new Option(typeDiffDisplay[i], typeDiffValue[i], true));
+                    items.add(new Option(TYPE_DIFF_DISPLAY[i], TYPE_DIFF_VALUE[i], true));
                 } else {
-                    items.add(new Option(typeDiffDisplay[i], typeDiffValue[i], false));
+                    items.add(new Option(TYPE_DIFF_DISPLAY[i], TYPE_DIFF_VALUE[i], false));
                 }
             }
             return items;
