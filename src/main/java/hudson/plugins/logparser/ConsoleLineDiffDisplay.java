@@ -7,12 +7,18 @@ import org.kohsuke.stapler.Stapler;
 import hudson.model.Action;
 import hudson.model.Run;
 
+/**
+ * This class gets user input, calls DiffToHtmlGenerator to 
+ * generate the diff result in html format, and then display 
+ * the diff result on the build page
+ */
+
 public class ConsoleLineDiffDisplay implements Action {
 
     final private Run<?, ?> currentBuild;
     private String prevBuild;
     private String html;
-
+    
     public ConsoleLineDiffDisplay(Run<?, ?> build) {
         this.currentBuild = build;
         this.prevBuild = Stapler.getCurrentRequest().getParameter("prevBuild");
@@ -24,15 +30,13 @@ public class ConsoleLineDiffDisplay implements Action {
         String currLogFileLocation = currentBuild.getLogFile().getAbsolutePath();
         String prevLogFileLocation = previousBuild.getLogFile().getAbsolutePath();
 
-        LogParserLineDiff d = new LogParserLineDiff();
+        DiffToHtmlGenerator d2h = null;
         try {
-            d.lineDiff(prevLogFileLocation, currLogFileLocation);
+            d2h = new DiffToHtmlGenerator(prevLogFileLocation, currLogFileLocation, currBuildNum,
+                    prevBuildNum);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        DiffToHtmlGenerator d2h = new DiffToHtmlGenerator(d.getDeltas(), d.getPrevConsoleOutput(), currBuildNum,
-                prevBuildNum);
 
         html = d2h.generateHtmlString();
     }

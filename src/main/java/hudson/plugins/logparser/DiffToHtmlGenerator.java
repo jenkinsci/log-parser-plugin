@@ -1,19 +1,30 @@
 package hudson.plugins.logparser;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import difflib.ChangeDelta;
 import difflib.DeleteDelta;
 import difflib.Delta;
+import difflib.DiffUtils;
 import difflib.InsertDelta;
+import difflib.Patch;
+
+/**
+ * This class can generate a html page based on line diff result
+ */
 
 public class DiffToHtmlGenerator {
 
     private List<Delta> deltas = null;
     private List<String> prevText = null;
+    private List<String> currText = null;
     private String htmlString = null;
     private int curr;
     private int prev;
@@ -22,12 +33,30 @@ public class DiffToHtmlGenerator {
     private static final int INSERTED = 1;
     private static final int DELETED = 2;
     private static final int CHANGED = 3;
+    
+    public DiffToHtmlGenerator(String prevPath, String currPath, int prevNum, int currNum) throws IOException {
+        curr = currNum;
+        prev = prevNum;
+        getConsoleFile(prevPath, currPath);
+        Patch patch = DiffUtils.diff(prevText, currText);
+        deltas = patch.getDeltas();
+    }
+    
+    private void getConsoleFile(String prevPath, String currPath) throws IOException {
+        BufferedReader prevReader = new BufferedReader(new FileReader(prevPath));
+        prevText = new ArrayList<String>();
+        String line = "";
+        while ((line = prevReader.readLine()) != null) {
+            prevText.add(line);
+        }
+        prevReader.close();
 
-    public DiffToHtmlGenerator(List<Delta> deltas, List<String> prevText, int curr, int prev) {
-        this.deltas = deltas;
-        this.prevText = prevText;
-        this.curr = curr;
-        this.prev = prev;
+        BufferedReader currReader = new BufferedReader(new FileReader(currPath));
+        currText = new ArrayList<String>();
+        while ((line = currReader.readLine()) != null) {
+            currText.add(line);
+        }
+        currReader.close();
     }
 
     public String generateHtmlString() {
