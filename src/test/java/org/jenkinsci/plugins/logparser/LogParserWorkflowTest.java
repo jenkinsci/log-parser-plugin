@@ -22,11 +22,23 @@ public class LogParserWorkflowTest {
     @ClassRule
     public static JenkinsRule jenkinsRule = new JenkinsRule();
 
-    private static Maven.MavenInstallation mavenInstallation;
+    private static LogParserAction result;
 
     @BeforeClass
     public static void init() throws Exception {
-        mavenInstallation = jenkinsRule.configureMaven3();
+        Maven.MavenInstallation mavenInstallation = jenkinsRule.configureMaven3();
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
+        FilePath workspace = jenkinsRule.jenkins.getWorkspaceFor(job);
+        workspace.unzipFrom(LogParserWorkflowTest.class.getResourceAsStream("./maven-project1.zip"));
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node {\n"
+                + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"
+                + "  sh \"${mvnHome}/bin/mvn clean install\"\n"
+                + "  step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])\n"
+                + "}\n", true)
+        );
+        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
+        result = job.getLastBuild().getAction(LogParserAction.class);
     }
 
     /**
@@ -34,21 +46,16 @@ public class LogParserWorkflowTest {
      */
     @Test
     public void logParserPublisherWorkflowStep() throws Exception {
-        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
-        FilePath workspace = jenkinsRule.jenkins.getWorkspaceFor(job);
-        workspace.unzipFrom(getClass().getResourceAsStream("./maven-project1.zip"));
-        job.setDefinition(new CpsFlowDefinition(""
-                        + "node {\n"
-                        + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"
-                        + "  sh \"${mvnHome}/bin/mvn clean install\"\n"
-                        + "  step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])\n"
-                        + "}\n", true)
-        );
-        jenkinsRule.assertBuildStatusSuccess(job.scheduleBuild2(0));
-        LogParserAction result = job.getLastBuild().getAction(LogParserAction.class);
         assertEquals(0, result.getResult().getTotalErrors());
         assertEquals(2, result.getResult().getTotalWarnings());
         assertEquals(0, result.getResult().getTotalInfos());
     }
 
+    /**
+     * Run a workflow job using {@link LogParserPublisher} and check for number of debug tags
+     */
+    @Test
+    public void logParserPublisherWorkflowStepDebugTags() throws Exception {
+        assertEquals(0, result.getResult().getTotalDebugs());
+    }
 }

@@ -50,6 +50,7 @@ public class LogParserParser {
         statusCount.put(LogParserConsts.ERROR, 0);
         statusCount.put(LogParserConsts.WARNING, 0);
         statusCount.put(LogParserConsts.INFO, 0);
+        statusCount.put(LogParserConsts.DEBUG, 0);
 
         this.parsingRulesArray = LogParserUtils
                 .readParsingRules(parsingRulesFile);
@@ -89,16 +90,17 @@ public class LogParserParser {
         // Determine parsed log files
         final String parsedFilePath = logDirectory + "/log_content.html";
         final String errorLinksFilePath = logDirectory + "/logerrorLinks.html";
-        final String warningLinksFilePath = logDirectory
-                + "/logwarningLinks.html";
+        final String warningLinksFilePath = logDirectory + "/logwarningLinks.html";
         final String infoLinksFilePath = logDirectory + "/loginfoLinks.html";
+        final String debugLinksFilePath = logDirectory + "/logdebugLinks.html";
         final String buildRefPath = logDirectory + "/log_ref.html";
         final String buildWrapperPath = logDirectory + "/log.html";
 
-        // Record file paths in hash
+        // Record file paths in HashMap
         linkFiles.put(LogParserConsts.ERROR, errorLinksFilePath);
         linkFiles.put(LogParserConsts.WARNING, warningLinksFilePath);
         linkFiles.put(LogParserConsts.INFO, infoLinksFilePath);
+        linkFiles.put(LogParserConsts.DEBUG, debugLinksFilePath);
 
         // Open console log for reading and all other files for writing
         final BufferedWriter writer = new BufferedWriter(new FileWriter(
@@ -111,18 +113,19 @@ public class LogParserParser {
                 warningLinksFilePath)));
         writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
                 infoLinksFilePath)));
+        writers.put(LogParserConsts.DEBUG, new BufferedWriter(new FileWriter(
+                debugLinksFilePath)));
 
         // Loop on the console log as long as there are input lines and parse
         // line by line
         // At the end of this loop, we will have:
         // - a parsed log with colored lines
-        // - 3 links files which will be consolidated into one referencing html
+        // - 4 links files which will be consolidated into one referencing html
         // file.
 
         // Create dummy header and section for beginning of log
         final String shortLink = " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
-        LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers,
-                sectionCounter); // This enters a line which will later be
+        LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); // This enters a line which will later be
                                  // replaced by the actual header and count for
                                  // this header
         headerForSection.add(shortLink);
@@ -146,6 +149,7 @@ public class LogParserParser {
         ((BufferedWriter) writers.get(LogParserConsts.ERROR)).close();
         ((BufferedWriter) writers.get(LogParserConsts.WARNING)).close();
         ((BufferedWriter) writers.get(LogParserConsts.INFO)).close();
+        ((BufferedWriter) writers.get(LogParserConsts.DEBUG)).close();
 
         // Build the reference html from the warnings/errors/info html files
         // created in the loop above
@@ -165,16 +169,16 @@ public class LogParserParser {
         final LogParserResult result = new LogParserResult();
         result.setHtmlLogFile(parsedFilePath);
         result.setTotalErrors((Integer) statusCount.get(LogParserConsts.ERROR));
-        result.setTotalWarnings((Integer) statusCount
-                .get(LogParserConsts.WARNING));
+        result.setTotalWarnings((Integer) statusCount.get(LogParserConsts.WARNING));
         result.setTotalInfos((Integer) statusCount.get(LogParserConsts.INFO));
+        result.setTotalDebugs((Integer) statusCount.get(LogParserConsts.DEBUG));
         result.setErrorLinksFile(errorLinksFilePath);
         result.setWarningLinksFile(warningLinksFilePath);
         result.setInfoLinksFile(infoLinksFilePath);
+        result.setDebugLinksFile(debugLinksFilePath);
         result.setParsedLogURL(parsedLogURL);
         result.setHtmlLogPath(logDirectory);
-        result.setBadParsingRulesError(this.compiledPatternsPlusError
-                .getError());
+        result.setBadParsingRulesError(this.compiledPatternsPlusError.getError());
 
         return result;
 
