@@ -29,6 +29,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
+
 public class LogParserPublisher extends Recorder implements SimpleBuildStep, Serializable {
     private static final long serialVersionUID = 1L;
     public boolean unstableOnWarning;
@@ -111,6 +113,21 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         return true;
     }
 
+    private String expandEnvironmentToken(final AbstractBuild<?, ?> build, final TaskListener listener, String to_expand) {
+        if (to_expand != null && !to_expand.isEmpty()) {
+            String expandedExpression = to_expand;
+            try {
+                expandedExpression = TokenMacro.expandAll(build, listener, to_expand, false, null);
+            } catch (Exception e) {
+                listener.getLogger().println(e.getMessage());
+            }
+
+            return expandedExpression;
+        } else {
+            return "";
+        }
+    }
+
     @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws
             InterruptedException, IOException {
@@ -121,11 +138,13 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
             // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
             boolean preformattedHtml = !((DescriptorImpl) getDescriptor()).getLegacyFormatting();
             final FilePath parsingRulesFile;
+
             if (useProjectRule) {
-                parsingRulesFile = new FilePath(workspace, projectRulePath);
+                parsingRulesFile = new FilePath(workspace, expandEnvironmentToken((AbstractBuild) build, listener, projectRulePath));
             } else {
-                parsingRulesFile = new FilePath(new File(parsingRulesPath));
+                parsingRulesFile = new FilePath(new File(expandEnvironmentToken((AbstractBuild) build, listener, parsingRulesPath)));
             }
+           
             final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml, launcher.getChannel());
             // Parse the build's log according to these rules and get the result
             result = parser.parseLog(build);
