@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <j:set var="descriptor" value="${it.descriptor}"/>
+  <l:layout>
+    <st:include it="${it.owner}" page="sidepanel.jelly"/>
+    <l:main-panel>
+	  <f:entry field="allBuild" title="Choose Another Build">
+        <f:select id="allBuildSelect" />
+      </f:entry>
+      <br/>
+      <br/>
+      <f:entry field="typeDiff" title="Choose Type of Diff">
+        <f:select id="typeDiffSelect" />
+      </f:entry>
+      <br/>
+      <br/>
+      <f:entry>
+        <a href="" class="button" id="okLink" onclick="return retrieveUrl();">OK</a>
+      </f:entry>
+      <script>
+        function retrieveUrl(){
+          var ePrevBuild = document.getElementById("allBuildSelect");
+          var prevBuild = ePrevBuild.options[ePrevBuild.selectedIndex].value;
+          var eTypeDiff = document.getElementById("typeDiffSelect");
+          var typeDiff = eTypeDiff.options[eTypeDiff.selectedIndex].value;
+          document.getElementById("okLink").href = typeDiff + "/?prevBuild=" + prevBuild;
+          return true;
+        }
+      </script>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

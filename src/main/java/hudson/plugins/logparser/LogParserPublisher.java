@@ -55,9 +55,8 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
      *            path to project specific rules relative to workspace root.
      */
     @Deprecated
-    private LogParserPublisher(final boolean unstableOnWarning,
-            final boolean failBuildOnError, final boolean showGraphs,
-            final String parsingRulesPath, final boolean useProjectRule,
+    private LogParserPublisher(final boolean unstableOnWarning, final boolean failBuildOnError,
+            final boolean showGraphs, final String parsingRulesPath, final boolean useProjectRule,
             final String projectRulePath) {
 
         this.unstableOnWarning = unstableOnWarning;
@@ -97,8 +96,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @Override
-    public boolean prebuild(final AbstractBuild<?, ?> build,
-            final BuildListener listener) {
+    public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
         return true;
     }
 
@@ -112,13 +110,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @Override
-    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws
-            InterruptedException, IOException {
+    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener)
+            throws InterruptedException, IOException {
 
         final Logger logger = Logger.getLogger(getClass().getName());
         LogParserResult result = new LogParserResult();
         try {
-            // Create a parser with the parsing rules as configured : colors, regular expressions, etc.
+            // Create a parser with the parsing rules as configured : colors,
+            // regular expressions, etc.
             boolean preformattedHtml = !((DescriptorImpl) getDescriptor()).getLegacyFormatting();
             final FilePath parsingRulesFile;
             if (useProjectRule) {
@@ -126,7 +125,8 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
             } else {
                 parsingRulesFile = new FilePath(new File(parsingRulesPath));
             }
-            final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml, launcher.getChannel());
+            final LogParserParser parser = new LogParserParser(parsingRulesFile, preformattedHtml,
+                    launcher.getChannel());
             // Parse the build's log according to these rules and get the result
             result = parser.parseLog(build);
 
@@ -157,6 +157,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         // Add an action created with the above results
         final LogParserAction action = new LogParserAction(build, result);
         build.addAction(action);
+        DiffBuildAction dbAction;
+        try {
+            dbAction = new DiffBuildAction(build);
+            build.addAction(dbAction);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -164,8 +172,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         return DescriptorImpl.DESCRIPTOR;
     }
 
-    public static final class DescriptorImpl extends
-            BuildStepDescriptor<Publisher> {
+    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
         private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
         private boolean useLegacyFormatting = false;
@@ -186,8 +193,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         }
 
         @Override
-        public boolean isApplicable(
-                final Class<? extends AbstractProject> jobType) {
+        public boolean isApplicable(final Class<? extends AbstractProject> jobType) {
             return true;
         }
 
@@ -200,12 +206,10 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         }
 
         @Override
-        public boolean configure(final StaplerRequest req, final JSONObject json)
-                throws FormException {
-            parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class,
-                    "log-parser.").toArray(new ParserRuleFile[0]);
-            useLegacyFormatting = json.getJSONObject("log-parser").getBoolean(
-                    "useLegacyFormatting");
+        public boolean configure(final StaplerRequest req, final JSONObject json) throws FormException {
+            parsingRulesGlobal = req.bindParametersToList(ParserRuleFile.class, "log-parser.")
+                    .toArray(new ParserRuleFile[0]);
+            useLegacyFormatting = json.getJSONObject("log-parser").getBoolean("useLegacyFormatting");
             save();
             return true;
         }
