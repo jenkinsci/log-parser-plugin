@@ -60,7 +60,7 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
     /**
      * To invoke Console Line Diff output page
      */
-    public ConsoleLineDiffDisplay getConsoleOutputLineDiff() {
+    public ConsoleLineDiffDisplay getConsoleLineDiffDisplay() {
         return new ConsoleLineDiffDisplay(build);
     }
 
@@ -100,7 +100,7 @@ public class DiffBuildAction implements Action, Describable<DiffBuildAction> {
         /**
          * Value for Choose Type of Diff dropdown, and these values have to match with the url or each output page
          */
-        private static final String TYPE_DIFF_VALUE[] = { "consoleOutputLineDiff" };
+        private static final String TYPE_DIFF_VALUE[] = { "consoleLineDiffDisplay" };
 
         /**
          * Fill data in Choose Another Build dropdown
