@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.util.*;
 
 public class LogParserResult {
 
@@ -12,12 +13,16 @@ public class LogParserResult {
     private int totalWarnings = 0;
     private int totalInfos = 0;
     private int totalDebugs = 0;
+    private Map<String, Integer> totalCountsByExtraTag = new HashMap<String, Integer>();
 
     private String htmlLogFile;
     private String errorLinksFile;
     private String warningLinksFile;
     private String infoLinksFile;
     private String debugLinksFile;
+    private Map<String, String> linkedFilesByExtraTag = new HashMap<String, String>();
+
+    private Set<String> extraTags = new HashSet<String>();
 
     private String parsedLogURL;
     private String htmlLogPath;
@@ -61,6 +66,10 @@ public class LogParserResult {
         return totalDebugs;
     }
 
+    public int getTotalCountsByExtraTag(String tag) {
+        return totalCountsByExtraTag.get(tag);
+    }
+
     public String getHtmlLogFile() {
         return htmlLogFile;
     }
@@ -83,6 +92,10 @@ public class LogParserResult {
 
     public String getDebugLinksFile() {
         return debugLinksFile;
+    }
+
+    public String getLinksFileByExtraTag(String tag) {
+        return linkedFilesByExtraTag.get(tag);
     }
 
     public String getParsedLogURL() {
@@ -117,6 +130,10 @@ public class LogParserResult {
         return getReader(getDebugLinksFile());
     }
 
+    public Reader getLinkedReaderByExtraTag(String tag) throws IOException {
+        return getReader(getLinksFileByExtraTag(tag));
+    }
+
     public void setHtmlLogFile(final String file) {
         this.htmlLogFile = file;
     }
@@ -141,6 +158,10 @@ public class LogParserResult {
         this.debugLinksFile = file;
     }
 
+    public void putLinksFileByExtraTag(final String tag, final String file) {
+        this.linkedFilesByExtraTag.put(tag, file);
+    }
+
     public void setTotalErrors(final int totalErrors) {
         this.totalErrors = totalErrors;
     }
@@ -157,12 +178,24 @@ public class LogParserResult {
         this.totalDebugs = totalDebugs;
     }
 
+    public void putTotalCountsByExtraTag(final String tag, final int totalCounts) {
+        this.totalCountsByExtraTag.put(tag, totalCounts);
+    }
+
     public void setParsedLogURL(final String parsedLogURL) {
         this.parsedLogURL = parsedLogURL;
     }
 
     public File getHtmlLogFileToRead() {
         return new File(this.htmlLogFile);
+    }
+
+    public void setExtraTags(Collection<String> extraTags) {
+        this.extraTags.addAll(extraTags);
+    }
+
+    public Set<String> getExtraTags() {
+        return this.extraTags;
     }
 
     public String getHtmlContent() {

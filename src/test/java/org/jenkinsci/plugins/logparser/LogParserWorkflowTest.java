@@ -58,4 +58,13 @@ public class LogParserWorkflowTest {
     public void logParserPublisherWorkflowStepDebugTags() throws Exception {
         assertEquals(0, result.getResult().getTotalDebugs());
     }
+
+    /**
+     * Run a workflow job using {@link LogParserPublisher} and check for number of example arbitrary tags
+     */
+    @Test
+    public void logParserPublisherWorkflowStepArbitraryTags() throws Exception {
+        assertEquals(0, result.getResult().getTotalCountsByExtraTag("jenkins"));
+        assertEquals(1, result.getResult().getTotalCountsByExtraTag("logParserPublisherWorkflowStep"));
+    }
 }

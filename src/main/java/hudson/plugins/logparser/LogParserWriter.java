@@ -54,7 +54,8 @@ public final class LogParserWriter {
             final HashMap<String, String> linkListDisplay,
             final HashMap<String, String> linkListDisplayPlural,
             final HashMap<String, Integer> statusCount,
-            final HashMap<String, String> linkFiles) throws IOException {
+            final HashMap<String, String> linkFiles,
+            final List<String> extraTags) throws IOException {
 
         final String refStart = "<script type=\"text/javascript\">\n"
                 + "\tfunction toggleList(list){\n"
@@ -83,6 +84,12 @@ public final class LogParserWriter {
         writeLinks(writer, LogParserConsts.DEBUG, headerForSection,
                 statusCountPerSection, iconTable, linkListDisplay,
                 linkListDisplayPlural, statusCount, linkFiles);
+        // Write extra tags
+        for (String extraTag : extraTags) {
+            writeLinks(writer, extraTag, headerForSection,
+                    statusCountPerSection, iconTable, linkListDisplay,
+                    linkListDisplayPlural, statusCount, linkFiles);
+        }
         writer.write(LogParserConsts.getHtmlClosingTags());
         writer.close(); // Close to unlock and flush to disk.
 
@@ -96,10 +103,19 @@ public final class LogParserWriter {
             final HashMap<String, String> linkListDisplayPlural,
             final HashMap<String, Integer> statusCount,
             final HashMap<String, String> linkFiles) throws IOException {
-        final String statusIcon = (String) iconTable.get(status);
-        final String linkListDisplayStr = (String) linkListDisplay.get(status);
-        final String linkListDisplayStrPlural = (String) linkListDisplayPlural
+        String statusIcon = (String) iconTable.get(status);
+        if (statusIcon == null) {
+            statusIcon = LogParserDisplayConsts.DEFAULT_ICON;
+        }
+        String linkListDisplayStr = (String) linkListDisplay.get(status);
+        if (linkListDisplayStr == null) {
+            linkListDisplayStr = LogParserDisplayConsts.getDefaultLinkListDisplay(status);
+        }
+        String linkListDisplayStrPlural = (String) linkListDisplayPlural
                 .get(status);
+        if (linkListDisplayStrPlural == null) {
+            linkListDisplayStrPlural = LogParserDisplayConsts.getDefaultLinkListDisplayPlural(status);
+        }
         final String linkListCount = ((Integer) statusCount.get(status))
                 .toString();
 

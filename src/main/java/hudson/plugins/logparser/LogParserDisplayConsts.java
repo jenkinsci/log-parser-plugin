@@ -1,5 +1,7 @@
 package hudson.plugins.logparser;
 
+import org.apache.commons.lang.WordUtils;
+
 import java.util.HashMap;
 
 public class LogParserDisplayConsts {
@@ -8,6 +10,17 @@ public class LogParserDisplayConsts {
     final private HashMap<String, String> iconTable = new HashMap<String, String>();
     final private HashMap<String, String> linkListDisplay = new HashMap<String, String>();
     final private HashMap<String, String> linkListDisplayPlural = new HashMap<String, String>();
+
+    public static final String DEFAULT_COLOR = "blue";
+    public static final String DEFAULT_ICON = "blue.gif";
+
+    public static String getDefaultLinkListDisplay(String status) {
+        return WordUtils.capitalize(status);
+    }
+
+    public static String getDefaultLinkListDisplayPlural(String status) {
+        return getDefaultLinkListDisplay(status) + "s";
+    }
 
     public LogParserDisplayConsts() {
         // Color of each status

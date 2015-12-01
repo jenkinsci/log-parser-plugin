@@ -5,6 +5,8 @@ import hudson.FilePath;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -43,15 +45,17 @@ public final class LogParserUtils {
         } else if (result.equalsIgnoreCase("warn")
                 || result.equalsIgnoreCase("end")) {
             result = LogParserConsts.WARNING;
-        } else {
+        } else if (LogParserConsts.LEGAL_STATUS.contains(result.toUpperCase(Locale.ENGLISH))) {
             result = result.toUpperCase(Locale.ENGLISH);
         }
 
         // If some non-existent status is in the configuration - disregard it
-        final List<String> legals = LogParserConsts.LEGAL_STATUS;
-        if (!legals.contains(result)) {
-            result = LogParserConsts.DEFAULT;
-        }
+        // Arbitrary tag: this condition check is commented out so that arbitrary status can come through
+
+        //final List<String> legals = LogParserConsts.LEGAL_STATUS;
+        //if (!legals.contains(result)) {
+        //    result = LogParserConsts.DEFAULT;
+        //}
 
         return result;
     }
@@ -61,6 +65,7 @@ public final class LogParserUtils {
 
         Pattern[] result = new Pattern[parsingRulesArray.length];
         final StringBuffer badParsingRules = new StringBuffer();
+        List<String> extraTags = new ArrayList<String>();
 
         for (int i = 0; i < parsingRulesArray.length; i++) {
             final String parsingRule = parsingRulesArray[i];
@@ -69,6 +74,13 @@ public final class LogParserUtils {
                 try {
                     final String ruleParts[] = parsingRule.split("\\s");
                     String regexp = ruleParts[1];
+                    String tag = ruleParts[0];
+
+                    if (!LogParserConsts.LEGAL_STATUS.contains(tag.toUpperCase(Locale.ENGLISH))) {
+                        if (!Arrays.asList("OK", "END", "WARN").contains(tag.toUpperCase(Locale.ENGLISH))) {
+                            extraTags.add(tag);
+                        }
+                    }
 
                     final int firstDash = parsingRule.indexOf('/');
                     final int lastDash = parsingRule.lastIndexOf('/');
@@ -92,6 +104,7 @@ public final class LogParserUtils {
         final CompiledPatterns fullResult = new CompiledPatterns();
         fullResult.setCompiledPatters(result);
         fullResult.setError(badParsingRules.toString());
+        fullResult.setExtraTags(extraTags);
         return fullResult;
     }
 

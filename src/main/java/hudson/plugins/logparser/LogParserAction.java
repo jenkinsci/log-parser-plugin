@@ -144,6 +144,10 @@ public class LogParserAction implements Action {
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
             dsb.add(a.result.getTotalDebugs(), "debugs",
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            for (String extraTag : a.result.getExtraTags()) {
+                dsb.add(a.result.getTotalCountsByExtraTag(extraTag), extraTag,
+                        new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
+            }
         }
         return dsb.build();
     }
