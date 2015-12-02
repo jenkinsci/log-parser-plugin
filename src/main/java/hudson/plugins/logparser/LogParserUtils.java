@@ -75,7 +75,6 @@ public final class LogParserUtils {
                     final String ruleParts[] = parsingRule.split("\\s");
                     String regexp = ruleParts[1];
                     String tag = ruleParts[0];
-
                     if (!LogParserConsts.LEGAL_STATUS.contains(tag.toUpperCase(Locale.ENGLISH))) {
                         if (!Arrays.asList("OK", "END", "WARN").contains(tag.toUpperCase(Locale.ENGLISH))) {
                             extraTags.add(tag);

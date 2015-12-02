@@ -5,7 +5,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Reader;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class LogParserResult {
 
@@ -21,7 +25,6 @@ public class LogParserResult {
     private String infoLinksFile;
     private String debugLinksFile;
     private Map<String, String> linkedFilesByExtraTag = new HashMap<String, String>();
-
     private Set<String> extraTags = new HashSet<String>();
 
     private String parsedLogURL;
