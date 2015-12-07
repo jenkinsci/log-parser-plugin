@@ -11,12 +11,14 @@ public class LogParserResult {
     private int totalErrors = 0;
     private int totalWarnings = 0;
     private int totalInfos = 0;
+    private int basicInfos = 0;
 
     private String htmlLogFile;
     private String errorLinksFile;
     private String warningLinksFile;
     private String infoLinksFile;
-
+    private String basicLinksFile;
+    
     private String parsedLogURL;
     private String htmlLogPath;
 
@@ -54,7 +56,11 @@ public class LogParserResult {
     public int getTotalInfos() {
         return totalInfos;
     }
-
+    
+    public int getBasicInfos(){
+    	return basicInfos;
+    }
+    
     public String getHtmlLogFile() {
         return htmlLogFile;
     }
@@ -74,7 +80,11 @@ public class LogParserResult {
     public String getInfoLinksFile() {
         return infoLinksFile;
     }
-
+    
+    public String getBasicLinksFile(){
+    	return basicLinksFile;
+    }
+    
     public String getParsedLogURL() {
         return parsedLogURL;
     }
@@ -122,6 +132,10 @@ public class LogParserResult {
     public void setInfoLinksFile(final String file) {
         this.infoLinksFile = file;
     }
+    
+    public void setBasicLinksFile(final String file){
+    	this.basicLinksFile = file;
+    }
 
     public void setTotalErrors(final int totalErrors) {
         this.totalErrors = totalErrors;
@@ -133,6 +147,10 @@ public class LogParserResult {
 
     public void setTotalInfos(final int totalInfos) {
         this.totalInfos = totalInfos;
+    }
+
+    public void setBasicInfos(final int basicInfos){
+    	this.basicInfos = basicInfos;
     }
 
     public void setParsedLogURL(final String parsedLogURL) {

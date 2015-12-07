@@ -19,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+
 public class LogParserParser {
 
     final private HashMap<String, Integer> statusCount = new HashMap<String, Integer>();
@@ -50,7 +52,7 @@ public class LogParserParser {
         statusCount.put(LogParserConsts.ERROR, 0);
         statusCount.put(LogParserConsts.WARNING, 0);
         statusCount.put(LogParserConsts.INFO, 0);
-
+        statusCount.put(LogParserConsts.BASIC, 0);
         this.parsingRulesArray = LogParserUtils
                 .readParsingRules(parsingRulesFile);
 
@@ -92,6 +94,7 @@ public class LogParserParser {
         final String warningLinksFilePath = logDirectory
                 + "/logwarningLinks.html";
         final String infoLinksFilePath = logDirectory + "/loginfoLinks.html";
+        final String basicLinksFilePath = logDirectory +"/logbasicLinks.html";
         final String buildRefPath = logDirectory + "/log_ref.html";
         final String buildWrapperPath = logDirectory + "/log.html";
 
@@ -99,7 +102,7 @@ public class LogParserParser {
         linkFiles.put(LogParserConsts.ERROR, errorLinksFilePath);
         linkFiles.put(LogParserConsts.WARNING, warningLinksFilePath);
         linkFiles.put(LogParserConsts.INFO, infoLinksFilePath);
-
+        linkFiles.put(LogParserConsts.BASIC, basicLinksFilePath);
         // Open console log for reading and all other files for writing
         final BufferedWriter writer = new BufferedWriter(new FileWriter(
                 parsedFilePath));
@@ -111,7 +114,8 @@ public class LogParserParser {
                 warningLinksFilePath)));
         writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
                 infoLinksFilePath)));
-
+        writers.put(LogParserConsts.BASIC, new BufferedWriter(new FileWriter(
+        		basicLinksFilePath)));
         // Loop on the console log as long as there are input lines and parse
         // line by line
         // At the end of this loop, we will have:
@@ -146,7 +150,7 @@ public class LogParserParser {
         ((BufferedWriter) writers.get(LogParserConsts.ERROR)).close();
         ((BufferedWriter) writers.get(LogParserConsts.WARNING)).close();
         ((BufferedWriter) writers.get(LogParserConsts.INFO)).close();
-
+        ((BufferedWriter) writers.get(LogParserConsts.BASIC)).close();
         // Build the reference html from the warnings/errors/info html files
         // created in the loop above
         LogParserWriter.writeReferenceHtml(buildRefPath, headerForSection,
@@ -168,9 +172,11 @@ public class LogParserParser {
         result.setTotalWarnings((Integer) statusCount
                 .get(LogParserConsts.WARNING));
         result.setTotalInfos((Integer) statusCount.get(LogParserConsts.INFO));
+        result.setBasicInfos((Integer) statusCount.get(LogParserConsts.BASIC));
         result.setErrorLinksFile(errorLinksFilePath);
         result.setWarningLinksFile(warningLinksFilePath);
         result.setInfoLinksFile(infoLinksFilePath);
+        result.setBasicLinksFile(basicLinksFilePath);
         result.setParsedLogURL(parsedLogURL);
         result.setHtmlLogPath(logDirectory);
         result.setBadParsingRulesError(this.compiledPatternsPlusError
@@ -188,6 +194,9 @@ public class LogParserParser {
             throws IOException {
         String parsedLine = line;
         String effectiveStatus = status;
+        if (checkBasicInfoLine(line)){
+        	effectiveStatus = LogParserConsts.BASIC;
+        }
         if (status == null) {
             effectiveStatus = LogParserConsts.NONE;
         } else if (status.equals(LogParserConsts.START)) {
@@ -338,5 +347,13 @@ public class LogParserParser {
                 + " minutes (" + diffSeconds + ") seconds.");
 
     }
+    /**
+     * A function that checks whether or not the line is basic or not.
+     * @param line
+     * @return boolean whether or not the line fits any of the strings that identify it as a basic line
+    */
+    private boolean checkBasicInfoLine(String line){
+		return (StringUtils.indexOfAny(line, LogParserConsts.BASIC_INFO_LINES)!=-1);
+	}
 
 }
