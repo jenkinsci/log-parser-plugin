@@ -49,6 +49,7 @@ public class LogParserWorkflowTest {
         assertEquals(0, result.getResult().getTotalErrors());
         assertEquals(2, result.getResult().getTotalWarnings());
         assertEquals(0, result.getResult().getTotalInfos());
+        assertEquals(0, result.getResult().getBasicInfos());
     }
 
 }
