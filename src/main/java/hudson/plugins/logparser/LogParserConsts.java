@@ -13,6 +13,7 @@ public class LogParserConsts {
     public static final String NONE = "NONE";
     public static final String START = "START"; // marks a beginning of a section
     public static final String DEFAULT = NONE;
+    public static final String BASIC = "BASIC";
 
     // Error messages
     public static final String CANNOT_PARSE = "log-parser plugin ERROR: Cannot parse log ";
@@ -21,7 +22,9 @@ public class LogParserConsts {
     public static final List<String> LEGAL_STATUS = Arrays.asList(ERROR, WARNING, INFO, NONE, START);
     public static final List<String> STATUSES_WITH_LINK_FILES = Arrays.asList(ERROR, WARNING, INFO);
     public static final List<String> STATUSES_WITH_SECTIONS_IN_LINK_FILES = Arrays.asList(ERROR, WARNING);
-
+    public static final String[] BASIC_INFO_LINES={"Maven Version:","JDK Version:",
+			"OS Info:","Total time:",
+			"Finished at:","Final Memory:"};
     public static String getHtmlOpeningTags() {
         final String hudsonRoot = Jenkins.getActiveInstance().getRootUrl();
         return "<!DOCTYPE html>\n" + "<html>\n" + "\t<head>\n"
