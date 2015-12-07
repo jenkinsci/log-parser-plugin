@@ -14,13 +14,11 @@ import java.util.Collections;
 
 public class LogParserBuildStep implements BuildStep {
 
-    public boolean prebuild(final AbstractBuild<?, ?> build,
-            final BuildListener listener) {
+    public boolean prebuild(final AbstractBuild<?, ?> build, final BuildListener listener) {
         return true;
     }
 
-    public boolean perform(final AbstractBuild<?, ?> build,
-            final Launcher launcher, final BuildListener listener)
+    public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
             throws InterruptedException, IOException {
         return true;
     }
@@ -33,8 +31,7 @@ public class LogParserBuildStep implements BuildStep {
         return null;
     }
 
-    public Collection<? extends Action> getProjectActions(
-            AbstractProject<?, ?> project) {
+    public Collection<? extends Action> getProjectActions(AbstractProject<?, ?> project) {
         return Collections.emptyList();
     }
 }

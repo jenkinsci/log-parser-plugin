@@ -11,27 +11,20 @@ public class LogParserResult {
     private int totalErrors = 0;
     private int totalWarnings = 0;
     private int totalInfos = 0;
-    
-    private int totalDeltas = 0;
+	private int basicInfos = 0;
 
-	private String htmlLogFile;
+    private String htmlLogFile;
     private String errorLinksFile;
     private String warningLinksFile;
     private String infoLinksFile;
+    private String basicLinksFile;
 
     private String parsedLogURL;
     private String htmlLogPath;
 
     private String failedToParseError;
     private String badParsingRulesError;
-    
-    public int getTotalDeltas() {
-		return totalDeltas;
-	}
 
-	public void setTotalDeltas(int totalDeltas) {
-		this.totalDeltas = totalDeltas;
-	}
 
     public String getBadParsingRulesError() {
         return badParsingRulesError;
@@ -64,6 +57,9 @@ public class LogParserResult {
     public int getTotalInfos() {
         return totalInfos;
     }
+    public int getBasicInfos(){
+    	return basicInfos;
+    }
 
     public String getHtmlLogFile() {
         return htmlLogFile;
@@ -85,6 +81,10 @@ public class LogParserResult {
         return infoLinksFile;
     }
 
+    public String getBasicLinksFile(){
+    	return basicLinksFile;
+    }
+    
     public String getParsedLogURL() {
         return parsedLogURL;
     }
@@ -113,6 +113,10 @@ public class LogParserResult {
         return getReader(getInfoLinksFile());
     }
 
+    public Reader getBasicLinksReader() throws IOException{
+    	return getReader(getBasicLinksFile());
+    }
+    
     public void setHtmlLogFile(final String file) {
         this.htmlLogFile = file;
     }
@@ -132,7 +136,11 @@ public class LogParserResult {
     public void setInfoLinksFile(final String file) {
         this.infoLinksFile = file;
     }
-
+    
+    public void setBasicLinksFile(final String file){
+    	this.basicLinksFile = file;
+    }
+    
     public void setTotalErrors(final int totalErrors) {
         this.totalErrors = totalErrors;
     }
@@ -145,9 +153,13 @@ public class LogParserResult {
         this.totalInfos = totalInfos;
     }
 
+    public void setBasicInfos(final int basicInfos){
+    	this.basicInfos = basicInfos;
+    }
     public void setParsedLogURL(final String parsedLogURL) {
         this.parsedLogURL = parsedLogURL;
     }
+    
 
     public File getHtmlLogFileToRead() {
         return new File(this.htmlLogFile);

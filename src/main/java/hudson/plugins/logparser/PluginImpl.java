@@ -11,6 +11,5 @@ public class PluginImpl extends Plugin {
     public static LogParserPublisher.DescriptorImpl getDescriptor() {
         return LOG_PARSER_DESCRIPTOR;
     }
-   
 
 }

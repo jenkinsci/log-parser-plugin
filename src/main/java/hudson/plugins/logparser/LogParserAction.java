@@ -48,17 +48,14 @@ public class LogParserAction implements Action {
 
     }
 
-    @Override
     public String getIconFileName() {
         return "clipboard.gif";
     }
 
-    @Override
     public String getDisplayName() {
         return "Parsed Console Output";
     }
 
-    @Override
     public String getUrlName() {
         return urlName;
     }

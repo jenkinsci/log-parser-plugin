@@ -15,12 +15,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 
 public class LogParserParser {
 
@@ -31,14 +30,13 @@ public class LogParserParser {
     final private String[] parsingRulesArray;
     final private Pattern[] compiledPatterns;
     final private CompiledPatterns compiledPatternsPlusError;
-
+    
     // if key is 3-ERROR it shows how many errors are in section 3
     final private HashMap<String, Integer> statusCountPerSection = new HashMap<String, Integer>();
     final private ArrayList<String> headerForSection = new ArrayList<String>();
     private int sectionCounter = 0;
 
     final private LogParserDisplayConsts displayConstants = new LogParserDisplayConsts();
-
     final private VirtualChannel channel;
     final private boolean preformattedHtml;
 
@@ -53,7 +51,7 @@ public class LogParserParser {
         statusCount.put(LogParserConsts.ERROR, 0);
         statusCount.put(LogParserConsts.WARNING, 0);
         statusCount.put(LogParserConsts.INFO, 0);
-
+        statusCount.put(LogParserConsts.BASIC, 0);
         this.parsingRulesArray = LogParserUtils
                 .readParsingRules(parsingRulesFile);
 
@@ -85,32 +83,25 @@ public class LogParserParser {
 
         // Get console log file
         final File logFile = build.getLogFile();
-        String previousLogFileLocation = ""; // added by zhesheng
-        if(build.getPreviousBuild() != null)
-        	previousLogFileLocation = build.getPreviousBuild().getLogFile().getAbsolutePath();
         final String logDirectory = logFile.getParent();
         final String logFileLocation = logFile.getAbsolutePath();
         final FilePath filePath = new FilePath(new File(logFileLocation));
+
         // Determine parsed log files
         final String parsedFilePath = logDirectory + "/log_content.html";
         final String errorLinksFilePath = logDirectory + "/logerrorLinks.html";
         final String warningLinksFilePath = logDirectory
                 + "/logwarningLinks.html";
         final String infoLinksFilePath = logDirectory + "/loginfoLinks.html";
+        final String basicLinksFilePath = logDirectory +"/logbasicLinks.html";
         final String buildRefPath = logDirectory + "/log_ref.html";
         final String buildWrapperPath = logDirectory + "/log.html";
-        final String lineDiffReportPath = logDirectory + "/line_diff.html";
-        
-        // do line diff between current build and previous build
-        // generate a html file and save it to log directory
-        
-        LogParserLineDiff d = new LogParserLineDiff();
-        int totalDeltas = d.lineDiff(previousLogFileLocation, logFileLocation, lineDiffReportPath);
-        
+
         // Record file paths in hash
         linkFiles.put(LogParserConsts.ERROR, errorLinksFilePath);
         linkFiles.put(LogParserConsts.WARNING, warningLinksFilePath);
         linkFiles.put(LogParserConsts.INFO, infoLinksFilePath);
+        linkFiles.put(LogParserConsts.BASIC, basicLinksFilePath);
 
         // Open console log for reading and all other files for writing
         final BufferedWriter writer = new BufferedWriter(new FileWriter(
@@ -123,6 +114,8 @@ public class LogParserParser {
                 warningLinksFilePath)));
         writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
                 infoLinksFilePath)));
+        writers.put(LogParserConsts.BASIC, new BufferedWriter(new FileWriter(
+        		basicLinksFilePath)));
 
         // Loop on the console log as long as there are input lines and parse
         // line by line
@@ -158,6 +151,7 @@ public class LogParserParser {
         ((BufferedWriter) writers.get(LogParserConsts.ERROR)).close();
         ((BufferedWriter) writers.get(LogParserConsts.WARNING)).close();
         ((BufferedWriter) writers.get(LogParserConsts.INFO)).close();
+        ((BufferedWriter) writers.get(LogParserConsts.BASIC)).close();
 
         // Build the reference html from the warnings/errors/info html files
         // created in the loop above
@@ -168,11 +162,11 @@ public class LogParserParser {
                 linkFiles);
         // Write the wrapping html for the reference page and the parsed log page
         LogParserWriter.writeWrapperHtml(buildWrapperPath);
-	
+
         final String buildUrlPath = build.getUrl(); // job/cat_log/58
         final String buildActionPath = LogParserAction.getUrlNameStat(); // "parsed_console";
         final String parsedLogURL = buildUrlPath + buildActionPath + "/log.html";
-	System.out.println("Successfully generated the log html file");
+
         // Create result class
         final LogParserResult result = new LogParserResult();
         result.setHtmlLogFile(parsedFilePath);
@@ -180,14 +174,15 @@ public class LogParserParser {
         result.setTotalWarnings((Integer) statusCount
                 .get(LogParserConsts.WARNING));
         result.setTotalInfos((Integer) statusCount.get(LogParserConsts.INFO));
+        result.setBasicInfos((Integer) statusCount.get(LogParserConsts.BASIC));
         result.setErrorLinksFile(errorLinksFilePath);
         result.setWarningLinksFile(warningLinksFilePath);
         result.setInfoLinksFile(infoLinksFilePath);
+        result.setBasicLinksFile(basicLinksFilePath);
         result.setParsedLogURL(parsedLogURL);
         result.setHtmlLogPath(logDirectory);
         result.setBadParsingRulesError(this.compiledPatternsPlusError
                 .getError());
-        result.setTotalDeltas(totalDeltas);
 
         return result;
 
@@ -201,6 +196,9 @@ public class LogParserParser {
             throws IOException {
         String parsedLine = line;
         String effectiveStatus = status;
+        if (checkBasicInfoLine(line)){
+        	effectiveStatus = LogParserConsts.BASIC;
+        }
         if (status == null) {
             effectiveStatus = LogParserConsts.NONE;
         } else if (status.equals(LogParserConsts.START)) {
@@ -228,6 +226,7 @@ public class LogParserParser {
                     parsedLineColored, effectiveStatus, status);
             parsedLine = parsedLineColoredAndMarked;
         }
+        
         final StringBuffer result = new StringBuffer(parsedLine);
         if (!preformattedHtml)
             result.append("<br/>\n");
@@ -297,27 +296,26 @@ public class LogParserParser {
 
         // Handle case where we are entering a new section
         if (status.equals(LogParserConsts.START)) {
-            sectionCounter++;
-            // This enters a line which will later be replaced by the actual
-            // header and count for this header
-            LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); 
-
-            final StringBuffer brShortLink = new StringBuffer("<br/>");
-            brShortLink.append(shortLink);
-            headerForSection.add(brShortLink.toString());
+            makeNewHeader(shortLink);
         }
 
         return markedLine.toString();
     }
-    
+
+	private void makeNewHeader(final StringBuffer shortLink) throws IOException {
+		sectionCounter++;
+		// This enters a line which will later be replaced by the actual
+		// header and count for this header
+		LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); 
+
+		final StringBuffer brShortLink = new StringBuffer("<br/>");
+		brShortLink.append(shortLink);
+		headerForSection.add(brShortLink.toString());
+	}
+
     private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final FilePath filePath, final
             String logFileLocation, final int linesInLog, final Logger logger) throws IOException, InterruptedException {
-    	parseLogBody(build, writer, filePath, logFileLocation, linesInLog, logger, 1);
-    }
-    
-    private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final FilePath filePath, final
-            String logFileLocation, final int linesInLog, final Logger logger, int baseBuildNumber) throws IOException, InterruptedException {
-    	
+
         // Logging information - start
         final String signature = build.getParent().getName() + "_build_"
                 + build.getNumber();
@@ -337,54 +335,16 @@ public class LogParserParser {
         String line;
         String status;
         int line_num = 0;
-        //BufferedWriter wt = new BufferedWriter(new FileWriter(filePath.getParent() + "/text.txt"));
-        
-        // Get current console log sanitized
-        final List<String> currentBuildConsoleOuput = new ArrayList<String>();
         while ((line = reader.readLine()) != null) {
-        	
             status = (String) lineStatusMatches.get(String.valueOf(line_num));
             final String parsedLine = parseLine(line, status);
             // This is for displaying sections in the links part
             writer.write(parsedLine);
             writer.newLine(); // Write system dependent end of line.
-            
-            currentBuildConsoleOuput.add(ConsoleNote.removeNotes(line));
-            
-            //wt.write(ConsoleNote.removeNotes(line));
-            //wt.newLine();
-            
             line_num++;
         }
-        //wt.flush();
-        //wt.close();
         reader.close();
-        
-        
-        //get basebuild
-        Run<?,?> baseBuild = build;
-        for(int i=0;i<build.getNumber()-baseBuildNumber;++i)
-        	baseBuild = baseBuild.getPreviousBuild();
-        
-  
-        // Get previous console log sanitized
-        String previousBuildLogFilePath = baseBuild.getLogFile().getAbsolutePath();
-        final BufferedReader previousBuildLogReader = new BufferedReader(new FileReader(previousBuildLogFilePath));
-        final List<String> previousBuildConsoleOuput = new ArrayList<String>();
-        
-        while ((line = previousBuildLogReader.readLine()) != null) {            
-            previousBuildConsoleOuput.add(ConsoleNote.removeNotes(line));
-        }
-        previousBuildLogReader.close();
-        
-        RootSections sectionPre = new RootSections(baseBuild.getNumber(), previousBuildConsoleOuput);
-        RootSections sectionCur = new RootSections(build.getNumber(), currentBuildConsoleOuput);
-        
-        RootSectionsDiff newDiff = new RootSectionsDiff(sectionPre, sectionCur);
-        String newDiffJson = new Gson().toJson(newDiff);
-        System.out.println("@@@@@@@" + newDiffJson);
-        
-        System.out.println("Succesfully read the output");
+
         // Logging information - end
         final Calendar calendarEnd = Calendar.getInstance();
         final long diffSeconds = (calendarEnd.getTimeInMillis() - calendarStart
@@ -394,5 +354,13 @@ public class LogParserParser {
                 + " minutes (" + diffSeconds + ") seconds.");
 
     }
-
+    
+    /**
+     * A function that checks whether or not the line is basic or not.
+     * @param line
+     * @return boolean whether or not the line fits any of the strings that identify it as a basic line
+     */
+    public boolean checkBasicInfoLine(String line){
+		return (StringUtils.indexOfAny(line, LogParserConsts.BASIC_INFO_LINES)!=-1);
+	}
 }
