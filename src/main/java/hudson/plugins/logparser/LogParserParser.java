@@ -127,6 +127,15 @@ public class LogParserParser {
                                  // this header
         headerForSection.add(shortLink);
         writer.write(LogParserConsts.getHtmlOpeningTags());
+		
+		// write styles for log body
+        final String styles = "<style>\n"
+			+ "  body {margin-left:.5em; }\n"
+			+ "  pre {font-family: Consolas, \"Courier New\"; word-wrap: break-word; }\n"
+			+ "  pre span {word-wrap: break-word; } \n"
+			+ "</style>\n";
+        writer.write(styles);
+
         if (this.preformattedHtml)
             writer.write("<pre>");
         // Read bulks of lines, parse
@@ -240,9 +249,10 @@ public class LogParserParser {
     }
 
     private String colorLine(final String line, final String status) {
-        final String color = (String) displayConstants.getColorTable().get(
-                status);
-        final StringBuffer result = new StringBuffer("<span style=\"color:");
+        final String color = (String) displayConstants.getColorTable().get(status);
+        final StringBuffer result = new StringBuffer("<span class=\"");
+        result.append(status.toLowerCase());
+        result.append("\" style=\"color:");
         result.append(color);
         result.append("\">");
         result.append(line);
@@ -269,7 +279,7 @@ public class LogParserParser {
         final StringBuffer link = new StringBuffer("<li>");
         link.append(statusCountStr);
         link.append(shortLink);
-        link.append("</li><br/>");
+        link.append("</li>");
 
         final BufferedWriter linkWriter = (BufferedWriter) writers
                 .get(effectiveStatus);

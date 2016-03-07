@@ -100,14 +100,24 @@ public final class LogParserWriter {
                 .toString();
 
         final String hudsonRoot = Hudson.getInstance().getRootUrl();
-        final String iconLocation = String.format("%s/images/16x16/",
-                Functions.getResourcePath());
+        final String iconLocation = String.format("%s/images/16x16/", Functions.getResourcePath());
+		
+        final String styles = 
+            "<style>\n" 
+            + "    ul {margin-left: 0; padding-left: 1em;}\n"
+            + "    ul li {font-size: small; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; margin-top: .5em; }\n"
+            + "    ul li:hover {white-space: normal;}\n"
+            + "    ul li a:link {text-decoration: none;}\n"
+            + "    ul li:hover a:link {text-decoration: underline;}\n"
+            + "</style>\n";
+        writer.write(styles);
+		
         final String linksStart = "<img src=\"" + hudsonRoot + "/" + iconLocation + statusIcon
                 + "\" style=\"margin: 2px;\" width=\"24\" alt=\"" + linkListDisplayStr + " Icon\" height=\"24\" />\n"
                 + "<a href=\"javascript:toggleList('" + linkListDisplayStr + "')\" target=\"_self\"><STRONG>"
-                + linkListDisplayStr + " (" + linkListCount + ")</STRONG></a><br />\n" + "<ul id=\""
-                + linkListDisplayStr + "\" style=\"display:none; margin-left:0; padding-left:3em\">\n";
-
+                + linkListDisplayStr + " (" + linkListCount + ")</STRONG></a><br />\n"
+                + "<ul style=\"display: none;\" id=\""
+                + linkListDisplayStr + "\" >\n";
         writer.write(linksStart);
 
         // Read the links file and insert here
