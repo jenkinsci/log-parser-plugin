@@ -10,7 +10,7 @@
         <table width="100%">
           <tr>
             <td width="100%">
-              <h2>Parsed Console Output</h2>
+              <h2>Console Output (parsed)</h2>
               <iframe src="${it.result.parsedLogURL}" width="100%" height="600" scrolling="auto" frameborder="0"/>
             </td>
           </tr>
