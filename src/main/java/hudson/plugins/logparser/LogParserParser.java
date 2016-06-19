@@ -6,10 +6,11 @@ import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -314,8 +315,10 @@ public class LogParserParser {
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        final BufferedReader reader = new BufferedReader(new FileReader(
-                logFileLocation));
+        final InputStreamReader streamReader = new InputStreamReader(
+                new FileInputStream( logFileLocation ),
+                build.getCharset() );
+        final BufferedReader reader = new BufferedReader( streamReader );
         String line;
         String status;
         int line_num = 0;
