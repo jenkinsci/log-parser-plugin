@@ -1,5 +1,7 @@
 package hudson.plugins.logparser;
 
+import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.Whitelisted;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -35,6 +37,7 @@ public class LogParserResult {
         this.badParsingRulesError = badParsingRulesError;
     }
 
+    @Whitelisted
     public String getFailedToParseError() {
         return failedToParseError;
     }
@@ -43,38 +46,47 @@ public class LogParserResult {
         this.failedToParseError = failedToParseError;
     }
 
+    @Whitelisted
     public int getTotalErrors() {
         return totalErrors;
     }
 
+    @Whitelisted
     public int getTotalWarnings() {
         return totalWarnings;
     }
 
+    @Whitelisted
     public int getTotalInfos() {
         return totalInfos;
     }
 
+    @Whitelisted
     public String getHtmlLogFile() {
         return htmlLogFile;
     }
 
+    @Whitelisted
     public String getHtmlLogPath() {
         return htmlLogPath;
     }
 
+    @Whitelisted
     public String getErrorLinksFile() {
         return errorLinksFile;
     }
 
+    @Whitelisted
     public String getWarningLinksFile() {
         return warningLinksFile;
     }
 
+    @Whitelisted
     public String getInfoLinksFile() {
         return infoLinksFile;
     }
 
+    @Whitelisted
     public String getParsedLogURL() {
         return parsedLogURL;
     }
@@ -143,6 +155,7 @@ public class LogParserResult {
         return new File(this.htmlLogFile);
     }
 
+    @Whitelisted
     public String getHtmlContent() {
         final StringBuffer result = new StringBuffer("");
         String line = "";
