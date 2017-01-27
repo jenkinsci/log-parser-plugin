@@ -2,6 +2,8 @@ package hudson.plugins.logparser;
 
 import java.util.HashMap;
 
+import jenkins.model.Jenkins;
+
 public class LogParserDisplayConsts {
 
     final private HashMap<String, String> colorTable = new HashMap<String, String>();
@@ -11,9 +13,10 @@ public class LogParserDisplayConsts {
 
     public LogParserDisplayConsts() {
         // Color of each status
-        colorTable.put(LogParserConsts.ERROR, "red");
-        colorTable.put(LogParserConsts.WARNING, "orange");
-        colorTable.put(LogParserConsts.INFO, "blue");
+        LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) Jenkins.getInstance().getDescriptor(LogParserPublisher.class);
+        colorTable.put(LogParserConsts.ERROR, descriptor.getColorError());
+        colorTable.put(LogParserConsts.WARNING, descriptor.getColorWarning());
+        colorTable.put(LogParserConsts.INFO, descriptor.getColorInfo());
         colorTable.put(LogParserConsts.START, "blue");
 
         // Icon for each status in the summary

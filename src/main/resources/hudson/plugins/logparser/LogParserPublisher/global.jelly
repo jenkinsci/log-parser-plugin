@@ -22,6 +22,15 @@
       <f:entry title="Use Legacy Formatting (variable width font)" help="/plugin/log-parser/global_legacy_formatting.html">
         <f:checkbox name="useLegacyFormatting" checked="${descriptor.getLegacyFormatting()}"/>
       </f:entry>
+      <f:entry title="Warning color" help="/plugin/log-parser/colorWarning.html">
+        <f:textbox name="log-parser.colorWarning" value="${descriptor.colorWarning}" checkUrl="'${rootURL}/descriptorByName/hudson.plugins.logparser.LogParserPublisher/checkColorWarning?value='+escape(this.value)"/>
+      </f:entry>
+      <f:entry title="Error color" help="/plugin/log-parser/colorError.html">
+        <f:textbox name="log-parser.colorError" value="${descriptor.colorError}" checkUrl="'${rootURL}/descriptorByName/hudson.plugins.logparser.LogParserPublisher/checkColorError?value='+escape(this.value)"/>
+      </f:entry>
+      <f:entry title="Info color" help="/plugin/log-parser/colorInfo.html">
+        <f:textbox name="log-parser.colorInfo" value="${descriptor.colorInfo}" checkUrl="'${rootURL}/descriptorByName/hudson.plugins.logparser.LogParserPublisher/checkColorInfo?value='+escape(this.value)"/>
+      </f:entry>
     </f:advanced>
   </f:section>
 </j:jelly>

@@ -15,18 +15,23 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+
+import javax.servlet.ServletException;
 
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class LogParserPublisher extends Recorder implements SimpleBuildStep, Serializable {
@@ -169,6 +174,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
         private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
         private boolean useLegacyFormatting = false;
+        private static final String defaultErrorColor = "red";
+        private static final String defaultWarningColor = "orange";
+        private static final String defaultInfoColor = "blue";
+        private String colorError = defaultErrorColor;
+        private String colorWarning = defaultWarningColor;
+        private String colorInfo = defaultInfoColor;
+        
+        private static final Pattern colorPattern = Pattern.compile("^[a-zA-Z]+|(#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}))$");
 
         private DescriptorImpl() {
             super(LogParserPublisher.class);
@@ -198,6 +211,27 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         public boolean getLegacyFormatting() {
             return useLegacyFormatting;
         }
+        
+        public String getColorError() {
+            if (colorError == null || colorError.isEmpty()) {
+                colorError = defaultErrorColor;
+            }
+            return colorError;
+        }
+        
+        public String getColorWarning() {
+            if (colorWarning == null || colorWarning.isEmpty()) {
+                colorWarning = defaultWarningColor;
+            }
+            return colorWarning;
+        }
+        
+        public String getColorInfo() {
+            if (colorInfo == null || colorInfo.isEmpty()) {
+                colorInfo = defaultInfoColor;
+            }
+            return colorInfo;
+        }
 
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json)
@@ -206,8 +240,35 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
                     "log-parser.").toArray(new ParserRuleFile[0]);
             useLegacyFormatting = json.getJSONObject("log-parser").getBoolean(
                     "useLegacyFormatting");
+            JSONObject colors = json.optJSONObject("log-parser");
+            if (colors != null) {
+                colorWarning = colors.optString("colorWarning");
+                colorError = colors.optString("colorError");
+                colorInfo = colors.optString("colorInfo");
+            }
             save();
             return true;
+        }
+        
+        private FormValidation validColor(String value) {
+            if (value.length() == 0 || !colorPattern.matcher(value).matches())
+                return FormValidation.error("Please set a valid color");
+            return FormValidation.ok();
+        }
+        
+        public FormValidation doCheckColorInfo(@QueryParameter String value)
+                throws IOException, ServletException {
+            return validColor(value);
+        }
+        
+        public FormValidation doCheckColorWarning(@QueryParameter String value)
+                throws IOException, ServletException {
+            return validColor(value);
+        }
+        
+        public FormValidation doCheckColorError(@QueryParameter String value)
+                throws IOException, ServletException {
+            return validColor(value);
         }
     }
 
