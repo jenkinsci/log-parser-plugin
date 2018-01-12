@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.ToolInstallations;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,7 +27,7 @@ public class LogParserWorkflowTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        mavenInstallation = jenkinsRule.configureMaven3();
+        mavenInstallation = ToolInstallations.configureMaven3();
     }
 
     /**
