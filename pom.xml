@@ -21,6 +21,8 @@
     <workflow-jenkins-plugin.version>1.7</workflow-jenkins-plugin.version>
     <!-- TODO: remove once FindBugs issues are fixed -->
     <findbugs.failOnError>false</findbugs.failOnError>
+    <jenkins.version>2.60.3</jenkins.version>
+    <java.level>8</java.level>
   </properties>
 
   <licenses>
