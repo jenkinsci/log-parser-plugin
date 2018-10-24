@@ -18,4 +18,5 @@ build
 # vim
 *~
 
-*.class
+*.classnbactions.xml
+nbactions.xml
