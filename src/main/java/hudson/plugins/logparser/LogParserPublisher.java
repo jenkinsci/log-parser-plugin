@@ -166,6 +166,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     public static final class DescriptorImpl extends
             BuildStepDescriptor<Publisher> {
 
+        final Logger logger = Logger.getLogger(getClass().getName());
         public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
         private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
         private boolean useLegacyFormatting = false;
@@ -213,6 +214,8 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         public boolean configure(final StaplerRequest req, final JSONObject json)
                 throws FormException {
             this.useLegacyFormatting = false;
+            logger.info(json.toString());
+
             req.bindJSON(this, json);
             save();
             return true;
@@ -221,6 +224,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
+
     }
 
     /*
@@ -232,6 +236,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         // Get the descriptor which holds the global configurations and extract
         // the available parsing rules from there
         return ((DescriptorImpl) this.getDescriptor()).getParsingRulesGlobal();
+
     }
 
     @Override
@@ -239,6 +244,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
 
         if (showGraphs) {
             return new LogParserProjectAction(project);
+
         } else {
             return null;
         }
