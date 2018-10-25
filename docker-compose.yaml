@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  mvn:
+    build:
+      context: .
+    volumes:
+      - mvn_home:/root/.m2
+      - ${PWD}:/data
+    command: "mvn hpi:run"
+volumes:
+  mvn_home:
