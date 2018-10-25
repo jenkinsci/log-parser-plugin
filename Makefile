@@ -2,7 +2,7 @@
 
 .PHONY: jenkins_test
 jenkins_test:
-	docker-compose up --rm mvn
+	docker-compose up mvn
 
 .PHONY: java_test
 java_test:
