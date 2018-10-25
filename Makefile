@@ -1,9 +1,9 @@
-.DEFAULT_GOAL := jenkins_test
+.DEFAULT_GOAL := tests
 
-.PHONY: jenkins_test
-jenkins_test:
+.PHONY: jenkins
+jenkins:
 	docker-compose up mvn
 
-.PHONY: java_test
-java_test:
+.PHONY: tests
+tests:
 	docker-compose run --rm mvn mvn clean test
