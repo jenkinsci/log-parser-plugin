@@ -24,18 +24,19 @@ public class ConfigurationAsCodeTest {
         assertEquals(true, descriptor.getLegacyFormatting());
     }
 
-    @Ignore
+    @Ignore("WIP")
     @Test public void should_support_configuration_as_code_parsing_rules() throws Exception {
         final Jenkins jenkins = Jenkins.getInstance();
         final LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) jenkins.getDescriptor(LogParserPublisher.class);
 
         ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code-parsing-rules.yaml").toString());
-        ParserRuleFile[] parseRuleFile = descriptor.getParsingRulesGlobal();
+        System.out.println(descriptor.getParsingRulesGlobal());
+        //ParserRuleFile[] parseRuleFile = descriptor.getParsingRulesGlobal();
         
-        assertEquals("Test Global Rules", parseRuleFile[0]);
+        //assertEquals("Test Global Rules", parseRuleFile[0]);
     }
     
-    @Ignore
+    @Ignore("Not finished")
     @Test public void export_configuration() throws Exception {
       ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code.yaml").toString());
       ConfigurationAsCode.get().export(System.out);

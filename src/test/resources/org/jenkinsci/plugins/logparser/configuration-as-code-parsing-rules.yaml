@@ -3,3 +3,4 @@ unclassified:
     parsingRulesGlobal:
       - name: "Test Global Rules"
         path: "./maven-project1.zip"
+        
