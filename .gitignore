@@ -198,5 +198,6 @@ nbdist/
 
 # End of https://www.gitignore.io/api/java,maven,netbeans,intellij,eclipse
 
+.idea/
 work/
 nbactions.xml
