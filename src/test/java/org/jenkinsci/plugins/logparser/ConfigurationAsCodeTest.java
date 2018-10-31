@@ -7,13 +7,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Ignore;
 
 public class ConfigurationAsCodeTest {
 
-    @Rule public JenkinsRule r = new JenkinsRule();
+    @Rule
+    public JenkinsRule r = new JenkinsRule();
 
     @Test
     public void should_support_configuration_as_code_legacy_formatter() throws Exception {
