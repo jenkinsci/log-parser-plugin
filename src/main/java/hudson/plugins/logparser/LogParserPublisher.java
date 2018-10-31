@@ -45,18 +45,18 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
      * Create new LogParserPublisher.
      *
      * @param unstableOnWarning mark build unstable if warnings found.
-     * @param failBuildOnError mark build failed if errors found.
-     * @param showGraphs show graphs on job page.
-     * @param parsingRulesPath path to the global parsing rules.
-     * @param useProjectRule true if we use a project specific rule.
-     * @param projectRulePath path to project specific rules relative to
-     * workspace root.
+     * @param failBuildOnError  mark build failed if errors found.
+     * @param showGraphs        show graphs on job page.
+     * @param parsingRulesPath  path to the global parsing rules.
+     * @param useProjectRule    true if we use a project specific rule.
+     * @param projectRulePath   path to project specific rules relative to
+     *                          workspace root.
      */
     @Deprecated
     private LogParserPublisher(final boolean unstableOnWarning,
-            final boolean failBuildOnError, final boolean showGraphs,
-            final String parsingRulesPath, final boolean useProjectRule,
-            final String projectRulePath) {
+                               final boolean failBuildOnError, final boolean showGraphs,
+                               final String parsingRulesPath, final boolean useProjectRule,
+                               final String projectRulePath) {
 
         this.unstableOnWarning = unstableOnWarning;
         this.failBuildOnError = failBuildOnError;
@@ -96,7 +96,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
 
     @Override
     public boolean prebuild(final AbstractBuild<?, ?> build,
-            final BuildListener listener) {
+                            final BuildListener listener) {
         return true;
     }
 
@@ -195,10 +195,13 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         public ParserRuleFile[] getParsingRulesGlobal() {
             return parsingRulesGlobal;
         }
+        public ParserRuleFile[] getRule() {
+            return parsingRulesGlobal;
+        }
 
         @DataBoundSetter
-        public void setParsingRulesGlobal(ParserRuleFile[] parsingRulesGlobal) {
-            this.parsingRulesGlobal = parsingRulesGlobal;
+        public void setRule(ParserRuleFile[] parsingRulesChoices) {
+            this.parsingRulesGlobal = parsingRulesChoices;
         }
 
         public boolean getLegacyFormatting() {
