@@ -195,12 +195,9 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         public ParserRuleFile[] getParsingRulesGlobal() {
             return parsingRulesGlobal;
         }
-        public ParserRuleFile[] getRule() {
-            return parsingRulesGlobal;
-        }
 
         @DataBoundSetter
-        public void setRule(ParserRuleFile[] parsingRulesChoices) {
+        public void setParsingRulesGlobal(ParserRuleFile[] parsingRulesChoices) {
             this.parsingRulesGlobal = parsingRulesChoices;
         }
 
