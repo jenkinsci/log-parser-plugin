@@ -162,7 +162,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         return DescriptorImpl.DESCRIPTOR;
     }
 
-    @Symbol("log-parser")
+    @Symbol("logParser")
     public static final class DescriptorImpl extends
             BuildStepDescriptor<Publisher> {
 
