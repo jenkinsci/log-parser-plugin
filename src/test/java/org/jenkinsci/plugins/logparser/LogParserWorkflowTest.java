@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.logparser;
 
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.plugins.logparser.LogParserAction;
 import hudson.plugins.logparser.LogParserPublisher;
 import hudson.tasks.Maven;
@@ -9,8 +10,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.Ignore;
-import static org.junit.Assert.assertTrue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.ToolInstallations;
 
@@ -43,7 +42,7 @@ public class LogParserWorkflowTest {
        job.setDefinition(new CpsFlowDefinition(""
                        + "node {\n"
                        + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"
-                       + "  sh \"${mvnHome}/bin/mvn clean install\"\n"
+                       + "  " + (Functions.isWindows() ? "bat" : "sh") + " \"${mvnHome}/bin/mvn clean install\"\n"
                        + "  step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])\n"
                        + "}\n", true)
        );
