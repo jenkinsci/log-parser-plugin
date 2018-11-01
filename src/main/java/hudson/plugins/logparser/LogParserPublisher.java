@@ -1,5 +1,6 @@
 package hudson.plugins.logparser;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
@@ -19,9 +20,13 @@ import hudson.tasks.Recorder;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 
@@ -95,21 +100,6 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
     }
 
     @Override
-    public boolean prebuild(final AbstractBuild<?, ?> build,
-                            final BuildListener listener) {
-        return true;
-    }
-
-    @Deprecated
-    @Override
-    public boolean perform(final AbstractBuild<?, ?> build, final Launcher launcher, final BuildListener listener)
-            throws InterruptedException, IOException {
-
-        this.perform((Run<?, ?>) build, build.getWorkspace(), launcher, listener);
-        return true;
-    }
-
-    @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher, TaskListener listener) throws
             InterruptedException, IOException {
 
@@ -159,19 +149,17 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
 
     @Override
     public BuildStepDescriptor<Publisher> getDescriptor() {
-        return DescriptorImpl.DESCRIPTOR;
+        return Jenkins.getInstance().getDescriptorByType(LogParserPublisher.DescriptorImpl.class);
     }
 
-    @Symbol("logParser")
+    @Extension @Symbol("logParser")
     public static final class DescriptorImpl extends
             BuildStepDescriptor<Publisher> {
 
-        final Logger logger = Logger.getLogger(getClass().getName());
-        public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
-        private volatile ParserRuleFile[] parsingRulesGlobal = new ParserRuleFile[0];
+        private List<ParserRuleFile> parsingRulesGlobal = new ArrayList<ParserRuleFile>();
         private boolean useLegacyFormatting = false;
 
-        private DescriptorImpl() {
+        public DescriptorImpl() {
             super(LogParserPublisher.class);
             load();
         }
@@ -192,12 +180,12 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
             return true;
         }
 
-        public ParserRuleFile[] getParsingRulesGlobal() {
+        public List<ParserRuleFile> getParsingRulesGlobal() {
             return parsingRulesGlobal;
         }
 
         @DataBoundSetter
-        public void setParsingRulesGlobal(ParserRuleFile[] parsingRulesChoices) {
+        public void setParsingRulesGlobal(List<ParserRuleFile> parsingRulesChoices) {
             this.parsingRulesGlobal = parsingRulesChoices;
         }
 
@@ -213,18 +201,24 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         @Override
         public boolean configure(final StaplerRequest req, final JSONObject json)
                 throws FormException {
-            this.useLegacyFormatting = false;
-            logger.info(json.toString());
-
+            useLegacyFormatting = false;
+            parsingRulesGlobal = new ArrayList();
             req.bindJSON(this, json);
             save();
             return true;
+        }
+
+        public ListBoxModel doFillParsingRulesPathItems() {
+            ListBoxModel items = new ListBoxModel();
+            for (ParserRuleFile file : parsingRulesGlobal) {
+                items.add(file.getName(), file.getPath());
+            }
+            return items;
         }
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
-
     }
 
     /*
@@ -232,11 +226,10 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
      * displays the available choices of parsing rules which were configured in
      * the global configurations
      */
-    public ParserRuleFile[] getParserRuleChoices() {
+    public List<ParserRuleFile> getParserRuleChoices() {
         // Get the descriptor which holds the global configurations and extract
         // the available parsing rules from there
         return ((DescriptorImpl) this.getDescriptor()).getParsingRulesGlobal();
-
     }
 
     @Override
