@@ -1,27 +1,55 @@
-# Development Ideology
+### Submitting Pull Requests
 
-Truths which we believe to be self-evident (adapted from [TextSecure's](https://github.com/WhisperSystems/TextSecure/blob/master/contributing.md))
+We'd love for you to contribute to our source code and to make this package even better than it is
+today! Here are the guidelines we'd like you to follow:
 
-1. **The answer is not more options.** If you feel compelled to add a preference that's exposed to the user, it's very possible you've made a wrong turn somewhere.
-2. **There are no power users.** The idea that some users "understand" concepts better than others has proven to be, for the post part, false. If anything, "power users" are more dangerous than the test, and we should avoid exposing dangerous functionality to them.
-3. **If it's "like PGP," it's wrong.** PGP is our guide for what not to do.
-4. **It's an asynchronous world.** We wary of anything that is anti-asynchronous: ACKs, protocol confirmations, or anly protocol-level "advisory" message.
-5. **There is no such thing as time**. Protocol ideas that require synchonized clocks are doomed to failure.
+ - [Issues and Bugs](#issue)
+ - [Feature Requests](#feature)
+ - [Coding Rules](#rules)
+ - [Commit Message Guidelines](#commit)
 
-# Code Style Guidelines
+## <a name="issue"></a> Found an Issue?
 
-## Resulting from long experience
+If you find a bug in the source code or a mistake in the documentation, you can help us by
+submitting an issue to our GitHub Repository. Even better you can submit a Pull Request
+with a fix. But first search if the issue is already described!
+
+If not create a new issue:
+
+* Tell about your environment:
+  * node version
+  * nativescript version
+  * used platform and versionÍ
+* Describe your issue
+  * describe your steps leading to the issue
+  * attach error logs or screenshots
+  * if possible provide test case or screenshots
+
+## <a name="feature"></a> Want a Feature?
+
+You can request a new feature by submitting an issue to our [GitHub Repository][github].
+
+Please follow these basic steps to simplify pull request reviews - if you don't you'll probably just be asked to anyway.**
+
+* Please rebase your branch against the current develop, use the **develop** for pull requests
+* Please ensure that the test suite passes **and** that code is lint free before submitting a PR by running:
+ * ```./mvnw test```
+ * Verify plugin is working via docker test ```docker compose up```
+* If you've added new functionality, **please** include tests which validate its behaviour
+* Make reference to possible [issues](https://github.com/jenkinsci/log-parser-plugin/issues) on PR comment
+
+### Resulting from long experience
 
 * To the largest extent possible, all fields shall be private. Use an IDE to generate the getters and setters.
 * If a class has more than one `volatile` member field, it is probable that there are subtle race conditions. Please consider where appropriate encapsulation of the multiple fields into an immutable value object replace the multiple `volatile` member fields with a single `volatile` reference to the value object (or perhaps better yet an `AtomicReference` to allow for `compareAndSet` - if compare-and-set logic is appropriate).
 * If it is `Serializable` it shall have a `serialVersionUID` field. Unless code has shipped to users, the initial value of the `serialVersionUID` field shall be `1L`.
 
-## Indentation
+### Indentation
 
 1. **Use spaces.** Tabs are banned.
 2. **Java blocks are 4 spaces.** JavaScript blocks as for Java. **XML nesting is 2 spaces**
 
-## Field Naming Conventions
+### Field Naming Conventions
 
 1. "hungarian"-style notation is banned (i.e. instance variable names preceded by an 'm', etc)
 2. If the field is `static final` then it shall be named in `ALL_CAPS_WITH_UNDERSCORES`.
@@ -31,20 +59,20 @@ Truths which we believe to be self-evident (adapted from [TextSecure's](https://
 6. It is acceptable to use `e` for the exception in a `try...catch` block.
 7. You shall never use `l` (i.e. lower case `L`) as a variable name.
 
-## Line Length
+### Line Length
 
 To the greatest extent possible, please wrap lines to ensure that they do not exceed 120 characters.
 
-## Maven POM file layout
+### Maven POM file layout
 
 * The `pom.xml` file shall use the sequencing of elements as defined by the `mvn tidy:pom` command (after any indenting fix-up).
 * If you are introducing a property to the `pom.xml` the property must be used in at least two distinct places in the model or a comment justifying the use of a property shall be provided.
 * If the `<plugin>` is in the groupId `org.apache.maven.plugins` you shall omit the `<groupId>`.
 * All `<plugin>` entries shall have an explicit version defined unless inherited from the parent.
 
-## Java code style
+### Java code style
 
-### Modifiers
+#### Modifiers
 
 * For fields, the order is:
     - public / protected / private
@@ -67,10 +95,10 @@ To the greatest extent possible, please wrap lines to ensure that they do not ex
     -  final
     -  strictfp
 
-### Imports
+#### Imports
 
 * For code in `src/main`:
-    - `*` imports are banned. 
+    - `*` imports are banned.
     - `static` imports are strongly discouraged.
     - `static` `*` imports are discouraged unless code readability is significantly enhanced and the import is restricted to a single class.
 * For code in `src/test`:
@@ -78,12 +106,12 @@ To the greatest extent possible, please wrap lines to ensure that they do not ex
     - `static` imports of anything other than JUnit classes and Hamcrest matchers are strongly discouraged.
     - `import static org.hamcrest.Matchers.*`, `import static org.junit.Assert.*` are expressly permitted. Any other `static` `*` imports are discouraged unless code readability is significantly enhanced and the import is restricted to a single class.
 
-### Annotation placement
+#### Annotation placement
 
 * Annotations on classes, interfaces, annotations, enums, methods, fields and local variables shall be on the lines immediately preceding the line where modifier(s) (e.g. `public` / `protected` / `private` / `final`, etc) would be appropriate.
 * Annotations on method arguments shall, to the largest extent possible, be on the same line as the method argument (and, if present, before the `final` modifier)
 
-### Javadoc
+#### Javadoc
 
 * Each class shall have a Javadoc comment.
 * Each field shall have a Javadoc comment.
@@ -101,16 +129,16 @@ To the greatest extent possible, please wrap lines to ensure that they do not ex
      * The count of widgets
      */
     private int widgetCount;
-    
+
     /**
      * Returns the count of widgets.
      *
-     * @return the count of widgets. 
+     * @return the count of widgets.
      */
     public int getWidgetCount() {
         return widgetCount;
     }
-    
+
     /**
      * Sets the count of widgets.
      *
@@ -122,31 +150,19 @@ To the greatest extent possible, please wrap lines to ensure that they do not ex
     ```
 * When adding a new class / interface / etc, it shall have a `@since` doc comment. The version shall be `FIXME` to indicate that the person merging the change should replace the `FIXME` with the next release version number. The fields and methods within a class/interface (but not nested classes) will be assumed to have the `@since` annotation of their class/interface unless a different `@since` annotation is present.
 
-### IDE Configuration
+## <a name="rules"></a> Coding Rules
 
-* Eclipse, by and large the IDE defaults are acceptable with the following changes:
-    - Tab policy to `Spaces only`
-    - Indent statements within `switch` body
-    - Maximum line width `120`
-    - Line wrapping, ensure all to `wrap where necessary`
-    - Organize imports alphabetically, no grouping
-* NetBeans, by and large the IDE defaults are acceptable with the following changes:
-    - Tabs and Indents
-        + Change Right Margin to `120`
-        + Indent case statements in switch
-    - Wrapping
-        + Change all the `Never` values to `If Long`
-        + Select the checkbox for Wrap After Assignement Operators
-* IntelliJ, by and large the IDE defaults are acceptable with the following changes:
-    - Wrapping and Braces
-        + Change `Do not wrap` to `Wrap if long`
-        + Change `Do not force` to `Always`
-    - Javadoc
-        + Disable generating `<p/>` on empty lines
-    - Imports
-        + Class count to use import with '*': `9999`
-        + Names count to use static import with '*': `99999`
-        + Import Layout
-            * import all other imports
-            * blank line
-            * import static all other imports
+To ensure consistency throughout the source code, keep these rules in mind as you are working:
+
+* All features or bug fixes **must be tested** by one or more [specs][unit-testing].
+* All public API methods **must be documented** with jsdoc.
+
+
+* To the largest extent possible, all fields shall be private. Use an IDE to generate the getters and setters.
+* If a class has more than one `volatile` member field, it is probable that there are subtle race conditions. Please consider where appropriate encapsulation of the multiple fields into an immutable value object replace the multiple `volatile` member fields with a single `volatile` reference to the value object (or perhaps better yet an `AtomicReference` to allow for `compareAndSet` - if compare-and-set logic is appropriate).
+* If it is `Serializable` it shall have a `serialVersionUID` field. Unless code has shipped to users, the initial value of the `serialVersionUID` field shall be `1L`.
+
+
+## <a name="commit"></a> Git Commit Guidelines
+
+We're using [Angular Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#-git-commit-guidelines)

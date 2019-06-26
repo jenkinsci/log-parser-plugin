@@ -1,0 +1,48 @@
+#!groovy
+
+// only 20 builds
+properties([
+  disableConcurrentBuilds(),
+  buildDiscarder(logRotator(artifactNumToKeepStr: '20', numToKeepStr: '20'))
+])
+
+@Library('mare-build-library')
+def git = new de.mare.ci.jenkins.Git()
+
+node('docker') {
+
+  def buildNumber = env.BUILD_NUMBER
+  def workspace = env.WORKSPACE
+  def buildUrl = env.BUILD_URL
+
+  // PRINT ENVIRONMENT TO JOB
+  echo "workspace directory is $workspace"
+  echo "build URL is $buildUrl"
+  echo "build Number is $buildNumber"
+  echo "PATH is $env.PATH"
+
+  try {
+    stage('Checkout') {
+      checkout scm
+    }
+
+    stage('Build and Test') {
+      sh "./mvnw clean install -U"
+      openTasks high: 'FIXME', normal: 'TODO', pattern: '**/src/**/*.*,*.properties,Jenkinsfil*,*.gradle'
+      junit 'target/surefire-reports/*.xml'
+    }
+
+    stage('Deploy') {
+      if (git.isProductionBranch()) {
+        sshagent(credentials: ['github-hypery2k']) {
+          sh "./mvnw deploy -DskipTests=true"
+        }
+      }
+    }
+
+  } catch (e) {
+    mail subject: 'Error on build', to: 'github@martinreinhardt-online.de', body: "Please go to ${env.BUILD_URL}."
+    throw e
+  }
+
+}
