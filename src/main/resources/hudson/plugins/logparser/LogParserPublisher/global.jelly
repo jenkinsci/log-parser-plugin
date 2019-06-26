@@ -1,26 +1,19 @@
 <?xml version="1.0"?>
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <f:section title="Console Output Parsing" name="log-parser">
-    <f:entry title="Parsing Rules" help="/plugin/log-parser/global_config_help.html">
-      <f:repeatable var="rule" items="${descriptor.parsingRulesGlobal}">
-        <table width="100%">
-          <f:entry title="Description">
-            <f:textbox name="log-parser.name" value="${rule.name}"/>
-          </f:entry>
-          <f:entry title="Parsing Rules File">
-            <f:textbox name="log-parser.path" value="${rule.path}"/>
-          </f:entry>
-          <f:entry title="">
+  <f:section title="Console Output Parsing">
+    <f:entry title="${%Parsing Rules}" help="/plugin/log-parser/global_config_help.html">
+      <f:repeatableProperty field="parsingRulesGlobal">
+        <f:entry title="">
             <div align="right">
-              <f:repeatableDeleteButton/>
+                <f:repeatableDeleteButton />
             </div>
-          </f:entry>
-        </table>
-      </f:repeatable>
+        </f:entry>
+      </f:repeatableProperty>
     </f:entry>
     <f:advanced>
-      <f:entry title="Use Legacy Formatting (variable width font)" help="/plugin/log-parser/global_legacy_formatting.html">
-        <f:checkbox name="useLegacyFormatting" checked="${descriptor.getLegacyFormatting()}"/>
+      <f:entry title="Use Legacy Formatting (variable width font)" help="/plugin/log-parser/global_legacy_formatting.html" field="legacyFormatting">
+        <f:checkbox />
       </f:entry>
     </f:advanced>
   </f:section>

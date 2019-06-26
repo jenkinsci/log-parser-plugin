@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  mvn:
+    build:
+      context: .
+    volumes:
+      - mvn_home:/root/.m2
+      - ${PWD}:/data
+    command: "mvn hpi:run"
+    ports:
+      - 8081:8080
+volumes:
+  mvn_home:
