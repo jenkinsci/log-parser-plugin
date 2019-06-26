@@ -53,7 +53,7 @@ public class LogParserAction implements Action {
     }
 
     public String getDisplayName() {
-        return "Parsed Console Output";
+        return "Console Output (parsed)";
     }
 
     public String getUrlName() {
