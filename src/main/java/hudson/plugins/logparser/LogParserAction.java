@@ -228,7 +228,7 @@ public class LogParserAction implements Action {
         ar.setSeriesPaint(0, ColorPalette.RED);    // error
         ar.setSeriesPaint(1, ColorPalette.BLUE);   // info
         ar.setSeriesPaint(2, ColorPalette.YELLOW); // warning
-        ar.setSeriesPaint(3, ColorPalette.BLUE);   // debug
+        ar.setSeriesPaint(3, ColorPalette.GREY);   // debug
 
         // crop extra space around the graph
         plot.setInsets(new RectangleInsets(0, 0, 0, 5.0));
