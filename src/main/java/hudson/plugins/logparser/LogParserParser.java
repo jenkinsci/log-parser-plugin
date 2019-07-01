@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -29,6 +31,7 @@ public class LogParserParser {
     final private String[] parsingRulesArray;
     final private Pattern[] compiledPatterns;
     final private CompiledPatterns compiledPatternsPlusError;
+    final private List<String> extraTags;
 
     // if key is 3-ERROR it shows how many errors are in section 3
     final private HashMap<String, Integer> statusCountPerSection = new HashMap<String, Integer>();
@@ -47,11 +50,6 @@ public class LogParserParser {
         // init logger
         final Logger logger = Logger.getLogger(getClass().getName());
 
-        // Count of lines in this status
-        statusCount.put(LogParserConsts.ERROR, 0);
-        statusCount.put(LogParserConsts.WARNING, 0);
-        statusCount.put(LogParserConsts.INFO, 0);
-
         this.parsingRulesArray = LogParserUtils
                 .readParsingRules(parsingRulesFile);
 
@@ -61,9 +59,19 @@ public class LogParserParser {
                 this.parsingRulesArray, logger);
         this.compiledPatterns = this.compiledPatternsPlusError
                 .getCompiledPatterns();
+        this.extraTags = this.compiledPatternsPlusError.getExtraTags();
 
         this.preformattedHtml = preformattedHtml;
         this.channel = channel;
+
+        // Count of lines in this status
+        statusCount.put(LogParserConsts.ERROR, 0);
+        statusCount.put(LogParserConsts.WARNING, 0);
+        statusCount.put(LogParserConsts.INFO, 0);
+        statusCount.put(LogParserConsts.DEBUG, 0);
+        for (String extraTag : this.extraTags) {
+            statusCount.put(extraTag, 0);
+        }
     }
 
     /*
@@ -90,16 +98,24 @@ public class LogParserParser {
         // Determine parsed log files
         final String parsedFilePath = logDirectory + "/log_content.html";
         final String errorLinksFilePath = logDirectory + "/logerrorLinks.html";
-        final String warningLinksFilePath = logDirectory
-                + "/logwarningLinks.html";
+        final String warningLinksFilePath = logDirectory + "/logwarningLinks.html";
         final String infoLinksFilePath = logDirectory + "/loginfoLinks.html";
+        final String debugLinksFilePath = logDirectory + "/logdebugLinks.html";
+        final Map<String, String> linksFilePathByExtraTags = new HashMap<String, String>();
+        for (String extraTag : this.extraTags) {
+            linksFilePathByExtraTags.put(extraTag, logDirectory + "/log" + extraTag + "Links.html");
+        }
         final String buildRefPath = logDirectory + "/log_ref.html";
         final String buildWrapperPath = logDirectory + "/log.html";
 
-        // Record file paths in hash
+        // Record file paths in HashMap
         linkFiles.put(LogParserConsts.ERROR, errorLinksFilePath);
         linkFiles.put(LogParserConsts.WARNING, warningLinksFilePath);
         linkFiles.put(LogParserConsts.INFO, infoLinksFilePath);
+        linkFiles.put(LogParserConsts.DEBUG, debugLinksFilePath);
+        for (String extraTag : this.extraTags) {
+            linkFiles.put(extraTag, linksFilePathByExtraTags.get(extraTag));
+        }
 
         // Open console log for reading and all other files for writing
         final BufferedWriter writer = new BufferedWriter(new FileWriter(
@@ -112,18 +128,23 @@ public class LogParserParser {
                 warningLinksFilePath)));
         writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
                 infoLinksFilePath)));
+        writers.put(LogParserConsts.DEBUG, new BufferedWriter(new FileWriter(
+                debugLinksFilePath)));
+        for (String extraTag : this.extraTags) {
+            writers.put(extraTag, new BufferedWriter(new FileWriter(
+                    linksFilePathByExtraTags.get(extraTag))));
+        }
 
         // Loop on the console log as long as there are input lines and parse
         // line by line
         // At the end of this loop, we will have:
         // - a parsed log with colored lines
-        // - 3 links files which will be consolidated into one referencing html
+        // - 4 links files which will be consolidated into one referencing html
         // file.
 
         // Create dummy header and section for beginning of log
         final String shortLink = " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
-        LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers,
-                sectionCounter); // This enters a line which will later be
+        LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); // This enters a line which will later be
                                  // replaced by the actual header and count for
                                  // this header
         headerForSection.add(shortLink);
@@ -156,6 +177,10 @@ public class LogParserParser {
         ((BufferedWriter) writers.get(LogParserConsts.ERROR)).close();
         ((BufferedWriter) writers.get(LogParserConsts.WARNING)).close();
         ((BufferedWriter) writers.get(LogParserConsts.INFO)).close();
+        ((BufferedWriter) writers.get(LogParserConsts.DEBUG)).close();
+        for (String extraTag : this.extraTags) {
+            ((BufferedWriter) writers.get(extraTag)).close();
+        }
 
         // Build the reference html from the warnings/errors/info html files
         // created in the loop above
@@ -163,7 +188,7 @@ public class LogParserParser {
                 statusCountPerSection, displayConstants.getIconTable(),
                 displayConstants.getLinkListDisplay(),
                 displayConstants.getLinkListDisplayPlural(), statusCount,
-                linkFiles);
+                linkFiles, extraTags);
         // Write the wrapping html for the reference page and the parsed log page
         LogParserWriter.writeWrapperHtml(buildWrapperPath);
 
@@ -175,16 +200,23 @@ public class LogParserParser {
         final LogParserResult result = new LogParserResult();
         result.setHtmlLogFile(parsedFilePath);
         result.setTotalErrors((Integer) statusCount.get(LogParserConsts.ERROR));
-        result.setTotalWarnings((Integer) statusCount
-                .get(LogParserConsts.WARNING));
+        result.setTotalWarnings((Integer) statusCount.get(LogParserConsts.WARNING));
         result.setTotalInfos((Integer) statusCount.get(LogParserConsts.INFO));
+        result.setTotalDebugs((Integer) statusCount.get(LogParserConsts.DEBUG));
+        for (String extraTag : this.extraTags) {
+            result.putTotalCountsByExtraTag(extraTag, (Integer) statusCount.get(extraTag));
+        }
         result.setErrorLinksFile(errorLinksFilePath);
         result.setWarningLinksFile(warningLinksFilePath);
         result.setInfoLinksFile(infoLinksFilePath);
+        result.setDebugLinksFile(debugLinksFilePath);
+        for (String extraTag : this.extraTags) {
+            result.putLinksFileByExtraTag(extraTag, linksFilePathByExtraTags.get(extraTag));
+        }
         result.setParsedLogURL(parsedLogURL);
         result.setHtmlLogPath(logDirectory);
-        result.setBadParsingRulesError(this.compiledPatternsPlusError
-                .getError());
+        result.setBadParsingRulesError(this.compiledPatternsPlusError.getError());
+        result.setExtraTags(this.extraTags);
 
         return result;
 
@@ -250,10 +282,13 @@ public class LogParserParser {
     }
 
     private String colorLine(final String line, final String status) {
-        final String color = (String) displayConstants.getColorTable().get(status);
+        String color = (String) displayConstants.getColorTable().get(status);
+        if (color == null) {
+            color = LogParserDisplayConsts.DEFAULT_COLOR;
+        }
         final StringBuffer result = new StringBuffer("<span class=\"");
         result.append(status.toLowerCase());
-        result.append("\" style=\"color:");
+        result.append("\" style=\"color: ");
         result.append(color);
         result.append("\">");
         result.append(line);
