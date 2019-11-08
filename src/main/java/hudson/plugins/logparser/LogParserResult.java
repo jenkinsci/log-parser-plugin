@@ -33,6 +33,13 @@ public class LogParserResult {
     private String failedToParseError;
     private String badParsingRulesError;
 
+    protected Object readResolve() {
+        if (extraTags == null) { // avoid NPE when deserializing old results
+        	extraTags = new HashSet<>();
+        }
+        return this;
+    }
+
     public String getBadParsingRulesError() {
         return badParsingRulesError;
     }
