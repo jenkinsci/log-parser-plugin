@@ -14,7 +14,7 @@ public class CompiledPatterns {
     public CompiledPatterns() {
         this.errorMsg = null;
         this.compiledPatterns = null;
-        this.extraTags = new ArrayList<String>();
+        this.extraTags = new ArrayList<>();
     }
 
     public String getError() {

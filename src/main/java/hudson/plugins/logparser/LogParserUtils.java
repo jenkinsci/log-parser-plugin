@@ -65,7 +65,7 @@ public final class LogParserUtils {
 
         Pattern[] result = new Pattern[parsingRulesArray.length];
         final StringBuffer badParsingRules = new StringBuffer();
-        List<String> extraTags = new ArrayList<String>();
+        List<String> extraTags = new ArrayList<>();
 
         for (int i = 0; i < parsingRulesArray.length; i++) {
             final String parsingRule = parsingRulesArray[i];
@@ -109,7 +109,7 @@ public final class LogParserUtils {
 
     public static String getSectionCountKey(final String status,
             final int sectionNumber) {
-        return Integer.toString(sectionNumber) + "-" + status;
+        return sectionNumber + "-" + status;
     }
 
     public static int getNumThreads() {
@@ -118,7 +118,7 @@ public final class LogParserUtils {
                 .getenv("HUDSON_LOG_PARSER_THREADS");
         if (maxThreadsByEnvStr != null) {
             try {
-                result = (Integer.valueOf(maxThreadsByEnvStr)).intValue();
+                result = Integer.parseInt(maxThreadsByEnvStr);
             } catch (Exception e) {
                 // Do nothing - use the default;
                 Logger.getLogger("getNumThreads").log(Level.FINEST,
@@ -134,7 +134,7 @@ public final class LogParserUtils {
                 .getenv("HUDSON_LOG_PARSER_LINES_PER_THREAD");
         if (linesByEnvStr != null) {
             try {
-                result = (Integer.valueOf(linesByEnvStr)).intValue();
+                result = Integer.parseInt(linesByEnvStr);
             } catch (Exception e) {
                 // Do nothing - use the default;
                 Logger.getLogger("getLinesPerThread").log(Level.FINEST,
