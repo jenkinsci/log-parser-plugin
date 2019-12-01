@@ -133,7 +133,7 @@ public class LogParserAction implements Action {
 
     private CategoryDataset buildDataSet() {
 
-        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dsb = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
+        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dsb = new DataSetBuilder<>();
 
         for (LogParserAction a = this; a != null; a = a.getPreviousAction()) {
             dsb.add(a.result.getTotalErrors(), "errors",

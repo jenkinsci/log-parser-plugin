@@ -17,15 +17,15 @@ public class LogParserResult {
     private int totalWarnings = 0;
     private int totalInfos = 0;
     private int totalDebugs = 0;
-    private Map<String, Integer> totalCountsByExtraTag = new HashMap<String, Integer>();
+    private final Map<String, Integer> totalCountsByExtraTag = new HashMap<>();
 
     private String htmlLogFile;
     private String errorLinksFile;
     private String warningLinksFile;
     private String infoLinksFile;
     private String debugLinksFile;
-    private Map<String, String> linkedFilesByExtraTag = new HashMap<String, String>();
-    private Set<String> extraTags = new HashSet<String>();
+    private final Map<String, String> linkedFilesByExtraTag = new HashMap<>();
+    private Set<String> extraTags = new HashSet<>();
 
     private String parsedLogURL;
     private String htmlLogPath;

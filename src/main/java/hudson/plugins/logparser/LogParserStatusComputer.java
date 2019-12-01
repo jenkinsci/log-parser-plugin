@@ -1,7 +1,6 @@
 package hudson.plugins.logparser;
 
 import hudson.FilePath;
-import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
 import jenkins.security.MasterToSlaveCallable;
 
@@ -93,7 +92,7 @@ public class LogParserStatusComputer implements Serializable {
                 tempFilePath.read()));
         int threadCounter = 0;
 
-        final ArrayList<LogParserThread> runners = new ArrayList<LogParserThread>();
+        final ArrayList<LogParserThread> runners = new ArrayList<>();
         final LogParserReader logParserReader = new LogParserReader(reader);
 
         //ExecutorService execSvc = Executors.newFixedThreadPool(
@@ -134,7 +133,7 @@ public class LogParserStatusComputer implements Serializable {
             }
         }
 
-        final HashMap<String, String> result = new HashMap<String, String>();
+        final HashMap<String, String> result = new HashMap<>();
         HashMap<String, String> moreLineStatusMatches;
         for (int i = 0; i < runnersSize; i++) {
             final LogParserThread logParserThread = sortedRunners[i];
@@ -156,7 +155,7 @@ public class LogParserStatusComputer implements Serializable {
 
     private HashMap<String, String> getLineStatusMatches(
             final String[] statuses, final int logPart) {
-        final HashMap<String, String> result = new HashMap<String, String>();
+        final HashMap<String, String> result = new HashMap<>();
         String status;
         int line_num;
         final int linesPerThread = LogParserUtils.getLinesPerThread();

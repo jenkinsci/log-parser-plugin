@@ -5,10 +5,10 @@ import org.apache.commons.lang.WordUtils;
 
 public class LogParserDisplayConsts {
 
-    final private HashMap<String, String> colorTable = new HashMap<String, String>();
-    final private HashMap<String, String> iconTable = new HashMap<String, String>();
-    final private HashMap<String, String> linkListDisplay = new HashMap<String, String>();
-    final private HashMap<String, String> linkListDisplayPlural = new HashMap<String, String>();
+    final private HashMap<String, String> colorTable = new HashMap<>();
+    final private HashMap<String, String> iconTable = new HashMap<>();
+    final private HashMap<String, String> linkListDisplay = new HashMap<>();
+    final private HashMap<String, String> linkListDisplayPlural = new HashMap<>();
 
     public static final String DEFAULT_COLOR = "blue";
     public static final String DEFAULT_ICON = "blue.gif";
