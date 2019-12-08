@@ -147,7 +147,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
 
     @Override
     public BuildStepDescriptor<Publisher> getDescriptor() {
-        return Jenkins.getInstance().getDescriptorByType(LogParserPublisher.DescriptorImpl.class);
+        return Jenkins.get().getDescriptorByType(LogParserPublisher.DescriptorImpl.class);
     }
 
     @Extension @Symbol("logParser")
