@@ -1,7 +1,7 @@
 package hudson.plugins.logparser;
 
 import hudson.Functions;
-import hudson.model.Hudson;
+import jenkins.model.Jenkins;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -117,7 +117,7 @@ public final class LogParserWriter {
         }
         final String linkListCount = statusCount.get(status).toString();
 
-        final String hudsonRoot = Hudson.getInstance().getRootUrl();
+        final String hudsonRoot = Jenkins.get().getRootUrl();
         final String iconLocation = String.format("%s/images/16x16/", Functions.getResourcePath());
 		
         final String styles = 
