@@ -24,7 +24,7 @@ public class LogParserConsts {
     public static final List<String> STATUSES_WITH_SECTIONS_IN_LINK_FILES = Arrays.asList(ERROR, WARNING, DEBUG);
 
     public static String getHtmlOpeningTags() {
-        final String hudsonRoot = Jenkins.getActiveInstance().getRootUrl();
+        final String hudsonRoot = Jenkins.get().getRootUrl();
         return "<!DOCTYPE html>\n" + "<html>\n" + "\t<head>\n"
                 + "\t\t<title>log-parser plugin page</title>\n"
                 + "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\""

@@ -1,7 +1,7 @@
 package hudson.plugins.logparser;
 
 import hudson.Functions;
-import hudson.model.Hudson;
+import jenkins.model.Jenkins;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -103,23 +103,21 @@ public final class LogParserWriter {
             final HashMap<String, String> linkListDisplayPlural,
             final HashMap<String, Integer> statusCount,
             final HashMap<String, String> linkFiles) throws IOException {
-        String statusIcon = (String) iconTable.get(status);
+        String statusIcon = iconTable.get(status);
         if (statusIcon == null) {
             statusIcon = LogParserDisplayConsts.DEFAULT_ICON;
         }
-        String linkListDisplayStr = (String) linkListDisplay.get(status);
+        String linkListDisplayStr = linkListDisplay.get(status);
         if (linkListDisplayStr == null) {
             linkListDisplayStr = LogParserDisplayConsts.getDefaultLinkListDisplay(status);
         }
-        String linkListDisplayStrPlural = (String) linkListDisplayPlural
-                .get(status);
+        String linkListDisplayStrPlural = linkListDisplayPlural.get(status);
         if (linkListDisplayStrPlural == null) {
             linkListDisplayStrPlural = LogParserDisplayConsts.getDefaultLinkListDisplayPlural(status);
         }
-        final String linkListCount = ((Integer) statusCount.get(status))
-                .toString();
+        final String linkListCount = statusCount.get(status).toString();
 
-        final String hudsonRoot = Hudson.getInstance().getRootUrl();
+        final String hudsonRoot = Jenkins.get().getRootUrl();
         final String iconLocation = String.format("%s/images/16x16/", Functions.getResourcePath());
 		
         final String styles = 
@@ -142,24 +140,21 @@ public final class LogParserWriter {
 
         // Read the links file and insert here
         final BufferedReader reader = new BufferedReader(new FileReader(
-                (String) linkFiles.get(status)));
-        String line = null;
+                linkFiles.get(status)));
         final String summaryLine = "<br/>(SUMMARY_INT_HERE LINK_LIST_DISPLAY_STR in this section)<br/>";
 
         final String headerTemplateRegexp = "HEADER HERE:";
         final String headerTemplateSplitBy = "#";
 
         // If it's a header line - put the header of the section
+        String line;
         while ((line = reader.readLine()) != null) {
             String curSummaryLine = null;
             if (line.startsWith(headerTemplateRegexp)) {
-                final String headerNum = line.split(headerTemplateSplitBy)[1];
-                line = (String) headerForSection.get(Integer
-                        .parseInt(headerNum));
-                final String key = LogParserUtils.getSectionCountKey(status,
-                        Integer.valueOf(headerNum));
-                final Integer summaryInt = (Integer) statusCountPerSection
-                        .get(key);
+                final int headerNum = Integer.parseInt(line.split(headerTemplateSplitBy)[1]);
+                line = headerForSection.get(headerNum);
+                final String key = LogParserUtils.getSectionCountKey(status, headerNum);
+                final Integer summaryInt = statusCountPerSection.get(key);
                 if (summaryInt == null || summaryInt == 0) {
                     // Don't write the header if there are no relevant lines for
                     // this section

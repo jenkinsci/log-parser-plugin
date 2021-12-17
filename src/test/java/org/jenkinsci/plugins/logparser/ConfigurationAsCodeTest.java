@@ -22,17 +22,14 @@ public class ConfigurationAsCodeTest {
 
     @Test
     public void LegacyFormattingTest() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
-        final LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) jenkins.getDescriptor(LogParserPublisher.class);
+        final LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) Jenkins.get().getDescriptor(LogParserPublisher.class);
         ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code-legacy-formatting.yaml").toString());
         assertEquals(true, descriptor.getLegacyFormatting());
     }
 
     @Test
     public void ParsingRulesTest() throws Exception {
-        final Jenkins jenkins = Jenkins.getInstance();
-        final LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) jenkins.getDescriptor(LogParserPublisher.class);
-
+        final LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) Jenkins.get().getDescriptor(LogParserPublisher.class);
         ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code-parsing-rules.yaml").toString());
         List<ParserRuleFile> parseRuleFiles = descriptor.getParsingRulesGlobal();
 

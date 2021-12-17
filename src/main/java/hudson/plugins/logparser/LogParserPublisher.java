@@ -5,9 +5,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
 import hudson.model.Action;
-import hudson.model.BuildListener;
 import hudson.model.Result;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -149,14 +147,14 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
 
     @Override
     public BuildStepDescriptor<Publisher> getDescriptor() {
-        return Jenkins.getInstance().getDescriptorByType(LogParserPublisher.DescriptorImpl.class);
+        return Jenkins.get().getDescriptorByType(LogParserPublisher.DescriptorImpl.class);
     }
 
     @Extension @Symbol("logParser")
     public static final class DescriptorImpl extends
             BuildStepDescriptor<Publisher> {
 
-        private List<ParserRuleFile> parsingRulesGlobal = new ArrayList<ParserRuleFile>();
+        private List<ParserRuleFile> parsingRulesGlobal = new ArrayList<>();
         private boolean useLegacyFormatting = false;
 
         public DescriptorImpl() {
@@ -202,7 +200,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         public boolean configure(final StaplerRequest req, final JSONObject json)
                 throws FormException {
             useLegacyFormatting = false;
-            parsingRulesGlobal = new ArrayList();
+            parsingRulesGlobal = new ArrayList<>();
             req.bindJSON(this, json);
             save();
             return true;
