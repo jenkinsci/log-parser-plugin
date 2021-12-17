@@ -27,13 +27,13 @@ public class LogParserDisplayConsts {
         colorTable.put(LogParserConsts.WARNING, "orange");
         colorTable.put(LogParserConsts.INFO, "blue");
         colorTable.put(LogParserConsts.START, "blue");
-        colorTable.put(LogParserConsts.DEBUG, "gray");
+        colorTable.put(LogParserConsts.DEBUG, "grey");
 
         // Icon for each status in the summary
         iconTable.put(LogParserConsts.ERROR, "red.gif");
         iconTable.put(LogParserConsts.WARNING, "yellow.gif");
         iconTable.put(LogParserConsts.INFO, "blue.gif");
-        iconTable.put(LogParserConsts.DEBUG, "gray.gif");
+        iconTable.put(LogParserConsts.DEBUG, "grey.gif");
 
         // How to display in link summary html
         linkListDisplay.put(LogParserConsts.ERROR, "Error");
