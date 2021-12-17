@@ -6,13 +6,12 @@ import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
 
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -90,10 +89,8 @@ public class LogParserParser {
         final Logger logger = Logger.getLogger(getClass().getName());
 
         // Get console log file
-        final File logFile = build.getLogFile();
-        final String logDirectory = logFile.getParent();
-        final String logFileLocation = logFile.getAbsolutePath();
-        final FilePath filePath = new FilePath(new File(logFileLocation));
+        final InputStream log = build.getLogInputStream();
+        final String logDirectory = build.getRootDir().getAbsolutePath();
 
         // Determine parsed log files
         final String parsedFilePath = logDirectory + "/log_content.html";
@@ -161,8 +158,7 @@ public class LogParserParser {
         if (this.preformattedHtml)
             writer.write("<pre>");
         // Read bulks of lines, parse
-        final int linesInLog = LogParserUtils.countLines(logFileLocation);
-        parseLogBody(build, writer, filePath, logFileLocation, linesInLog,
+        parseLogBody(build, writer, log,
                 logger);
 
         // Write parsed output, links, etc.
@@ -343,8 +339,8 @@ public class LogParserParser {
         return markedLine.toString();
     }
 
-    private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final FilePath filePath, final
-            String logFileLocation, final int linesInLog, final Logger logger) throws IOException, InterruptedException {
+    private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final InputStream log,
+                        final Logger logger) throws IOException, InterruptedException {
 
         // Logging information - start
         final String signature = build.getParent().getName() + "_build_"
@@ -352,16 +348,13 @@ public class LogParserParser {
         logger.log(Level.INFO, "LogParserParser: Start parsing : " + signature);
         final Calendar calendarStart = Calendar.getInstance();
 
-        final LogParserStatusComputer computer = new LogParserStatusComputer(
-                channel, filePath, parsingRulesArray, compiledPatterns,
-                linesInLog, signature);
-        final HashMap<String, String> lineStatusMatches = computer
-                .getComputedStatusMatches();
+        final HashMap<String, String> lineStatusMatches = channel.call(
+                new LogParserStatusComputer(log, parsingRulesArray, compiledPatterns, signature));
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
         final InputStreamReader streamReader = new InputStreamReader(
-                new FileInputStream( logFileLocation ),
+                build.getLogInputStream(),
                 build.getCharset() );
         final BufferedReader reader = new BufferedReader( streamReader );
         String line;

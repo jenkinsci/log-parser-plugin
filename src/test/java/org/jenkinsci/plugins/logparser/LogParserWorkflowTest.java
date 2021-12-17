@@ -4,6 +4,7 @@ import hudson.FilePath;
 import hudson.Functions;
 import hudson.plugins.logparser.LogParserAction;
 import hudson.plugins.logparser.LogParserPublisher;
+import hudson.slaves.DumbSlave;
 import hudson.tasks.Maven;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -29,12 +30,13 @@ public class LogParserWorkflowTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        Maven.MavenInstallation mavenInstallation = ToolInstallations.configureMaven3();
+        Maven.MavenInstallation mavenInstallation = ToolInstallations.configureMaven35();
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
-        FilePath workspace = jenkinsRule.jenkins.getWorkspaceFor(job);
+        DumbSlave agent = jenkinsRule.createOnlineSlave();
+        FilePath workspace = agent.getWorkspaceFor(job);
         workspace.unzipFrom(LogParserWorkflowTest.class.getResourceAsStream("./maven-project1.zip"));
         job.setDefinition(new CpsFlowDefinition(""
-                       + "node {\n"
+                       + "node('" + agent.getNodeName() + "') {\n"
                        + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"
                        + "  " + (Functions.isWindows() ? "bat" : "sh") + " \"${mvnHome}/bin/mvn clean install\"\n"
                        + "  step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])\n"
