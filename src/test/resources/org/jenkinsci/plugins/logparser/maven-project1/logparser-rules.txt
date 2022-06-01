@@ -1,0 +1,5 @@
+warn /\[WARNING\]/
+
+jenkins /JENKINS/
+
+logParserPublisherWorkflowStep /\[logParserPublisherWorkflowStep\]/
