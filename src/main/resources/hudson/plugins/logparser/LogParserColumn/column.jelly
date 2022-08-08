@@ -1,0 +1,21 @@
+<j:jelly xmlns:j="jelly:core">
+  <j:set var="result" value="${it.getResult(job)}"/>
+  <j:set var="url" value="${it.getUrl(job)}"/>
+  <td style="font-weight: bold">
+    <j:choose>
+      <j:when test="${url == null}">
+      </j:when>
+      <j:when test="${result == null}">
+        -
+      </j:when>
+      <j:otherwise>
+        <a href="${rootURL}/${url}">
+          <span style="color: ${%Error.color}">${%Error}${result[0]};</span> 
+          <span style="color: ${%Warning.color}">${%Warning}${result[1]};</span> 
+          <span style="color: ${%Info.color}">${%Info}${result[2]};</span> 
+          <span style="color: ${%Debug.color}">${%Debug}${result[3]}</span>
+        </a>
+      </j:otherwise>
+    </j:choose>
+  </td>
+</j:jelly>
