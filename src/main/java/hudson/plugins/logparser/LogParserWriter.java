@@ -118,7 +118,7 @@ public final class LogParserWriter {
         final String linkListCount = statusCount.get(status).toString();
 
         final String hudsonRoot = Jenkins.get().getRootUrl();
-        final String iconLocation = String.format("%s/images/16x16/", Functions.getResourcePath());
+        final String iconLocation = String.format("%s/plugin/log-parser/images/", jenkins.model.Jenkins.RESOURCE_PATH).substring(1);
 		
         final String styles = 
             "<style>\n" 
@@ -130,7 +130,7 @@ public final class LogParserWriter {
             + "</style>\n";
         writer.write(styles);
 		
-        final String linksStart = "<img src=\"" + hudsonRoot + "/" + iconLocation + statusIcon
+        final String linksStart = "<img src=\"" + hudsonRoot + iconLocation + statusIcon
                 + "\" style=\"margin: 2px;\" width=\"24\" alt=\"" + linkListDisplayStr + " Icon\" height=\"24\" />\n"
                 + "<a href=\"javascript:toggleList('" + linkListDisplayStr + "')\" target=\"_self\"><STRONG>"
                 + linkListDisplayStr + " (" + linkListCount + ")</STRONG></a><br />\n"
