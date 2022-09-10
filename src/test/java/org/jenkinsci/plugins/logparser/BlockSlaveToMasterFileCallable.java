@@ -28,7 +28,6 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.remoting.ChannelBuilder;
 import java.io.File;
-import jenkins.ReflectiveFilePathFilter;
 import jenkins.SlaveToMasterFileCallable;
 import jenkins.security.ChannelConfigurator;
 

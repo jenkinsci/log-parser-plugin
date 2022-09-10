@@ -8,10 +8,12 @@ import hudson.slaves.DumbSlave;
 import hudson.tasks.Maven;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.ToolInstallations;
 
@@ -23,13 +25,15 @@ import static org.junit.Assert.assertEquals;
  */
 public class LogParserWorkflowTest {
 
-    @ClassRule
-    public static JenkinsRule jenkinsRule = new JenkinsRule();
+    @ClassRule public static BuildWatcher buildWatcher = new BuildWatcher();
 
-    private static LogParserAction result;
+    @Rule public JenkinsRule jenkinsRule = new JenkinsRule();
 
-    @BeforeClass
-    public static void init() throws Exception {
+    private LogParserAction result;
+
+    @Before
+    public void setup() throws Exception
+    {
         Maven.MavenInstallation mavenInstallation = ToolInstallations.configureMaven35();
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
         DumbSlave agent = jenkinsRule.createOnlineSlave();
