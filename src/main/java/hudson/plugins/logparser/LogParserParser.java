@@ -353,10 +353,7 @@ public class LogParserParser {
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        final InputStreamReader streamReader = new InputStreamReader(
-                build.getLogInputStream(),
-                build.getCharset() );
-        final BufferedReader reader = new BufferedReader( streamReader );
+        final BufferedReader reader = new BufferedReader( build.getLogReader() );
         String line;
         String status;
         int line_num = 0;
