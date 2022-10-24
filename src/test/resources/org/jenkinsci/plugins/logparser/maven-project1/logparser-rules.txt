@@ -2,4 +2,4 @@ warn /\[WARNING\]/
 
 jenkins /JENKINS/
 
-logParserPublisherWorkflowStep /\[logParserPublisherWorkflowStep\]/
+logParserPublisherWorkflowStep /\[Pipeline\] logParser/
