@@ -14,20 +14,8 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.ToolInstallations;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
+import java.io.File;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,10 +38,9 @@ public class LogParserWorkflowTest {
         DumbSlave agent = jenkinsRule.createOnlineSlave();
         FilePath workspace = agent.getWorkspaceFor(job);
         assertNotNull(workspace);
-        Path projectZip = zipProjectDir();
-        try (InputStream is = Files.newInputStream(projectZip)){
-            workspace.unzipFrom(is);
-        }
+        URL mavenProject = LogParserWorkflowTest.class.getResource("./maven-project1");
+        assertNotNull(mavenProject);
+        new FilePath(new File(mavenProject.toURI())).copyRecursiveTo(workspace);
         job.setDefinition(new CpsFlowDefinition(""
                        + "node('" + agent.getNodeName() + "') {\n"
                        + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"
@@ -90,47 +77,5 @@ public class LogParserWorkflowTest {
     public void logParserPublisherWorkflowStepArbitraryTags() throws Exception {
         assertEquals(0, result.getResult().getTotalCountsByExtraTag("jenkins"));
         assertEquals(1, result.getResult().getTotalCountsByExtraTag("logParserPublisherWorkflowStep"));
-    }
-
-    /**
-     * Generates a zip file from the project structure checked into
-     *
-     * <pre>src/test/resources/org/jenkinsci/plugins/logparser/maven-project1</pre>
-     *
-     * Keeps test behavior the same, but allows for clearer changes than checking
-     * in a zip file.
-     *
-     * @return Path to newly-generated zip file
-     * @throws IOException if error creating temp directory, zip file, or walking tree
-     */
-    private static Path zipProjectDir() throws IOException {
-        URL projectDir = LogParserWorkflowTest.class.getResource("./maven-project1");
-        assertNotNull(projectDir);
-        Path projectZip = Files.createTempDirectory("log-parser-workflow-test")
-                .resolve("maven-project1.zip")
-                .toAbsolutePath();
-        URI zip = URI.create("jar:file:" + projectZip);
-        Map<String, String> env = new HashMap<>();
-        env.put("create", "true");
-        Path projectRoot = Paths.get(URI.create(projectDir.toString()));
-        try (FileSystem zipFs = FileSystems.newFileSystem(zip, env)) {
-            Files.walkFileTree(projectRoot, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    Path relative = projectRoot.relativize(dir);
-                    Files.createDirectories(zipFs.getPath(relative.toString()));
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Path relative = projectRoot.relativize(file);
-                    Path target = zipFs.getPath(relative.toString());
-                    Files.copy(file, target);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        }
-        return projectZip;
     }
 }
