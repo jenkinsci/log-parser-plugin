@@ -18,14 +18,9 @@ public final class LogParserWriter {
             final HashMap<String, BufferedWriter> writers,
             final int sectionCounter) throws IOException {
         final List<String> statuses = LogParserConsts.STATUSES_WITH_SECTIONS_IN_LINK_FILES;
-        final int statusesSize = statuses.size();
-        for (int i = 0; i < statusesSize; i++) {
-            final String currentStatus = (String) statuses.get(i);
-            final BufferedWriter linkWriter = (BufferedWriter) writers
-                    .get(currentStatus);
-            String str = "HEADER HERE: #NUMBER";
-            str = str.replaceFirst("NUMBER",
-                    ((Integer) sectionCounter).toString());
+        for (String status : statuses) {
+            final BufferedWriter linkWriter = writers.get(status);
+            String str = "HEADER HERE: #" + sectionCounter;
             linkWriter.write(str + "\n");
         }
 
@@ -41,10 +36,9 @@ public final class LogParserWriter {
                 + "<a href='build.log'>build log</a>\n" + "</noframes>\n"
                 + "</frameset>\n";
 
-        final BufferedWriter writer = new BufferedWriter(new FileWriter(
-                buildWrapperPath));
-        writer.write(wrapperHtml);
-        writer.close();
+        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(buildWrapperPath))) {
+            writer.write(wrapperHtml);
+        }
     }
 
     public static void writeReferenceHtml(final String buildRefPath,
@@ -63,36 +57,34 @@ public final class LogParserWriter {
                 + "\t\telement.display == 'none' ? element.display='block' : element.display='none';\n"
                 + "\t}\n" + "</script>\n";
 
-        final BufferedWriter writer = new BufferedWriter(new FileWriter(
-                buildRefPath));
-        // Hudson stylesheets
-        writer.write(LogParserConsts.getHtmlOpeningTags()); 
-        writer.write(refStart); // toggle links javascript
-        // Write Errors
-        writeLinks(writer, LogParserConsts.ERROR, headerForSection,
-                statusCountPerSection, iconTable, linkListDisplay,
-                linkListDisplayPlural, statusCount, linkFiles);
-        // Write Warnings
-        writeLinks(writer, LogParserConsts.WARNING, headerForSection,
-                statusCountPerSection, iconTable, linkListDisplay,
-                linkListDisplayPlural, statusCount, linkFiles);
-        // Write Infos
-        writeLinks(writer, LogParserConsts.INFO, headerForSection,
-                statusCountPerSection, iconTable, linkListDisplay,
-                linkListDisplayPlural, statusCount, linkFiles);
-        // Write Debugs
-        writeLinks(writer, LogParserConsts.DEBUG, headerForSection,
-                statusCountPerSection, iconTable, linkListDisplay,
-                linkListDisplayPlural, statusCount, linkFiles);
-        // Write extra tags
-        for (String extraTag : extraTags) {
-            writeLinks(writer, extraTag, headerForSection,
+        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(buildRefPath))) {
+            // Hudson stylesheets
+            writer.write(LogParserConsts.getHtmlOpeningTags());
+            writer.write(refStart); // toggle links javascript
+            // Write Errors
+            writeLinks(writer, LogParserConsts.ERROR, headerForSection,
                     statusCountPerSection, iconTable, linkListDisplay,
                     linkListDisplayPlural, statusCount, linkFiles);
+            // Write Warnings
+            writeLinks(writer, LogParserConsts.WARNING, headerForSection,
+                    statusCountPerSection, iconTable, linkListDisplay,
+                    linkListDisplayPlural, statusCount, linkFiles);
+            // Write Infos
+            writeLinks(writer, LogParserConsts.INFO, headerForSection,
+                    statusCountPerSection, iconTable, linkListDisplay,
+                    linkListDisplayPlural, statusCount, linkFiles);
+            // Write Debugs
+            writeLinks(writer, LogParserConsts.DEBUG, headerForSection,
+                    statusCountPerSection, iconTable, linkListDisplay,
+                    linkListDisplayPlural, statusCount, linkFiles);
+            // Write extra tags
+            for (String extraTag : extraTags) {
+                writeLinks(writer, extraTag, headerForSection,
+                        statusCountPerSection, iconTable, linkListDisplay,
+                        linkListDisplayPlural, statusCount, linkFiles);
+            }
+            writer.write(LogParserConsts.getHtmlClosingTags());
         }
-        writer.write(LogParserConsts.getHtmlClosingTags());
-        writer.close(); // Close to unlock and flush to disk.
-
     }
 
     private static void writeLinks(final BufferedWriter writer,
@@ -139,49 +131,48 @@ public final class LogParserWriter {
         writer.write(linksStart);
 
         // Read the links file and insert here
-        final BufferedReader reader = new BufferedReader(new FileReader(
-                linkFiles.get(status)));
-        final String summaryLine = "<br/>(SUMMARY_INT_HERE LINK_LIST_DISPLAY_STR in this section)<br/>";
+        try (final BufferedReader reader = new BufferedReader(new FileReader(linkFiles.get(status)))) {
+            final String summaryLine = "<br/>(SUMMARY_INT_HERE LINK_LIST_DISPLAY_STR in this section)<br/>";
 
-        final String headerTemplateRegexp = "HEADER HERE:";
-        final String headerTemplateSplitBy = "#";
+            final String headerTemplateRegexp = "HEADER HERE:";
+            final String headerTemplateSplitBy = "#";
 
-        // If it's a header line - put the header of the section
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String curSummaryLine = null;
-            if (line.startsWith(headerTemplateRegexp)) {
-                final int headerNum = Integer.parseInt(line.split(headerTemplateSplitBy)[1]);
-                line = headerForSection.get(headerNum);
-                final String key = LogParserUtils.getSectionCountKey(status, headerNum);
-                final Integer summaryInt = statusCountPerSection.get(key);
-                if (summaryInt == null || summaryInt == 0) {
-                    // Don't write the header if there are no relevant lines for
-                    // this section
-                    line = null;
-                } else {
-                    String linkListDisplayStrWithPlural = linkListDisplayStr;
-                    if (summaryInt > 1) {
-                        linkListDisplayStrWithPlural = linkListDisplayStrPlural;
+            // If it's a header line - put the header of the section
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String curSummaryLine = null;
+                if (line.startsWith(headerTemplateRegexp)) {
+                    final int headerNum = Integer.parseInt(line.split(headerTemplateSplitBy)[1]);
+                    line = headerForSection.get(headerNum);
+                    final String key = LogParserUtils.getSectionCountKey(status, headerNum);
+                    final Integer summaryInt = statusCountPerSection.get(key);
+                    if (summaryInt == null || summaryInt == 0) {
+                        // Don't write the header if there are no relevant lines for
+                        // this section
+                        line = null;
+                    } else {
+                        String linkListDisplayStrWithPlural = linkListDisplayStr;
+                        if (summaryInt > 1) {
+                            linkListDisplayStrWithPlural = linkListDisplayStrPlural;
+                        }
+                        curSummaryLine = summaryLine.replace("SUMMARY_INT_HERE",
+                                summaryInt.toString()).replace(
+                                "LINK_LIST_DISPLAY_STR",
+                                linkListDisplayStrWithPlural);
                     }
-                    curSummaryLine = summaryLine.replace("SUMMARY_INT_HERE",
-                            summaryInt.toString()).replace(
-                            "LINK_LIST_DISPLAY_STR",
-                            linkListDisplayStrWithPlural);
+
                 }
 
-            }
-
-            if (line != null) {
-                writer.write(line);
-                writer.newLine(); // Write system dependent end of line.
-            }
-            if (curSummaryLine != null) {
-                writer.write(curSummaryLine);
-                writer.newLine(); // Write system dependent end of line.
+                if (line != null) {
+                    writer.write(line);
+                    writer.newLine(); // Write system dependent end of line.
+                }
+                if (curSummaryLine != null) {
+                    writer.write(curSummaryLine);
+                    writer.newLine(); // Write system dependent end of line.
+                }
             }
         }
-        reader.close(); // Close to unlock.
 
         final String linksEnd = "</ul>\n";
         writer.write(linksEnd);
