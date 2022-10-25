@@ -145,16 +145,15 @@ public final class LogParserUtils {
     }
 
     public static int countLines(final String filename) throws IOException {
-        final LineNumberReader reader = new LineNumberReader(new FileReader(
-                filename));
-        int count = 0;
-        while (reader.readLine() != null) {
-            // Read the whole file to count the lines.
-            count++;
+        try (final LineNumberReader reader = new LineNumberReader(new FileReader(filename))) {
+            int count = 0;
+            while (reader.readLine() != null) {
+                // Read the whole file to count the lines.
+                count++;
+            }
+            count = reader.getLineNumber();
+            return count;
         }
-        count = reader.getLineNumber();
-        reader.close();
-        return count;
     }
 
     private LogParserUtils() {
