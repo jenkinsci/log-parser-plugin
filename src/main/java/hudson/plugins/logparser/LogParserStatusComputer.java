@@ -71,69 +71,66 @@ public class LogParserStatusComputer extends MasterToSlaveCallable<HashMap<Strin
 
         logger.log(Level.INFO, "Local temp file:" + tempFileLocation);
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(
-                tempFilePath.read()));
-        int threadCounter = 0;
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(tempFilePath.read()))) {
+            int threadCounter = 0;
 
-        final ArrayList<LogParserThread> runners = new ArrayList<>();
-        final LogParserReader logParserReader = new LogParserReader(reader);
+            final ArrayList<LogParserThread> runners = new ArrayList<>();
+            final LogParserReader logParserReader = new LogParserReader(reader);
 
-        //ExecutorService execSvc = Executors.newFixedThreadPool(
-        //    LogParserUtils.getNumThreads() );
-        final ExecutorService execSvc = Executors.newCachedThreadPool();
-        int linesInLog = LogParserUtils.countLines(tempFileLocation);
-        final int threadsNeeded = linesInLog
-                / LogParserUtils.getLinesPerThread() + 1;
+            //ExecutorService execSvc = Executors.newFixedThreadPool(
+            //    LogParserUtils.getNumThreads() );
+            final ExecutorService execSvc = Executors.newCachedThreadPool();
+            int linesInLog = LogParserUtils.countLines(tempFileLocation);
+            final int threadsNeeded = linesInLog
+                    / LogParserUtils.getLinesPerThread() + 1;
 
-        // Read and parse the log parts.  Keep the threads and results in an
-        // array for future reference when writing
-        for (int i = 0; i < threadsNeeded; i++) {
-            //logger.log(Level.INFO,"LogParserParser: Open thread #"+threadCounter);
-            final LogParserThread logParserThread = new LogParserThread(
-                    logParserReader, parsingRulesArray, compiledPatterns,
-                    threadCounter);
-            //logParserThread.start();
-            runners.add(logParserThread);
-            execSvc.execute(logParserThread);
-            threadCounter++;
-        }
-
-        // Wait for all threads to finish before sequentially writing the
-        // outcome
-        execSvc.shutdown();
-        execSvc.awaitTermination(3600, TimeUnit.SECONDS);
-
-        // Sort the threads in the order of the log parts they read
-        // It could be that thread #1 read log part #2 and thread #2 read log
-        // part #1
-
-        final int runnersSize = runners.size();
-        LogParserThread[] sortedRunners = new LogParserThread[runnersSize];
-        for (LogParserThread logParserThread : runners) {
-            final LogParserLogPart logPart = logParserThread.getLogPart();
-            if (logPart != null) {
-                final int logPartNum = logPart.getLogPartNum();
-                sortedRunners[logPartNum] = logParserThread;
+            // Read and parse the log parts.  Keep the threads and results in an
+            // array for future reference when writing
+            for (int i = 0; i < threadsNeeded; i++) {
+                //logger.log(Level.INFO,"LogParserParser: Open thread #"+threadCounter);
+                final LogParserThread logParserThread = new LogParserThread(
+                        logParserReader, parsingRulesArray, compiledPatterns,
+                        threadCounter);
+                //logParserThread.start();
+                runners.add(logParserThread);
+                execSvc.execute(logParserThread);
+                threadCounter++;
             }
-        }
 
-        final HashMap<String, String> result = new HashMap<>();
-        HashMap<String, String> moreLineStatusMatches;
-        for (int i = 0; i < runnersSize; i++) {
-            final LogParserThread logParserThread = sortedRunners[i];
-            if (logParserThread != null) {
-                moreLineStatusMatches = getLineStatusMatches(
-                        logParserThread.getLineStatuses(), i);
-                result.putAll(moreLineStatusMatches);
+            // Wait for all threads to finish before sequentially writing the
+            // outcome
+            execSvc.shutdown();
+            execSvc.awaitTermination(3600, TimeUnit.SECONDS);
+
+            // Sort the threads in the order of the log parts they read
+            // It could be that thread #1 read log part #2 and thread #2 read log
+            // part #1
+
+            final int runnersSize = runners.size();
+            LogParserThread[] sortedRunners = new LogParserThread[runnersSize];
+            for (LogParserThread logParserThread : runners) {
+                final LogParserLogPart logPart = logParserThread.getLogPart();
+                if (logPart != null) {
+                    final int logPartNum = logPart.getLogPartNum();
+                    sortedRunners[logPartNum] = logParserThread;
+                }
             }
+
+            final HashMap<String, String> result = new HashMap<>();
+            HashMap<String, String> moreLineStatusMatches;
+            for (int i = 0; i < runnersSize; i++) {
+                final LogParserThread logParserThread = sortedRunners[i];
+                if (logParserThread != null) {
+                    moreLineStatusMatches = getLineStatusMatches(
+                            logParserThread.getLineStatuses(), i);
+                    result.putAll(moreLineStatusMatches);
+                }
+            }
+            return result;
+        } finally {
+            // Delete temp file
+            tempFilePath.delete();
         }
-
-        reader.close(); // Close to unlock.
-
-        // Delete temp file
-        tempFilePath.delete();
-
-        return result;
         // SLAVE PART END
     }
 
