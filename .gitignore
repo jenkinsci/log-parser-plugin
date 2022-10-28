@@ -1,8 +1,16 @@
+# OS stuff
+*.icloud
+._*
+.DS_Store
+Thumbs.db
+Desktop.ini
+.Spotlight-V100
+.Trashes
 
-# Created by https://www.gitignore.io/api/java,maven,netbeans,intellij,eclipse
-
-### Eclipse ###
-
+# IDE stuff
+.idea/*
+*.iml
+*.ipr
 .metadata
 bin/
 tmp/

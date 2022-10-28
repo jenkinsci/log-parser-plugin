@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd" xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <servers>
+    <server>
+      <id>central</id>
+      <username>${JENKINS_MAVEN_USER}</username>
+      <password>${JENKINS_MAVEN_PASS}</password>
+    </server>
+    <server>
+      <id>snapshots</id>
+      <username>${JENKINS_MAVEN_USER}</username>
+      <password>${JENKINS_MAVEN_PASS}</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <repositories>
+        <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>central</id>
+          <name>remote-snapshot-repos</name>
+          <url>https://repo.jenkins-ci.org/artifactory/remote-snapshot-repos</url>
+        </repository>
+        <repository>
+          <snapshots />
+          <id>snapshots</id>
+          <name>remote-snapshot-repos</name>
+          <url>https://repo.jenkins-ci.org/artifactory/remote-snapshot-repos</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <id>central</id>
+          <name>remote-snapshot-repos</name>
+          <url>https://repo.jenkins-ci.org/artifactory/remote-snapshot-repos</url>
+        </pluginRepository>
+        <pluginRepository>
+          <snapshots />
+          <id>snapshots</id>
+          <name>remote-snapshot-repos</name>
+          <url>https://repo.jenkins-ci.org/artifactory/remote-snapshot-repos</url>
+        </pluginRepository>
+      </pluginRepositories>
+      <id>artifactory</id>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>artifactory</activeProfile>
+  </activeProfiles>
+</settings>
