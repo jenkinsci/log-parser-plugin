@@ -33,6 +33,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
+          distribution: 'adopt'
 
   security-scan:
     uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@v2
@@ -52,7 +53,7 @@ jobs:
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
-          distribution: temurin
+          distribution: 'adopt'
           java-version: 8
 
       - name: publish release package
