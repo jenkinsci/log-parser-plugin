@@ -56,7 +56,7 @@ jobs:
           java-version: 8
 
       - name: publish release package
-        if: contains( github.ref, 'master' ) || contains( github.base_ref, 'master' )
+        if: contains( github.ref, 'main' ) || contains( github.base_ref, 'main' )
         env:
           JENKINS_MAVEN_PASS: ${{ secrets.JENKINS_MAVEN_PASS }}
         run: ./mvnw -s .github/workflows/m2.settings.xml deploy -DskipTests=true
