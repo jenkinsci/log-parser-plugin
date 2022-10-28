@@ -10,12 +10,15 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.ToolInstallations;
 
+import java.io.File;
+import java.net.URL;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * In this test suite we initialize the Job workspaces with a resource (maven-project1.zip) that contains a Maven
@@ -34,7 +37,10 @@ public class LogParserWorkflowTest {
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
         DumbSlave agent = jenkinsRule.createOnlineSlave();
         FilePath workspace = agent.getWorkspaceFor(job);
-        workspace.unzipFrom(LogParserWorkflowTest.class.getResourceAsStream("./maven-project1.zip"));
+        assertNotNull(workspace);
+        URL mavenProject = LogParserWorkflowTest.class.getResource("./maven-project1");
+        assertNotNull(mavenProject);
+        new FilePath(new File(mavenProject.toURI())).copyRecursiveTo(workspace);
         job.setDefinition(new CpsFlowDefinition(""
                        + "node('" + agent.getNodeName() + "') {\n"
                        + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"

@@ -136,13 +136,13 @@ public class LogParserAction implements Action {
         DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dsb = new DataSetBuilder<>();
 
         for (LogParserAction a = this; a != null; a = a.getPreviousAction()) {
-            dsb.add(a.result.getTotalErrors(), "errors",
+            dsb.add(a.result.getTotalErrors(), "0",
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
-            dsb.add(a.result.getTotalWarnings(), "warnings",
+            dsb.add(a.result.getTotalWarnings(), "1",
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
-            dsb.add(a.result.getTotalInfos(), "infos",
+            dsb.add(a.result.getTotalInfos(), "2",
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
-            dsb.add(a.result.getTotalDebugs(), "debugs",
+            dsb.add(a.result.getTotalDebugs(), "3",
                     new ChartUtil.NumberOnlyBuildLabel(a.getOwner()));
             for (String extraTag : a.result.getExtraTags()) {
                 dsb.add(a.result.getTotalCountsByExtraTag(extraTag), extraTag,
@@ -212,22 +212,25 @@ public class LogParserAction implements Action {
             @Override
             public String generateToolTip(CategoryDataset dataset, int row,
                     int column) {
+                ChartUtil.NumberOnlyBuildLabel label = (ChartUtil.NumberOnlyBuildLabel) dataset
+                        .getColumnKey(column);
+                LogParserResult result = label.build.getAction(LogParserAction.class).getResult();
                 switch (row) {
                 case 0:
                     return "Errors: " + result.getTotalErrors();
                 case 1:
                     return "Warnings: " + result.getTotalWarnings();
                 case 2:
-                    return "Debugs: " + result.getTotalDebugs();
-                default:
                     return "Infos: " + result.getTotalInfos();
+                default:
+                    return "Debugs: " + result.getTotalDebugs();
                 }
             }
         };
         plot.setRenderer(ar);
         ar.setSeriesPaint(0, ColorPalette.RED);    // error
-        ar.setSeriesPaint(1, ColorPalette.BLUE);   // info
-        ar.setSeriesPaint(2, ColorPalette.YELLOW); // warning
+        ar.setSeriesPaint(1, ColorPalette.YELLOW); // warning
+        ar.setSeriesPaint(2, ColorPalette.BLUE);   // info
         ar.setSeriesPaint(3, ColorPalette.GREY);   // debug
 
         // crop extra space around the graph

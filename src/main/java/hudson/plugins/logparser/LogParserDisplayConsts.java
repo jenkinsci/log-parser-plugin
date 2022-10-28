@@ -33,7 +33,7 @@ public class LogParserDisplayConsts {
         iconTable.put(LogParserConsts.ERROR, "red.gif");
         iconTable.put(LogParserConsts.WARNING, "yellow.gif");
         iconTable.put(LogParserConsts.INFO, "blue.gif");
-        iconTable.put(LogParserConsts.DEBUG, "grey.gif");
+        iconTable.put(LogParserConsts.DEBUG, "gray.gif");
 
         // How to display in link summary html
         linkListDisplay.put(LogParserConsts.ERROR, "Error");

@@ -115,67 +115,62 @@ public class LogParserParser {
         }
 
         // Open console log for reading and all other files for writing
-        final BufferedWriter writer = new BufferedWriter(new FileWriter(
-                parsedFilePath));
+        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(parsedFilePath))) {
 
-        // Record writers to links files in hash
-        writers.put(LogParserConsts.ERROR, new BufferedWriter(new FileWriter(
-                errorLinksFilePath)));
-        writers.put(LogParserConsts.WARNING, new BufferedWriter(new FileWriter(
-                warningLinksFilePath)));
-        writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
-                infoLinksFilePath)));
-        writers.put(LogParserConsts.DEBUG, new BufferedWriter(new FileWriter(
-                debugLinksFilePath)));
-        for (String extraTag : this.extraTags) {
-            writers.put(extraTag, new BufferedWriter(new FileWriter(
-                    linksFilePathByExtraTags.get(extraTag))));
-        }
+            // Record writers to links files in hash
+            writers.put(LogParserConsts.ERROR, new BufferedWriter(new FileWriter(
+                    errorLinksFilePath)));
+            writers.put(LogParserConsts.WARNING, new BufferedWriter(new FileWriter(
+                    warningLinksFilePath)));
+            writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
+                    infoLinksFilePath)));
+            writers.put(LogParserConsts.DEBUG, new BufferedWriter(new FileWriter(
+                    debugLinksFilePath)));
+            for (String extraTag : this.extraTags) {
+                writers.put(extraTag, new BufferedWriter(new FileWriter(
+                        linksFilePathByExtraTags.get(extraTag))));
+            }
 
-        // Loop on the console log as long as there are input lines and parse
-        // line by line
-        // At the end of this loop, we will have:
-        // - a parsed log with colored lines
-        // - 4 links files which will be consolidated into one referencing html
-        // file.
+            // Loop on the console log as long as there are input lines and parse
+            // line by line
+            // At the end of this loop, we will have:
+            // - a parsed log with colored lines
+            // - 4 links files which will be consolidated into one referencing html
+            // file.
 
-        // Create dummy header and section for beginning of log
-        final String shortLink = " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
-        LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); // This enters a line which will later be
-                                 // replaced by the actual header and count for
-                                 // this header
-        headerForSection.add(shortLink);
-        writer.write(LogParserConsts.getHtmlOpeningTags());
-		
-		// write styles for log body
-        final String styles = "<style>\n"
-			+ "  body {margin-left:.5em; }\n"
-			+ "  pre {font-family: Consolas, \"Courier New\"; word-wrap: break-word; }\n"
-			+ "  pre span {word-wrap: break-word; } \n"
-			+ "</style>\n";
-        writer.write(styles);
+            // Create dummy header and section for beginning of log
+            final String shortLink = " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
+            LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); // This enters a line which will later be
+            // replaced by the actual header and count for
+            // this header
+            headerForSection.add(shortLink);
+            writer.write(LogParserConsts.getHtmlOpeningTags());
 
-        if (this.preformattedHtml)
-            writer.write("<pre>");
-        // Read bulks of lines, parse
-        parseLogBody(build, writer, log,
-                logger);
+            // write styles for log body
+            final String styles = "<style>\n"
+                    + "  body {margin-left:.5em; }\n"
+                    + "  pre {font-family: Consolas, \"Courier New\"; word-wrap: break-word; }\n"
+                    + "  pre span {word-wrap: break-word; } \n"
+                    + "</style>\n";
+            writer.write(styles);
 
-        // Write parsed output, links, etc.
-        //writeLogBody();
+            if (this.preformattedHtml)
+                writer.write("<pre>");
+            // Read bulks of lines, parse
+            parseLogBody(build, writer, log,
+                    logger);
 
-        // Close html footer
-        if (this.preformattedHtml)
-            writer.write("</pre>");
-        writer.write(LogParserConsts.getHtmlClosingTags());
-        writer.close(); // Close to unlock and flush to disk.
+            // Write parsed output, links, etc.
+            //writeLogBody();
 
-        writers.get(LogParserConsts.ERROR).close();
-        writers.get(LogParserConsts.WARNING).close();
-        writers.get(LogParserConsts.INFO).close();
-        writers.get(LogParserConsts.DEBUG).close();
-        for (String extraTag : this.extraTags) {
-            writers.get(extraTag).close();
+            // Close html footer
+            if (this.preformattedHtml)
+                writer.write("</pre>");
+            writer.write(LogParserConsts.getHtmlClosingTags());
+        } finally {
+            for (BufferedWriter writer : writers.values()) {
+                writer.close();
+            }
         }
 
         // Build the reference html from the warnings/errors/info html files
@@ -353,22 +348,20 @@ public class LogParserParser {
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        final InputStreamReader streamReader = new InputStreamReader(
-                build.getLogInputStream(),
-                build.getCharset() );
-        final BufferedReader reader = new BufferedReader( streamReader );
-        String line;
-        String status;
-        int line_num = 0;
-        while ((line = reader.readLine()) != null) {
-            status = lineStatusMatches.get(String.valueOf(line_num));
-            final String parsedLine = parseLine(line, status);
-            // This is for displaying sections in the links part
-            writer.write(parsedLine);
-            writer.newLine(); // Write system dependent end of line.
-            line_num++;
+        try (final InputStreamReader streamReader = new InputStreamReader(build.getLogInputStream(), build.getCharset());
+             final BufferedReader reader = new BufferedReader(streamReader)) {
+            String line;
+            String status;
+            int line_num = 0;
+            while ((line = reader.readLine()) != null) {
+                status = lineStatusMatches.get(String.valueOf(line_num));
+                final String parsedLine = parseLine(line, status);
+                // This is for displaying sections in the links part
+                writer.write(parsedLine);
+                writer.newLine(); // Write system dependent end of line.
+                line_num++;
+            }
         }
-        reader.close();
 
         // Logging information - end
         final Calendar calendarEnd = Calendar.getInstance();

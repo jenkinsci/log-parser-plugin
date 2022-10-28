@@ -8,8 +8,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.logging.Logger;
 
 public final class ReadWriteTextFile {
+    private static final Logger LOGGER = Logger.getLogger(ReadWriteTextFile.class.getName());
 
     private ReadWriteTextFile() {
         // to suppress PMD warning
@@ -18,19 +20,13 @@ public final class ReadWriteTextFile {
     static public String getContents(final File aFile) {
         final StringBuilder contents = new StringBuilder();
 
-        try {
-            final BufferedReader input = new BufferedReader(new FileReader(
-                    aFile));
-            try {
-                String line = null; // not declared within while loop
-                while ((line = input.readLine()) != null) {
-                    contents.append(line + "\n");
-                }
-            } finally {
-                input.close();
+        try (final BufferedReader input = new BufferedReader(new FileReader(aFile))) {
+            String line = null; // not declared within while loop
+            while ((line = input.readLine()) != null) {
+                contents.append(line).append("\n");
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warning("Failure reading from " + aFile.getPath());
         }
 
         return contents.toString();
@@ -42,7 +38,12 @@ public final class ReadWriteTextFile {
             throw new IllegalArgumentException("File should not be null.");
         }
         if (!aFile.exists()) {
-            aFile.createNewFile();
+            boolean created = aFile.createNewFile();
+            if (created) {
+                LOGGER.fine(aFile.getPath() + " created");
+            } else {
+                LOGGER.fine(aFile.getPath() + " already exists");
+            }
         }
         if (!aFile.isFile()) {
             throw new IllegalArgumentException("Should not be a directory: "
@@ -54,12 +55,9 @@ public final class ReadWriteTextFile {
         }
 
         // use buffering
-        final Writer output = new BufferedWriter(new FileWriter(aFile));
-        try {
+        try (final Writer output = new BufferedWriter(new FileWriter(aFile))) {
             // FileWriter always assumes default encoding is OK!
             output.write(aContents);
-        } finally {
-            output.close();
         }
     }
 

@@ -1,6 +1,7 @@
 package hudson.plugins.logparser;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
