@@ -7,6 +7,11 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Extracted from {@link LogParserThread} so the same implementation could be
+ * used in different {@link ParsingStrategy} implementations.
+ * @since 2.4.0
+ */
 class LineToStatus implements UnaryOperator<String> {
     private final List<ParsingRulePattern> patterns;
 

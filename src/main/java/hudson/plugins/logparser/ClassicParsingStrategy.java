@@ -9,6 +9,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+/**
+ * This was the only available {@link ParsingStrategy} in 2.3.0 and earlier.
+ * <p>
+ * For each build, this strategy will:
+ * <ol>
+ *     <li>Stream the log file to count lines via {@link LogParserUtils#countLines(String)}</li>
+ *     <li>Create an {@link ExecutorService} via {@link Executors#newCachedThreadPool()}</li>
+ *     <li>Determine number of {@link LogParserThread} tasks from lines / ({@link LogParserUtils#getLinesPerThread()} + 1)</li>
+ *     <li>Submit and wait for all tasks to finish</li>
+ *     <li>Aggregate lines into status from each task</li>
+ * </ol>
+ *
+ * @since 2.4.0
+ * @see StreamParsingStrategy
+ */
 class ClassicParsingStrategy implements ParsingStrategy {
     @Override
     public HashMap<String, String> parse(ParsingInput input) {
