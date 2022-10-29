@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public class LogParserStatusComputer extends MasterToSlaveCallable<HashMap<String, String>, RuntimeException> {
 
-    private static final long serialVersionUID = -4474356311889262212L;
+    private static final long serialVersionUID = -6025098995519544527L;
     final private String[] parsingRulesArray;
     final private Pattern[] compiledPatterns;
     private final InputStream remoteLog;
@@ -65,7 +65,8 @@ public class LogParserStatusComputer extends MasterToSlaveCallable<HashMap<Strin
         tempFilePath.copyFrom(log);
 
         logger.log(Level.INFO, "Local temp file:" + tempFileLocation);
-        ParsingStrategy strategy = new ClassicParsingStrategy();
+        ParsingStrategyLocator locator = ParsingStrategyLocator.create();
+        ParsingStrategy strategy = locator.get();
 
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(tempFilePath.read()))) {
             ParsingInput input = new ParsingInput(reader, tempFileLocation, parsingRulesArray, compiledPatterns);
