@@ -36,7 +36,10 @@ class StreamParsingStrategy implements ParsingStrategy {
             List<String> statusByLine = lines.map(toStatus).collect(Collectors.toList());
             final HashMap<String, String> result = new HashMap<>();
             for (int i = 0; i < statusByLine.size(); i++) {
-                result.put(Integer.toString(i), statusByLine.get(i));
+                String status = statusByLine.get(i);
+                if (!LogParserConsts.NONE.equals(status)) {
+                    result.put(Integer.toString(i), status);
+                }
             }
             return result;
         }
