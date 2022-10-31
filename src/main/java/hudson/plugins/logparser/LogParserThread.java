@@ -1,8 +1,8 @@
 package hudson.plugins.logparser;
 
-import hudson.console.ConsoleNote;
-
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -97,22 +97,14 @@ class LogParserThread extends Thread {
     }
 
     private String getLineStatus(String line) {
-        // For now, strip out ConsoleNote(s) before parsing.
-        // Notes are injected into log lines, and can break start-of-line
-        // patterns, and include html. Will likely need alternative way to
-        // handle in the future.
-        line = ConsoleNote.removeNotes(line);
-        for (int i = 0; i < this.parsingRulesArray.length; i++) {
-            final String parsingRule = this.parsingRulesArray[i];
-            if (!LogParserUtils.skipParsingRule(parsingRule)
-                    && this.compiledPatterns[i] != null
-                    && this.compiledPatterns[i].matcher(line).find()) {
-                final String status = parsingRule.split("\\s")[0];
-                return LogParserUtils.standardizeStatus(status);
-            }
+        List<ParsingRulePattern> patterns = new LinkedList<>();
+        for (int i = 0; i < parsingRulesArray.length; i++) {
+            String rule = parsingRulesArray[i];
+            Pattern pattern = compiledPatterns[i];
+            patterns.add(new ParsingRulePattern(rule, pattern));
         }
-
-        return LogParserConsts.NONE;
+        LineToStatus toStatus = new LineToStatus(patterns);
+        return toStatus.apply(line);
     }
 
     public int getThreadNum() {
