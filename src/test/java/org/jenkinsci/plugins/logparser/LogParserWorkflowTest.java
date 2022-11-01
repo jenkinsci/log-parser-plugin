@@ -44,7 +44,7 @@ public class LogParserWorkflowTest {
         job.setDefinition(new CpsFlowDefinition(""
                        + "node('" + agent.getNodeName() + "') {\n"
                        + "  def mvnHome = tool '" + mavenInstallation.getName() + "'\n"
-                       + "  " + (Functions.isWindows() ? "bat" : "sh") + " \"${mvnHome}/bin/mvn clean install\"\n"
+                       + "  " + (Functions.isWindows() ? "bat" : "sh") + " \"${mvnHome}/bin/mvn --batch-mode clean install\"\n"
                        + "  step([$class: 'LogParserPublisher', projectRulePath: 'logparser-rules.txt', useProjectRule: true])\n"
                        + "}\n", true)
         );
