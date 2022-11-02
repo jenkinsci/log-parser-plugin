@@ -22,7 +22,7 @@
         <spotbugs.failOnError>false</spotbugs.failOnError>
         <jenkins.version>2.332.1</jenkins.version>
         <!-- Maven Plugins -->
-        <workflow-jenkins-plugin.version>2.5</workflow-jenkins-plugin.version>
+        <workflow-jenkins-plugin.version>590.v6a_d052e5a_a_b_5</workflow-jenkins-plugin.version>
         <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
         <maven-site-plugin.version>3.3</maven-site-plugin.version>
         <plugin.gitflow-maven.version>1.5.0</plugin.gitflow-maven.version>
