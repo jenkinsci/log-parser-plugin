@@ -4,9 +4,9 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Result;
-import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.logparser.action.LogParserProjectAction;
@@ -14,6 +14,14 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
+import jenkins.tasks.SimpleBuildStep;
+import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,19 +31,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
-import jenkins.tasks.SimpleBuildStep;
-import net.sf.json.JSONObject;
-
-import org.jenkinsci.Symbol;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.StaplerRequest;
-
 public class LogParserPublisher extends Recorder implements SimpleBuildStep, Serializable {
-
+    static final String NULL_PARSING_RULES = "Path to global parsing rules is null";
     private static final long serialVersionUID = 1L;
     public boolean unstableOnWarning;
     public boolean failBuildOnError;
@@ -109,6 +106,12 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
             final FilePath parsingRulesFile;
             if (useProjectRule) {
                 parsingRulesFile = new FilePath(workspace, projectRulePath);
+            } else if (parsingRulesPath == null) {
+                logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, NULL_PARSING_RULES);
+                result.setFailedToParseError(NULL_PARSING_RULES);
+                build.setResult(Result.ABORTED);
+                build.addAction(new LogParserAction(build, result));
+                return;
             } else {
                 parsingRulesFile = new FilePath(new File(parsingRulesPath));
             }
@@ -129,11 +132,6 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
             // parser file not found..
             logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
-        } catch (NullPointerException e) {
-            // in case the rules path is null
-            logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
-            result.setFailedToParseError(e.toString());
-            build.setResult(Result.ABORTED);
         } catch (InterruptedException e) {
             logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, e);
             result.setFailedToParseError(e.toString());
