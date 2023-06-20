@@ -34,6 +34,11 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
+      - name: Build with Maven
+        run: mvn --batch-mode clean install
+      - uses: jwgmeligmeyling/spotbugs-github-action@master
+        with:
+          path: '**/spotbugsXml.xml'
 
   security-scan:
     uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@v2
