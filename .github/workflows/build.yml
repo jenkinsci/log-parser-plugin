@@ -1,9 +1,14 @@
 name: CI
 
 on:
+  push:
   pull_request:
   merge_group:
-  push:
+
+permissions:
+  security-events: write
+  contents: read
+  actions: read
 
 jobs:
   build:
