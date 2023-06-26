@@ -52,7 +52,7 @@ class ClassicParsingStrategy implements ParsingStrategy {
             tempFilePath.copyFrom(input.getLog());
 
             logger.log(Level.INFO, "Local temp file:" + tempFileLocation);
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(tempFilePath.read()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(tempFilePath.read(), input.getCharset()))) {
                 String[] parsingRulesArray = input.getParsingRulesArray();
                 Pattern[] compiledPatterns = input.getCompiledPatterns();
                 int threadCounter = 0;
