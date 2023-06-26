@@ -12,6 +12,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -342,13 +343,14 @@ public class LogParserParser {
                 + build.getNumber();
         logger.log(Level.INFO, "LogParserParser: Start parsing : " + signature);
         final Calendar calendarStart = Calendar.getInstance();
+        Charset charset = build.getCharset();
 
         final HashMap<String, String> lineStatusMatches = channel.call(
-                new LogParserStatusComputer(log, parsingRulesArray, compiledPatterns, signature));
+                new LogParserStatusComputer(log, parsingRulesArray, compiledPatterns, signature, charset));
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        try (final InputStreamReader streamReader = new InputStreamReader(build.getLogInputStream(), build.getCharset());
+        try (final InputStreamReader streamReader = new InputStreamReader(build.getLogInputStream(), charset);
              final BufferedReader reader = new BufferedReader(streamReader)) {
             String line;
             String status;

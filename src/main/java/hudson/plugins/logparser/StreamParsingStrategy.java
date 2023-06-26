@@ -34,7 +34,7 @@ class StreamParsingStrategy implements ParsingStrategy {
             parsingRulePatterns.add(new ParsingRulePattern(rule, pattern));
         }
         LineToStatus toStatus = new LineToStatus(parsingRulePatterns);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input.getLog()));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input.getLog(), input.getCharset()));
              Stream<String> lines = reader.lines()) {
             List<String> statusByLine = lines.map(toStatus).collect(Collectors.toList());
             final HashMap<String, String> result = new HashMap<>();

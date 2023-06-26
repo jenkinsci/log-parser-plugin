@@ -1,6 +1,7 @@
 package hudson.plugins.logparser;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 class ParsingInput {
@@ -8,12 +9,14 @@ class ParsingInput {
     private final Pattern[] compiledPatterns;
     private final InputStream log;
     private final String signature;
+    private final String charsetName;
 
-    ParsingInput(String[] parsingRulesArray, Pattern[] compiledPatterns, InputStream log, String signature) {
+    ParsingInput(String[] parsingRulesArray, Pattern[] compiledPatterns, InputStream log, String signature, String charsetName) {
         this.parsingRulesArray = parsingRulesArray;
         this.compiledPatterns = compiledPatterns;
         this.log = log;
         this.signature = signature;
+        this.charsetName = charsetName;
     }
 
     public String[] getParsingRulesArray() {
@@ -30,5 +33,9 @@ class ParsingInput {
 
     public String getSignature() {
         return signature;
+    }
+
+    public Charset getCharset() {
+        return Charset.forName(charsetName);
     }
 }
