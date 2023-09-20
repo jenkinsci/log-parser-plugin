@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.67</version>
+        <version>4.73</version>
         <relativePath />
     </parent>
 
@@ -20,7 +20,7 @@
     <properties>
         <!-- TODO: remove once FindBugs issues are fixed -->
         <spotbugs.failOnError>false</spotbugs.failOnError>
-        <jenkins.version>2.375.4</jenkins.version>
+        <jenkins.version>2.387.3</jenkins.version>
         <!-- Maven Plugins -->
         <workflow-jenkins-plugin.version>2.5</workflow-jenkins-plugin.version>
         <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
@@ -79,8 +79,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.375.x</artifactId>
-                <version>2179.v0884e842b_859</version>
+                <artifactId>bom-2.387.x</artifactId>
+                <version>2446.v2e9fd3b_d8c81</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -148,11 +148,6 @@
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>mailer</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci</groupId>
-            <artifactId>symbol-annotation</artifactId>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
