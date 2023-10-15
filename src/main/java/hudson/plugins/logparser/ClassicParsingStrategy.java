@@ -39,9 +39,7 @@ class ClassicParsingStrategy implements ParsingStrategy {
         // Copy remote file to temp local location
         String tempDir = System.getProperty("java.io.tmpdir");
         if (!tempDir.endsWith(File.separator)) {
-            final StringBuffer tempDirBuffer = new StringBuffer(tempDir);
-            tempDirBuffer.append(File.separator);
-            tempDir = tempDirBuffer.toString();
+            tempDir = tempDir + File.separator;
         }
 
         final String tempFileLocation = tempDir + "log-parser_" + input.getSignature();
