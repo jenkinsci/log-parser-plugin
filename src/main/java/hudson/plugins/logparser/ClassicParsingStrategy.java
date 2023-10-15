@@ -28,8 +28,8 @@ import java.util.regex.Pattern;
  *     <li>Aggregate lines into status from each task</li>
  * </ol>
  *
- * @since 2.4.0
  * @see StreamParsingStrategy
+ * @since 2.4.0
  */
 class ClassicParsingStrategy implements ParsingStrategy {
     @Override
@@ -123,10 +123,12 @@ class ClassicParsingStrategy implements ParsingStrategy {
         String status;
         int line_num;
         final int linesPerThread = LogParserUtils.getLinesPerThread();
-        for (int i = 0; i < statuses.length; i++) {
-            status = statuses[i];
-            line_num = i + logPart * linesPerThread;
-            result.put(String.valueOf(line_num), status);
+        if (statuses != null && statuses.length > 0) {
+            for (int i = 0; i < statuses.length; i++) {
+                status = statuses[i];
+                line_num = i + logPart * linesPerThread;
+                result.put(String.valueOf(line_num), status);
+            }
         }
         return result;
     }
