@@ -1,40 +1,57 @@
 package hudson.plugins.logparser;
 
-import hudson.FilePath;
 import hudson.remoting.RemoteInputStream;
 import jenkins.security.MasterToSlaveCallable;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class LogParserStatusComputer extends MasterToSlaveCallable<HashMap<String, String>, RuntimeException> {
 
-    private static final long serialVersionUID = -6025098995519544527L;
+    private static final long serialVersionUID = 646211554890510833L;
     final private String[] parsingRulesArray;
     final private Pattern[] compiledPatterns;
     private final InputStream remoteLog;
     private final String signature;
+    private final String charsetName;
 
     public LogParserStatusComputer(
-            final InputStream log, final String[] parsingRulesArray,
+            final InputStream log,
+            final String[] parsingRulesArray,
             final Pattern[] compiledPatterns,
-            final String signature) throws IOException, InterruptedException {
+            final String signature,
+            final Charset charset) {
         this.parsingRulesArray = parsingRulesArray;
         this.compiledPatterns = compiledPatterns;
         this.remoteLog = new RemoteInputStream(log, RemoteInputStream.Flag.GREEDY);
         this.signature = signature;
+        this.charsetName = charset.name();
+    }
+
+    /**
+     * Prefer the other constructor that allows for passing in the {@link Charset}.
+     * This constructor relies on the default charset.
+     * @param log
+     * @param parsingRulesArray
+     * @param compiledPatterns
+     * @param signature
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Deprecated
+    public LogParserStatusComputer(
+            final InputStream log, final String[] parsingRulesArray,
+            final Pattern[] compiledPatterns,
+            final String signature) throws IOException, InterruptedException {
+        this(log, parsingRulesArray, compiledPatterns, signature, Charset.defaultCharset());
     }
 
     public HashMap<String, String> call() {
         try {
-            return computeStatusMatches(remoteLog, signature);
+            return computeStatusMatches(remoteLog, signature, charsetName);
             // rethrow any exception here to report why the
             // parsing failed
         } catch (InterruptedException e) {
@@ -46,35 +63,14 @@ public class LogParserStatusComputer extends MasterToSlaveCallable<HashMap<Strin
 
     private HashMap<String, String> computeStatusMatches(
             final InputStream log,
-            final String signature) throws IOException, InterruptedException {
+            final String signature,
+            final String charsetName) throws IOException, InterruptedException {
         // SLAVE PART START
-
-        final Logger logger = Logger.getLogger(this.getClass().getName());
-
-        // Copy remote file to temp local location
-        String tempDir = System.getProperty("java.io.tmpdir");
-        if (!tempDir.endsWith(File.separator)) {
-            final StringBuffer tempDirBuffer = new StringBuffer(tempDir);
-            tempDirBuffer.append(File.separator);
-            tempDir = tempDirBuffer.toString();
-        }
-
-        final String tempFileLocation = tempDir + "log-parser_" + signature;
-        final File tempFile = new File(tempFileLocation);
-        final FilePath tempFilePath = new FilePath(tempFile);
-        tempFilePath.copyFrom(log);
-
-        logger.log(Level.INFO, "Local temp file:" + tempFileLocation);
         ParsingStrategyLocator locator = ParsingStrategyLocator.create();
         ParsingStrategy strategy = locator.get();
 
-        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(tempFilePath.read()))) {
-            ParsingInput input = new ParsingInput(reader, tempFileLocation, parsingRulesArray, compiledPatterns);
-            return strategy.parse(input);
-        } finally {
-            // Delete temp file
-            tempFilePath.delete();
-        }
+        ParsingInput input = new ParsingInput(parsingRulesArray, compiledPatterns, log, signature, charsetName);
+        return strategy.parse(input);
         // SLAVE PART END
     }
 

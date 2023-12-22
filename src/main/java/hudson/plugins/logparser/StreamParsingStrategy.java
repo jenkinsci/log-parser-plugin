@@ -1,6 +1,8 @@
 package hudson.plugins.logparser;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +34,8 @@ class StreamParsingStrategy implements ParsingStrategy {
             parsingRulePatterns.add(new ParsingRulePattern(rule, pattern));
         }
         LineToStatus toStatus = new LineToStatus(parsingRulePatterns);
-        try (Stream<String> lines = input.getReader().lines()) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input.getLog(), input.getCharset()));
+             Stream<String> lines = reader.lines()) {
             List<String> statusByLine = lines.map(toStatus).collect(Collectors.toList());
             final HashMap<String, String> result = new HashMap<>();
             for (int i = 0; i < statusByLine.size(); i++) {
@@ -42,6 +45,8 @@ class StreamParsingStrategy implements ParsingStrategy {
                 }
             }
             return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

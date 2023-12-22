@@ -1,18 +1,16 @@
 name: CI
 
-on: [push]
-
-permissions:
-  security-events: write
-  contents: read
-  actions: read
+on:
+  pull_request:
+  merge_group:
+  push:
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        java: [8, 11, 17]
+        os: [macos-latest, ubuntu-latest]
+        java: [11, 17, 21]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -40,12 +38,6 @@ jobs:
         with:
           path: '**/spotbugsXml.xml'
 
-  security-scan:
-    uses: jenkins-infra/jenkins-security-scan/.github/workflows/jenkins-security-scan.yaml@v2
-    with:
-      java-cache: 'maven'
-      java-version: 11
-
   deploy:
     needs: [build]
     runs-on: ubuntu-latest
@@ -55,11 +47,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up JDK 8
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
-          java-version: 8
+          java-version: 17
 
       - name: publish release package
         if: contains( github.ref, 'main' ) || contains( github.base_ref, 'main' )
