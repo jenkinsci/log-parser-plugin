@@ -24,16 +24,12 @@ public final class LogParserUtils {
     }
 
     public static boolean skipParsingRule(final String parsingRule) {
-        boolean skip = false;
-        if (parsingRule == null || parsingRule.equals("")
-                || parsingRule.charAt(0) == '#'
-                || parsingRule.startsWith("\\s")
-                || parsingRule.startsWith("\r") || // Carriage return
-                parsingRule.contains("$header")) { // for now - disregard rules
-                                                   // with header in them
-            skip = true;
-        }
-        return skip;
+        return parsingRule == null || parsingRule.equals("")
+            || parsingRule.charAt(0) == '#'
+            || parsingRule.startsWith("\\s")
+            || parsingRule.startsWith("\r")      // Carriage return
+            || parsingRule.contains("$header");  // for now - disregard rules
+                                                 // with header in them
     }
 
     public static String standardizeStatus(final String status) {
@@ -75,10 +71,9 @@ public final class LogParserUtils {
                     final String ruleParts[] = parsingRule.split("\\s");
                     String regexp = ruleParts[1];
                     String tag = ruleParts[0];
-                    if (!LogParserConsts.LEGAL_STATUS.contains(tag.toUpperCase(Locale.ENGLISH))) {
-                        if (!Arrays.asList("OK", "END", "WARN").contains(tag.toUpperCase(Locale.ENGLISH))) {
-                            extraTags.add(tag);
-                        }
+                    if (!LogParserConsts.LEGAL_STATUS.contains(tag.toUpperCase(Locale.ENGLISH))
+                        && !Arrays.asList("OK", "END", "WARN").contains(tag.toUpperCase(Locale.ENGLISH))) {
+                        extraTags.add(tag);
                     }
 
                     final int firstDash = parsingRule.indexOf('/');
@@ -145,7 +140,7 @@ public final class LogParserUtils {
     }
 
     public static int countLines(final String filename) throws IOException {
-        try (final LineNumberReader reader = new LineNumberReader(new FileReader(filename))) {
+        try (LineNumberReader reader = new LineNumberReader(new FileReader(filename))) {
             int count = 0;
             while (reader.readLine() != null) {
                 // Read the whole file to count the lines.

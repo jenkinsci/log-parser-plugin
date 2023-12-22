@@ -26,7 +26,7 @@ public class LogParserLogPart {
     }
 
     public boolean isEmpty() {
-        return (lines[0] == null);
+        return lines[0] == null;
     }
 
 }

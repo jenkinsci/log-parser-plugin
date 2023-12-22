@@ -1,6 +1,5 @@
 package hudson.plugins.logparser;
 
-import hudson.Functions;
 import jenkins.model.Jenkins;
 
 import java.io.BufferedReader;
@@ -36,7 +35,7 @@ public final class LogParserWriter {
                 + "<a href='build.log'>build log</a>\n" + "</noframes>\n"
                 + "</frameset>\n";
 
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(buildWrapperPath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(buildWrapperPath))) {
             writer.write(wrapperHtml);
         }
     }
@@ -57,7 +56,7 @@ public final class LogParserWriter {
                 + "\t\telement.display == 'none' ? element.display='block' : element.display='none';\n"
                 + "\t}\n" + "</script>\n";
 
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(buildRefPath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(buildRefPath))) {
             // Hudson stylesheets
             writer.write(LogParserConsts.getHtmlOpeningTags());
             writer.write(refStart); // toggle links javascript
@@ -110,7 +109,7 @@ public final class LogParserWriter {
         final String linkListCount = statusCount.get(status).toString();
 
         final String hudsonRoot = Jenkins.get().getRootUrl();
-        final String iconLocation = String.format("%s/plugin/log-parser/images/", jenkins.model.Jenkins.RESOURCE_PATH).substring(1);
+        final String iconLocation = String.format("%s/plugin/log-parser/images/", Jenkins.RESOURCE_PATH).substring(1);
 		
         final String styles = 
             "<style>\n" 
@@ -131,7 +130,7 @@ public final class LogParserWriter {
         writer.write(linksStart);
 
         // Read the links file and insert here
-        try (final BufferedReader reader = new BufferedReader(new FileReader(linkFiles.get(status)))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(linkFiles.get(status)))) {
             final String summaryLine = "<br/>(SUMMARY_INT_HERE LINK_LIST_DISPLAY_STR in this section)<br/>";
 
             final String headerTemplateRegexp = "HEADER HERE:";
