@@ -18,8 +18,8 @@ class LogParserThread extends Thread {
     private final LogParserReader logParserReader;
 
     public LogParserThread(final LogParserReader logParserReader,
-            final String[] parsingRulesArray, final Pattern[] compiledPatterns,
-            final int threadNum) {
+                           final String[] parsingRulesArray, final Pattern[] compiledPatterns,
+                           final int threadNum) {
         this.parsingRulesArray = parsingRulesArray;
         this.compiledPatterns = compiledPatterns;
         this.threadNum = threadNum;
@@ -32,31 +32,9 @@ class LogParserThread extends Thread {
             // Synchronized method so as not to read from the same file from
             // several threads.
             logPart = logParserReader.readLogPart(this.threadNum);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
         logPartStatuses = getLineStatuses(logPart.getLines());
-        
-        /*
-        try {
-            logPartStatuses = channel
-                    .call(new Callable<String[], RuntimeException>() {
-                        public String[] call() {
-                            return getLineStatuses(logPart.getLines());
-                        }
-                    });
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        */
 
     }
 
