@@ -116,7 +116,7 @@ public class LogParserParser {
         }
 
         // Open console log for reading and all other files for writing
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(parsedFilePath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(parsedFilePath))) {
 
             // Record writers to links files in hash
             writers.put(LogParserConsts.ERROR, new BufferedWriter(new FileWriter(
@@ -350,8 +350,8 @@ public class LogParserParser {
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        try (final InputStreamReader streamReader = new InputStreamReader(build.getLogInputStream(), charset);
-             final BufferedReader reader = new BufferedReader(streamReader)) {
+        try (InputStreamReader streamReader = new InputStreamReader(build.getLogInputStream(), charset);
+             BufferedReader reader = new BufferedReader(streamReader)) {
             String line;
             String status;
             int line_num = 0;

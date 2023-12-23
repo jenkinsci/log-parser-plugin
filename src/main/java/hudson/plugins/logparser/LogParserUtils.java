@@ -145,7 +145,7 @@ public final class LogParserUtils {
     }
 
     public static int countLines(final String filename) throws IOException {
-        try (final LineNumberReader reader = new LineNumberReader(new FileReader(filename))) {
+        try (LineNumberReader reader = new LineNumberReader(new FileReader(filename))) {
             int count = 0;
             while (reader.readLine() != null) {
                 // Read the whole file to count the lines.
