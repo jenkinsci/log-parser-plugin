@@ -20,7 +20,7 @@ public final class ReadWriteTextFile {
     static public String getContents(final File aFile) {
         final StringBuilder contents = new StringBuilder();
 
-        try (final BufferedReader input = new BufferedReader(new FileReader(aFile))) {
+        try (BufferedReader input = new BufferedReader(new FileReader(aFile))) {
             String line = null; // not declared within while loop
             while ((line = input.readLine()) != null) {
                 contents.append(line).append("\n");
@@ -55,7 +55,7 @@ public final class ReadWriteTextFile {
         }
 
         // use buffering
-        try (final Writer output = new BufferedWriter(new FileWriter(aFile))) {
+        try (Writer output = new BufferedWriter(new FileWriter(aFile))) {
             // FileWriter always assumes default encoding is OK!
             output.write(aContents);
         }

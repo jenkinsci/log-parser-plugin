@@ -36,7 +36,7 @@ public final class LogParserWriter {
                 + "<a href='build.log'>build log</a>\n" + "</noframes>\n"
                 + "</frameset>\n";
 
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(buildWrapperPath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(buildWrapperPath))) {
             writer.write(wrapperHtml);
         }
     }
@@ -57,7 +57,7 @@ public final class LogParserWriter {
                 + "\t\telement.display == 'none' ? element.display='block' : element.display='none';\n"
                 + "\t}\n" + "</script>\n";
 
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(buildRefPath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(buildRefPath))) {
             // Hudson stylesheets
             writer.write(LogParserConsts.getHtmlOpeningTags());
             writer.write(refStart); // toggle links javascript
@@ -131,7 +131,7 @@ public final class LogParserWriter {
         writer.write(linksStart);
 
         // Read the links file and insert here
-        try (final BufferedReader reader = new BufferedReader(new FileReader(linkFiles.get(status)))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(linkFiles.get(status)))) {
             final String summaryLine = "<br/>(SUMMARY_INT_HERE LINK_LIST_DISPLAY_STR in this section)<br/>";
 
             final String headerTemplateRegexp = "HEADER HERE:";
