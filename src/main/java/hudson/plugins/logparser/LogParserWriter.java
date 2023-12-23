@@ -109,7 +109,7 @@ public final class LogParserWriter {
         final String linkListCount = statusCount.get(status).toString();
 
         final String hudsonRoot = Jenkins.get().getRootUrl();
-        final String iconLocation = String.format("%s/plugin/log-parser/images/", jenkins.model.Jenkins.RESOURCE_PATH).substring(1);
+        final String iconLocation = String.format("%s/plugin/log-parser/images/", Jenkins.RESOURCE_PATH).substring(1);
 		
         final String styles = 
             "<style>\n" 
