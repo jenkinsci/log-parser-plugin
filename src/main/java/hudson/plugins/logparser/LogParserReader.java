@@ -24,7 +24,7 @@ public class LogParserReader {
 
         int counter = 0;
         String line;
-        while (counter < numLines && ((line = reader.readLine()) != null)) {
+        while (counter < numLines && (line = reader.readLine()) != null) {
             lines[counter++] = line;
         }
         logger.log(Level.INFO, "Done reading log part " + logPartNum);
