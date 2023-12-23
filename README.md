@@ -12,4 +12,4 @@ This log parser plugin will parse the console build logs which will be generated
 * Link the summary of errors and warnings with the full log, which makes us easy to search for a line of interest in the build log.
 
 
-see [logparser-rules.txt](src/test/resources/org/jenkinsci/plugins/logparser/maven-project1/logparser-rules.txt) for a sample parsing rule set.
+Also see [logparser-rules.txt](src/test/resources/org/jenkinsci/plugins/logparser/maven-project1/logparser-rules.txt) for a sample parsing rule set. See [Wiki](https://wiki.jenkins-ci.org/JENKINS/Log-Parser-Plugin.html) for more details.
