@@ -1,29 +1,38 @@
-<!--
- ~ The MIT License
- ~
- ~ Copyright (c) 2015, CloudBees, Inc.
- ~
- ~ Permission is hereby granted, free of charge, to any person obtaining a copy
- ~ of this software and associated documentation files (the "Software"), to deal
- ~ in the Software without restriction, including without limitation the rights
- ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- ~ copies of the Software, and to permit persons to whom the Software is
- ~ furnished to do so, subject to the following conditions:
- ~
- ~ The above copyright notice and this permission notice shall be included in
- ~ all copies or substantial portions of the Software.
- ~
- ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- ~ THE SOFTWARE.
- -->
-
 <FindBugsFilter>
+  <!--
+    Exclusions in this section have been triaged and determined to be
+    false positives.
+  -->
   <Match>
-    <Class name="~.*\.Messages"/>
+    <Bug pattern="MS_MUTABLE_COLLECTION_PKGPROTECT" />
+    <Class name="hudson.plugins.logparser.LogParserConsts" />
+    <Or>
+      <Field name="LEGAL_STATUS" />
+      <Field name="STATUSES_WITH_SECTIONS_IN_LINK_FILES" />
+    </Or>
+  </Match>
+
+  <!--
+    Here lies technical debt. Exclusions in this section have not yet
+    been triaged. When working on this section, pick an exclusion to
+    triage, then:
+
+    - Add a @SuppressFBWarnings(value = "[...]", justification = "[...]")
+      annotation if it is a false positive.  Indicate the reason why
+      it is a false positive, then remove the exclusion from this
+      section.
+
+    - If it is not a false positive, fix the bug, then remove the
+      exclusion from this section.
+   -->
+  <Match>
+    <Bug pattern="DM_DEFAULT_ENCODING" />
+    <Or>
+      <Class name="hudson.plugins.logparser.LogParserParser" />
+      <Class name="hudson.plugins.logparser.LogParserResult" />
+      <Class name="hudson.plugins.logparser.LogParserUtils" />
+      <Class name="hudson.plugins.logparser.LogParserWriter" />
+      <Class name="hudson.plugins.logparser.ReadWriteTextFile" />
+    </Or>
   </Match>
 </FindBugsFilter>
