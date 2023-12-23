@@ -1,6 +1,5 @@
 package hudson.plugins.logparser;
 
-import hudson.Functions;
 import jenkins.model.Jenkins;
 
 import java.io.BufferedReader;
