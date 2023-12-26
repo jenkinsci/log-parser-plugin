@@ -21,7 +21,7 @@
         <!-- Maven Plugins -->
         <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
         <maven-site-plugin.version>3.3</maven-site-plugin.version>
-        <plugin.gitflow-maven.version>1.19.0</plugin.gitflow-maven.version>
+        <plugin.gitflow-maven.version>1.21.0</plugin.gitflow-maven.version>
     </properties>
 
     <licenses>
