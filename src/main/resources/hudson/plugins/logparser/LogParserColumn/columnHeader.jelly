@@ -1,0 +1,3 @@
+<j:jelly xmlns:j="jelly:core">
+  <th>${%LogParserColumn.Header}</th>
+</j:jelly>
