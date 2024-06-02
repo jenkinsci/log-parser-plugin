@@ -60,14 +60,17 @@ public class LogParserAction implements Action, SimpleBuildStep.LastBuildAction 
         return Collections.singleton(new LogParserProjectAction(job));
     }
 
+    @Override
     public String getIconFileName() {
         return "clipboard.gif";
     }
 
+    @Override
     public String getDisplayName() {
         return "Console Output (parsed)";
     }
 
+    @Override
     public String getUrlName() {
         return urlName;
     }

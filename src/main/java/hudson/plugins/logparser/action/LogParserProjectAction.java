@@ -28,14 +28,17 @@ public class LogParserProjectAction implements Action {
         this.job = job;
     }
 
+    @Override
     public String getIconFileName() {
         return null;
     }
 
+    @Override
     public String getDisplayName() {
         return "logparser";
     }
 
+    @Override
     public String getUrlName() {
         return "logparser";
     }
