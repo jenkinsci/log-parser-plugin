@@ -42,22 +42,28 @@ public class LogParserAction implements Action, SimpleBuildStep.LastBuildAction 
 
     final private Run<?, ?> build;
     final private LogParserResult result;
+    final private boolean showGraphs;
 
     private static String urlName = "parsed_console";
 
     @Deprecated
-    public LogParserAction(final AbstractBuild<?, ?> build, final LogParserResult result) {
-        this((Run<?, ?>) build, result);
+    public LogParserAction(final AbstractBuild<?, ?> build, final LogParserResult result, final boolean showGraphs) {
+        this((Run<?, ?>) build, result, showGraphs);
     }
 
-    public LogParserAction(final Run<?, ?> build, final LogParserResult result) {
+    public LogParserAction(final Run<?, ?> build, final LogParserResult result, final boolean showGraphs) {
         this.build = build;
         this.result = result;
+        this.showGraphs = showGraphs;
     }
 
     public Collection<? extends Action> getProjectActions() {
-        final Job<?, ?> job = build.getParent();
-        return Collections.singleton(new LogParserProjectAction(job));
+        if (showGraphs) {
+            final Job<?, ?> job = build.getParent();
+            return Collections.singleton(new LogParserProjectAction(job));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override

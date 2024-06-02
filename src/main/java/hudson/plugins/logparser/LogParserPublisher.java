@@ -110,7 +110,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
                 logger.log(Level.SEVERE, LogParserConsts.CANNOT_PARSE + build, NULL_PARSING_RULES);
                 result.setFailedToParseError(NULL_PARSING_RULES);
                 build.setResult(Result.ABORTED);
-                build.addAction(new LogParserAction(build, result));
+                build.addAction(new LogParserAction(build, result, showGraphs));
                 return;
             } else {
                 parsingRulesFile = new FilePath(new File(parsingRulesPath));
@@ -139,7 +139,7 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         }
 
         // Add an action created with the above results
-        final LogParserAction action = new LogParserAction(build, result);
+        final LogParserAction action = new LogParserAction(build, result, showGraphs);
         build.addAction(action);
     }
 
