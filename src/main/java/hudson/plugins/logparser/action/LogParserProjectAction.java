@@ -1,8 +1,8 @@
 package hudson.plugins.logparser.action;
 
 import hudson.model.Action;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.model.Run;
+import hudson.model.Job ;
 import hudson.plugins.logparser.LogParserAction;
 
 import java.io.IOException;
@@ -22,10 +22,10 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class LogParserProjectAction implements Action {
 
-    public final AbstractProject<?,?> project;
+    public final Job <?,?> job;
 
-    public LogParserProjectAction(AbstractProject<?, ?> project) {
-        this.project = project;
+    public LogParserProjectAction(Job <?, ?> job) {
+        this.job = job;
     }
 
     public String getIconFileName() {
@@ -41,9 +41,9 @@ public class LogParserProjectAction implements Action {
     }
 
     public LogParserAction getLastLogParserAction() {
-        final AbstractBuild<?,?> tb = project.getLastSuccessfulBuild();
+        final Run<?,?> tb = job.getLastSuccessfulBuild();
 
-        AbstractBuild<?,?> b = project.getLastBuild();
+        Run<?,?> b = job.getLastBuild();
         while (b != null) {
             LogParserAction a = b.getAction(LogParserAction.class);
             if (a != null) {
