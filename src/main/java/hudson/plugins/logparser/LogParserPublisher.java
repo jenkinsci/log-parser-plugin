@@ -227,16 +227,4 @@ public class LogParserPublisher extends Recorder implements SimpleBuildStep, Ser
         // the available parsing rules from there
         return ((DescriptorImpl) this.getDescriptor()).getParsingRulesGlobal();
     }
-
-    @Override
-    public Action getProjectAction(AbstractProject<?, ?> project) {
-
-        if (showGraphs) {
-            return new LogParserProjectAction(project);
-
-        } else {
-            return null;
-        }
-    }
-
 }
