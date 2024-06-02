@@ -3,7 +3,9 @@ package hudson.plugins.logparser;
 import hudson.Functions;
 import hudson.model.Action;
 import hudson.model.AbstractBuild;
+import hudson.model.Job;
 import hudson.model.Run;
+import hudson.plugins.logparser.action.LogParserProjectAction;
 import hudson.util.Area;
 import hudson.util.ChartUtil;
 import hudson.util.ColorPalette;
@@ -11,9 +13,15 @@ import hudson.util.DataSetBuilder;
 import hudson.util.ShiftedCategoryAxis;
 import hudson.util.StackedAreaRenderer2;
 
+import jenkins.tasks.SimpleBuildStep;
+import jenkins.tasks.SimpleBuildStep.LastBuildAction;
+
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.servlet.ServletException;
 
@@ -30,7 +38,7 @@ import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-public class LogParserAction implements Action {
+public class LogParserAction implements Action, SimpleBuildStep.LastBuildAction {
 
     final private Run<?, ?> build;
     final private LogParserResult result;
@@ -45,7 +53,11 @@ public class LogParserAction implements Action {
     public LogParserAction(final Run<?, ?> build, final LogParserResult result) {
         this.build = build;
         this.result = result;
+    }
 
+    public Collection<? extends Action> getProjectActions() {
+        final Job<?, ?> job = build.getParent();
+        return Collections.singleton(new LogParserProjectAction(job));
     }
 
     public String getIconFileName() {
