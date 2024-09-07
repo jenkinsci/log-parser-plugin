@@ -5,6 +5,7 @@ import hudson.console.ConsoleNote;
 import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
+import hudson.plugins.timestamper.api.TimestamperAPI;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -358,8 +359,8 @@ public class LogParserParser {
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        try (InputStreamReader streamReader = new InputStreamReader(build.getLogInputStream(), charset);
-             BufferedReader reader = new BufferedReader(streamReader)) {
+        String query = "time=yyyy-MM-dd HH:MM:ss.SSS&appendLog";
+        try (BufferedReader reader = TimestamperAPI.get().read(build, query)) {
             String line;
             String status;
             int line_num = 0;
