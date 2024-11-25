@@ -168,9 +168,9 @@
     </build>
 
     <scm>
-        <connection>scm:git:https://github.com/jenkinsci/log-parser-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/log-parser-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/log-parser-plugin</url>
+        <url>https://${GITHUB_TOKEN}@github.com/jenkinsci/log-parser-plugin.git</url>
+        <connection>scm:git:${project.scm.url}</connection>
+        <developerConnection>scm:git:${project.scm.url}</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
