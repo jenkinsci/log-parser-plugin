@@ -1,0 +1,54 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitsDisabled",
+    "schedule:daily"
+  ],
+  "automerge": true,
+  "ignorePaths": [
+  ],
+  "ignoreDeps": [
+    "org.apache.maven:maven-resolver-provider",
+    "org.apache.maven:maven-settings-builder",
+    "org.apache.maven.resolver:maven-resolver-api",
+    "org.apache.maven.resolver:maven-resolver-connector-basic",
+    "org.apache.maven.resolver:maven-resolver-impl",
+    "org.apache.maven.resolver:maven-resolver-transport-file",
+    "org.apache.maven.resolver:maven-resolver-transport-http",
+    "org.apache.maven.resolver:maven-resolver-util",
+    "org.eclipse.sisu:org.eclipse.sisu.inject"
+  ],
+  "packageRules": [
+    {
+      "allowedVersions": "<7.0.0",
+      "matchPackageNames": [
+        "com.google.inject:guice"
+      ],
+      "description": "We focus on Guice 6 until core adopts 7"
+    },
+    {
+      "groupName": "Selenium",
+      "matchPackageNames": [
+        "/selenium/"
+      ]
+    },
+    {
+      "matchDepNames": [
+        "docker",
+        "docker/buildx",
+        "firefox",
+        "mozilla/geckodriver",
+        "org.apache.maven:maven-core"
+      ],
+      "labels": [
+        "dependencies",
+        "build-image"
+      ]
+    }
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "rebaseWhen": "conflicted"
+}
