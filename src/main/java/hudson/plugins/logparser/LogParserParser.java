@@ -241,7 +241,6 @@ public class LogParserParser {
         parsedLine = parsedLine.replaceAll(">", "&gt;");
 
         // Remove xterm color escape sequence with an empty space.
-        //parsedLine = parsedLine.replaceAll("\u001B\\[\\d+m", "");
         parsedLine = convertEscapeSequencesToHtml(parsedLine);
 
         if (effectiveStatus != null
