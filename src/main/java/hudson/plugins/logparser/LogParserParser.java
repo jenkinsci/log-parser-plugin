@@ -5,13 +5,12 @@ import hudson.console.ConsoleNote;
 import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
-
-import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,7 +22,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class LogParserParser {
-
     final private HashMap<String, Integer> statusCount = new HashMap<>();
     final private HashMap<String, BufferedWriter> writers = new HashMap<>();
     final private HashMap<String, String> linkFiles = new HashMap<>();
@@ -43,22 +41,18 @@ public class LogParserParser {
     final private VirtualChannel channel;
     final private boolean preformattedHtml;
 
-    public LogParserParser(final FilePath parsingRulesFile,
-            final boolean preformattedHtml, final VirtualChannel channel)
-            throws IOException {
-
+    public LogParserParser(final FilePath parsingRulesFile, final boolean preformattedHtml,
+        final VirtualChannel channel) throws IOException {
         // init logger
         final Logger logger = Logger.getLogger(getClass().getName());
 
-        this.parsingRulesArray = LogParserUtils
-                .readParsingRules(parsingRulesFile);
+        this.parsingRulesArray = LogParserUtils.readParsingRules(parsingRulesFile);
 
         // This causes each regular expression to be compiled once for better
         // performance
-        this.compiledPatternsPlusError = LogParserUtils.compilePatterns(
-                this.parsingRulesArray, logger);
-        this.compiledPatterns = this.compiledPatternsPlusError
-                .getCompiledPatterns();
+        this.compiledPatternsPlusError =
+            LogParserUtils.compilePatterns(this.parsingRulesArray, logger);
+        this.compiledPatterns = this.compiledPatternsPlusError.getCompiledPatterns();
         this.extraTags = this.compiledPatternsPlusError.getExtraTags();
 
         this.preformattedHtml = preformattedHtml;
@@ -80,12 +74,13 @@ public class LogParserParser {
      * errorLinks.html, warningLinks.html, infoLinks.html
      */
     @Deprecated
-    public LogParserResult parseLog(final AbstractBuild<?, ?> build) throws IOException, InterruptedException {
+    public LogParserResult parseLog(final AbstractBuild<?, ?> build)
+        throws IOException, InterruptedException {
         return this.parseLog((Run<?, ?>) build);
     }
 
-    public LogParserResult parseLog(final Run<?, ?> build) throws IOException, InterruptedException {
-
+    public LogParserResult parseLog(final Run<?, ?> build)
+        throws IOException, InterruptedException {
         // init logger
         final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -117,19 +112,18 @@ public class LogParserParser {
 
         // Open console log for reading and all other files for writing
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(parsedFilePath))) {
-
             // Record writers to links files in hash
-            writers.put(LogParserConsts.ERROR, new BufferedWriter(new FileWriter(
-                    errorLinksFilePath)));
-            writers.put(LogParserConsts.WARNING, new BufferedWriter(new FileWriter(
-                    warningLinksFilePath)));
-            writers.put(LogParserConsts.INFO, new BufferedWriter(new FileWriter(
-                    infoLinksFilePath)));
-            writers.put(LogParserConsts.DEBUG, new BufferedWriter(new FileWriter(
-                    debugLinksFilePath)));
+            writers.put(
+                LogParserConsts.ERROR, new BufferedWriter(new FileWriter(errorLinksFilePath)));
+            writers.put(
+                LogParserConsts.WARNING, new BufferedWriter(new FileWriter(warningLinksFilePath)));
+            writers.put(
+                LogParserConsts.INFO, new BufferedWriter(new FileWriter(infoLinksFilePath)));
+            writers.put(
+                LogParserConsts.DEBUG, new BufferedWriter(new FileWriter(debugLinksFilePath)));
             for (String extraTag : this.extraTags) {
-                writers.put(extraTag, new BufferedWriter(new FileWriter(
-                        linksFilePathByExtraTags.get(extraTag))));
+                writers.put(extraTag,
+                    new BufferedWriter(new FileWriter(linksFilePathByExtraTags.get(extraTag))));
             }
 
             // Loop on the console log as long as there are input lines and parse
@@ -140,8 +134,10 @@ public class LogParserParser {
             // file.
 
             // Create dummy header and section for beginning of log
-            final String shortLink = " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
-            LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); // This enters a line which will later be
+            final String shortLink =
+                " <a target=\"content\" href=\"log_content.html\">Beginning of log</a>";
+            LogParserWriter.writeHeaderTemplateToAllLinkFiles(
+                writers, sectionCounter); // This enters a line which will later be
             // replaced by the actual header and count for
             // this header
             headerForSection.add(shortLink);
@@ -149,20 +145,19 @@ public class LogParserParser {
 
             // write styles for log body
             final String styles = "<style>\n"
-                    + "  body {margin-left:.5em; }\n"
-                    + "  pre {font-family: Consolas, \"Courier New\"; word-wrap: break-word; }\n"
-                    + "  pre span {word-wrap: break-word; } \n"
-                    + "</style>\n";
+                + "  body {margin-left:.5em; }\n"
+                + "  pre {font-family: Consolas, \"Courier New\"; word-wrap: break-word; }\n"
+                + "  pre span {word-wrap: break-word; } \n"
+                + "</style>\n";
             writer.write(styles);
 
             if (this.preformattedHtml)
                 writer.write("<pre>");
             // Read bulks of lines, parse
-            parseLogBody(build, writer, log,
-                    logger);
+            parseLogBody(build, writer, log, logger);
 
             // Write parsed output, links, etc.
-            //writeLogBody();
+            // writeLogBody();
 
             // Close html footer
             if (this.preformattedHtml)
@@ -176,11 +171,9 @@ public class LogParserParser {
 
         // Build the reference html from the warnings/errors/info html files
         // created in the loop above
-        LogParserWriter.writeReferenceHtml(buildRefPath, headerForSection,
-                statusCountPerSection, displayConstants.getIconTable(),
-                displayConstants.getLinkListDisplay(),
-                displayConstants.getLinkListDisplayPlural(), statusCount,
-                linkFiles, extraTags);
+        LogParserWriter.writeReferenceHtml(buildRefPath, headerForSection, statusCountPerSection,
+            displayConstants.getIconTable(), displayConstants.getLinkListDisplay(),
+            displayConstants.getLinkListDisplayPlural(), statusCount, linkFiles, extraTags);
         // Write the wrapping html for the reference page and the parsed log page
         LogParserWriter.writeWrapperHtml(buildWrapperPath);
 
@@ -211,7 +204,6 @@ public class LogParserParser {
         result.setExtraTags(this.extraTags);
 
         return result;
-
     }
 
     public String parseLine(final String line) throws IOException {
@@ -223,8 +215,7 @@ public class LogParserParser {
         return text.replaceAll("\u001B\\[(\\d{1,2})(;\\d{1,2})?(;\\d{1,2})?m", "");
     }
 
-    public String parseLine(final String line, final String status)
-            throws IOException {
+    public String parseLine(final String line, final String status) throws IOException {
         String parsedLine = line;
         String effectiveStatus = status;
         if (status == null) {
@@ -241,21 +232,18 @@ public class LogParserParser {
         parsedLine = parsedLine.replaceAll(">", "&gt;");
 
         // Remove xterm color escape sequence with an empty space.
-        //parsedLine = parsedLine.replaceAll("\u001B\\[\\d+m", "");
         parsedLine = convertEscapeSequencesToHtml(parsedLine);
 
-        if (effectiveStatus != null
-                && !effectiveStatus.equals(LogParserConsts.NONE)) {
+        if (effectiveStatus != null && !effectiveStatus.equals(LogParserConsts.NONE)) {
             // Increment count of the status
             incrementCounter(effectiveStatus);
             incrementCounterPerSection(effectiveStatus, sectionCounter);
             // Color line according to the status
-            final String parsedLineColored = colorLine(parsedLine,
-                    effectiveStatus);
+            final String parsedLineColored = colorLine(parsedLine, effectiveStatus);
 
             // Mark line and add to left side links of highlighted lines
-            final String parsedLineColoredAndMarked = addMarkerAndLink(
-                    parsedLineColored, effectiveStatus, status);
+            final String parsedLineColoredAndMarked =
+                addMarkerAndLink(parsedLineColored, effectiveStatus, status);
             parsedLine = parsedLineColoredAndMarked;
         }
         final StringBuffer result = new StringBuffer(parsedLine);
@@ -269,10 +257,8 @@ public class LogParserParser {
         statusCount.put(status, currentVal + 1);
     }
 
-    public void incrementCounterPerSection(final String status,
-            final int sectionNumber) {
-        final String key = LogParserUtils.getSectionCountKey(status,
-                sectionNumber);
+    public void incrementCounterPerSection(final String status, final int sectionNumber) {
+        final String key = LogParserUtils.getSectionCountKey(status, sectionNumber);
         Integer currentValInteger = statusCountPerSection.get(key);
         // No value - entered yet - initialize with 0
         if (currentValInteger == null) {
@@ -297,17 +283,15 @@ public class LogParserParser {
         return result.toString();
     }
 
-    private String addMarkerAndLink(final String line,
-            final String effectiveStatus, final String status)
-            throws IOException {
+    private String addMarkerAndLink(
+        final String line, final String effectiveStatus, final String status) throws IOException {
         // Add marker
-        final String statusCountStr = statusCount
-                .get(effectiveStatus).toString();
+        final String statusCountStr = statusCount.get(effectiveStatus).toString();
         final String marker = effectiveStatus + statusCountStr;
 
         // Add link
-        final StringBuffer shortLink = new StringBuffer(
-                " <a target=\"content\" href=\"log_content.html#");
+        final StringBuffer shortLink =
+            new StringBuffer(" <a target=\"content\" href=\"log_content.html#");
         shortLink.append(marker);
         shortLink.append("\">");
         shortLink.append(line);
@@ -318,8 +302,7 @@ public class LogParserParser {
         link.append(shortLink);
         link.append("</li>");
 
-        final BufferedWriter linkWriter = (BufferedWriter) writers
-                .get(effectiveStatus);
+        final BufferedWriter linkWriter = (BufferedWriter) writers.get(effectiveStatus);
         linkWriter.write(link.toString());
         linkWriter.newLine(); // Write system dependent end of line.
 
@@ -334,7 +317,7 @@ public class LogParserParser {
             sectionCounter++;
             // This enters a line which will later be replaced by the actual
             // header and count for this header
-            LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter); 
+            LogParserWriter.writeHeaderTemplateToAllLinkFiles(writers, sectionCounter);
 
             final StringBuffer brShortLink = new StringBuffer("<br/>");
             brShortLink.append(shortLink);
@@ -344,22 +327,21 @@ public class LogParserParser {
         return markedLine.toString();
     }
 
-    private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer, final InputStream log,
-                        final Logger logger) throws IOException, InterruptedException {
-
+    private void parseLogBody(final Run<?, ?> build, final BufferedWriter writer,
+        final InputStream log, final Logger logger) throws IOException, InterruptedException {
         // Logging information - start
-        final String signature = build.getParent().getName() + "_build_"
-                + build.getNumber();
+        final String signature = build.getParent().getName() + "_build_" + build.getNumber();
         logger.log(Level.INFO, "LogParserParser: Start parsing : " + signature);
         final Calendar calendarStart = Calendar.getInstance();
         Charset charset = build.getCharset();
 
-        final HashMap<String, String> lineStatusMatches = channel.call(
-                new LogParserStatusComputer(log, parsingRulesArray, compiledPatterns, signature, charset));
+        final HashMap<String, String> lineStatusMatches = channel.call(new LogParserStatusComputer(
+            log, parsingRulesArray, compiledPatterns, signature, charset));
 
         // Read log file from start - line by line and apply the statuses as
         // found by the threads.
-        try (InputStreamReader streamReader = new InputStreamReader(build.getLogInputStream(), charset);
+        try (InputStreamReader streamReader =
+                 new InputStreamReader(build.getLogInputStream(), charset);
              BufferedReader reader = new BufferedReader(streamReader)) {
             String line;
             String status;
@@ -376,12 +358,11 @@ public class LogParserParser {
 
         // Logging information - end
         final Calendar calendarEnd = Calendar.getInstance();
-        final long diffSeconds = (calendarEnd.getTimeInMillis() - calendarStart
-                .getTimeInMillis()) / 1000;
+        final long diffSeconds =
+            (calendarEnd.getTimeInMillis() - calendarStart.getTimeInMillis()) / 1000;
         final long diffMinutes = diffSeconds / 60;
-        logger.log(Level.INFO, "LogParserParser: Parsing took " + diffMinutes
-                + " minutes (" + diffSeconds + ") seconds.");
-
+        logger.log(Level.INFO,
+            "LogParserParser: Parsing took " + diffMinutes + " minutes (" + diffSeconds
+                + ") seconds.");
     }
-
 }
