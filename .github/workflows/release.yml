@@ -58,7 +58,7 @@ jobs:
                 run: |
                     export TZ="Europe/Berlin"
                     git checkout -b release/${{ inputs.releaseversion }}
-                    mvn release:prepare release:perform -B -DreleaseVersion=${{ inputs.releaseversion }} -DpushChanges=false -DskipTests=true -DskipITs=true -DlocalCheckout=true -D"arguments=-Dmaven.deploy.skip=true -DskipTests=true -DskipITs=true"
+                    mvn release:prepare release:perform -B -DreleaseVersion=${{ inputs.releaseversion }} -DskipTests=true -DskipITs=true -DlocalCheckout=true -D"arguments=-DskipTests=true -DskipITs=true"
                     # manually push
                     git push --tags
                     git push origin release/${{ inputs.releaseversion }}
@@ -82,6 +82,17 @@ jobs:
                     skip-tag: true
                     skip-on-empty: true
                     tag-prefix: 'v'
+
+            -   name: tag-and-release
+                id: tag-and-release
+                uses: avakar/tag-and-release@v1
+                with:
+                    release_name: ${{ github.event.inputs.releaseversion }}
+                    tag_name: v${{ github.event.inputs.releaseversion }}
+                    draft: true
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
             -   name: Create Pull Request
