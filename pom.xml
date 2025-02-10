@@ -19,7 +19,7 @@
     <properties>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
         <jenkins.baseline>2.479</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
 
         <!-- Maven Plugins -->
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
@@ -40,7 +40,7 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.26.0</version>
                 <configuration>
-                    <targetJdk>11</targetJdk>
+                    <targetJdk>17</targetJdk>
                     <rulesets>
                         <ruleset>/rulesets/basic.xml</ruleset>
                         <ruleset>/rulesets/braces.xml</ruleset>
