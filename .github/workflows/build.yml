@@ -18,12 +18,12 @@ permissions:
   checks: write # needed for spotbugs
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        java: [11, 17]
-      fail-fast: false
+    build:
+        strategy:
+            matrix:
+                os: [ ubuntu-latest,windows-latest ]
+                java: [ 17, 21 ]
+            fail-fast: false
 
     runs-on: ${{ matrix.os }}
 
