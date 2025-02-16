@@ -60,19 +60,6 @@
         </plugins>
     </reporting>
 
-    <developers>
-        <developer>
-            <id>hypery2k</id>
-            <name>Martin Reinhardt</name>
-            <email>contact@martinreinhardt-online.de</email>
-        </developer>
-        <developer>
-            <id>jborghi</id>
-            <name>John Borghi</name>
-            <email>jborghi@java.net</email>
-        </developer>
-    </developers>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
