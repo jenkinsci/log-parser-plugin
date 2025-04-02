@@ -8,31 +8,32 @@ import hudson.slaves.DumbSlave;
 import hudson.tasks.Maven;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.ToolInstallations;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.io.File;
 import java.net.URL;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * In this test suite we initialize the Job workspaces with a resource (maven-project1.zip) that contains a Maven
  * project.
  */
-public class LogParserWorkflowTest {
+@WithJenkins
+class LogParserWorkflowTest {
 
-    @ClassRule
-    public static JenkinsRule jenkinsRule = new JenkinsRule();
+    private static JenkinsRule jenkinsRule;
 
     private static LogParserAction result;
 
-    @BeforeClass
-    public static void init() throws Exception {
+    @BeforeAll
+    static void init(JenkinsRule rule) throws Exception {
+        jenkinsRule = rule;
         Maven.MavenInstallation mavenInstallation = ToolInstallations.configureMaven35();
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "logParserPublisherWorkflowStep");
         DumbSlave agent = jenkinsRule.createOnlineSlave();
@@ -56,7 +57,7 @@ public class LogParserWorkflowTest {
      * Run a workflow job using {@link LogParserPublisher} and check for success.
      */
     @Test
-    public void logParserPublisherWorkflowStep() throws Exception {
+    void logParserPublisherWorkflowStep() {
        assertEquals(0, result.getResult().getTotalErrors());
        assertEquals(2, result.getResult().getTotalWarnings());
        assertEquals(0, result.getResult().getTotalInfos());
@@ -66,7 +67,7 @@ public class LogParserWorkflowTest {
      * Run a workflow job using {@link LogParserPublisher} and check for number of debug tags
      */
     @Test
-    public void logParserPublisherWorkflowStepDebugTags() throws Exception {
+    void logParserPublisherWorkflowStepDebugTags() {
         assertEquals(0, result.getResult().getTotalDebugs());
     }
 
@@ -74,7 +75,7 @@ public class LogParserWorkflowTest {
      * Run a workflow job using {@link LogParserPublisher} and check for number of example arbitrary tags
      */
     @Test
-    public void logParserPublisherWorkflowStepArbitraryTags() throws Exception {
+    void logParserPublisherWorkflowStepArbitraryTags() {
         assertEquals(0, result.getResult().getTotalCountsByExtraTag("jenkins"));
         assertEquals(1, result.getResult().getTotalCountsByExtraTag("logParserPublisherWorkflowStep"));
     }

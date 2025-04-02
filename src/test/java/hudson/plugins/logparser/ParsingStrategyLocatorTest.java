@@ -1,16 +1,16 @@
 package hudson.plugins.logparser;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ParsingStrategyLocatorTest {
+class ParsingStrategyLocatorTest {
 
     @Test
-    public void shouldDefaultToClassic() {
+    void shouldDefaultToClassic() {
         Map<String, String> systemProperties = new HashMap<>();
         ParsingStrategyLocator locator = new ParsingStrategyLocator(systemProperties);
 
@@ -20,7 +20,7 @@ public class ParsingStrategyLocatorTest {
     }
 
     @Test
-    public void shouldAllowOverridingToStream() {
+    void shouldAllowOverridingToStream() {
         Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put(ParsingStrategy.class.getName(), StreamParsingStrategy.class.getName());
         ParsingStrategyLocator locator = new ParsingStrategyLocator(systemProperties);
@@ -31,7 +31,7 @@ public class ParsingStrategyLocatorTest {
     }
 
     @Test
-    public void shouldFallbackToClassic() {
+    void shouldFallbackToClassic() {
         Map<String, String> systemProperties = new HashMap<>();
         systemProperties.put(ParsingStrategy.class.getName(), "does.not.match");
         ParsingStrategyLocator locator = new ParsingStrategyLocator(systemProperties);

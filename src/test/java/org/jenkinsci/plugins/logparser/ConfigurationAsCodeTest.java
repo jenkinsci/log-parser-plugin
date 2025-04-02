@@ -3,31 +3,29 @@ package org.jenkinsci.plugins.logparser;
 import jenkins.model.Jenkins;
 import hudson.plugins.logparser.LogParserPublisher;
 import hudson.plugins.logparser.ParserRuleFile;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
-
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Ignore;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.util.List;
 
-public class ConfigurationAsCodeTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    @Rule
-    public JenkinsRule r = new JenkinsRule();
+@WithJenkins
+class ConfigurationAsCodeTest {
 
     @Test
-    public void LegacyFormattingTest() throws Exception {
+    void legacyFormattingTest(JenkinsRule r) {
         final LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) Jenkins.get().getDescriptor(LogParserPublisher.class);
         ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code-legacy-formatting.yaml").toString());
-        assertEquals(true, descriptor.getLegacyFormatting());
+        assertTrue(descriptor.getLegacyFormatting());
     }
 
     @Test
-    public void ParsingRulesTest() throws Exception {
+    void parsingRulesTest(JenkinsRule r) {
         final LogParserPublisher.DescriptorImpl descriptor = (LogParserPublisher.DescriptorImpl) Jenkins.get().getDescriptor(LogParserPublisher.class);
         ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code-parsing-rules.yaml").toString());
         List<ParserRuleFile> parseRuleFiles = descriptor.getParsingRulesGlobal();
@@ -37,9 +35,9 @@ public class ConfigurationAsCodeTest {
         assertEquals("./maven-project1.zip", parseRuleFiles.get(0).getPath());
     }
 
-    @Ignore("Not finished")
+    @Disabled("Not finished")
     @Test
-    public void export_configuration() throws Exception {
+    void export_configuration(JenkinsRule r) throws Exception {
         ConfigurationAsCode.get().configure(ConfigurationAsCodeTest.class.getResource("configuration-as-code.yaml").toString());
         ConfigurationAsCode.get().export(System.out);
     }
