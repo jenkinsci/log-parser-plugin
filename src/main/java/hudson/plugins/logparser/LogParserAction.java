@@ -14,7 +14,6 @@ import hudson.util.ShiftedCategoryAxis;
 import hudson.util.StackedAreaRenderer2;
 
 import jenkins.tasks.SimpleBuildStep;
-import jenkins.tasks.SimpleBuildStep.LastBuildAction;
 
 import java.awt.Color;
 import java.io.File;
