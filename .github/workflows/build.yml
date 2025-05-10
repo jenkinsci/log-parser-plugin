@@ -1,21 +1,21 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-  merge_group:
+    push:
+        branches:
+            - main
+            - develop
+    pull_request:
+    merge_group:
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  security-events: write
-  contents: read
-  actions: read # This is required for actions/checkout
-  issues: write
-  pull-requests: write
-  checks: write # needed for spotbugs
+    id-token: write # This is required for requesting the JWT
+    security-events: write
+    contents: read
+    actions: read # This is required for actions/checkout
+    issues: write
+    pull-requests: write
+    checks: write # needed for spotbugs
 
 jobs:
     build:
@@ -25,45 +25,45 @@ jobs:
                 java: [ 17, 21 ]
             fail-fast: false
 
-    runs-on: ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v3
 
-      - name: Set up cache for ~./m2/repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}-${{ hashFiles('.mvn/wrapper/maven-wrapper.properties') }}
-          restore-keys: |
-            maven-${{ matrix.os }}-java${{ matrix.java }}-
-            maven-${{ matrix.os }}-
+            -   name: Set up cache for ~./m2/repository
+                uses: actions/cache@v3
+                with:
+                    path: ~/.m2/repository
+                    key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}-${{ hashFiles('.mvn/wrapper/maven-wrapper.properties') }}
+                    restore-keys: |
+                        maven-${{ matrix.os }}-java${{ matrix.java }}-
+                        maven-${{ matrix.os }}-
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: "adopt"
+            -   name: Set up JDK
+                uses: actions/setup-java@v3
+                with:
+                    java-version: ${{ matrix.java }}
+                    distribution: "adopt"
 
-      - name: Build with Maven
-        run: ./mvnw --batch-mode clean install
+            -   name: Build with Maven
+                run: ./mvnw --batch-mode clean install
 
-      - name: Run PMD checks
-        run: ./mvnw pmd:check
+            -   name: Run PMD checks
+                run: ./mvnw pmd:check
 
-  build-results:
-    name: Build results
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - run: exit 1
-        # see https://stackoverflow.com/a/67532120/4907315
-        if: >-
-          ${{
-                contains(needs.*.result, 'failure')
-            || contains(needs.*.result, 'cancelled')
-                || contains(needs.*.result, 'skipped')
-                }}
+    build-results:
+        name: Build results
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        needs:
+            - build
+        steps:
+            -   run: exit 1
+                # see https://stackoverflow.com/a/67532120/4907315
+                if: >-
+                    ${{
+                          contains(needs.*.result, 'failure')
+                      || contains(needs.*.result, 'cancelled')
+                          || contains(needs.*.result, 'skipped')
+                          }}
