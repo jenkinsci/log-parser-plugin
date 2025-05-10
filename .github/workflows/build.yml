@@ -16,7 +16,6 @@ permissions:
     # This is required for actions/checkout
     actions: read
     issues: write
-    pull-requests: write
     # For reporting
     attestations: write
     checks: write
