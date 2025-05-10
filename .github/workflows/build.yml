@@ -17,8 +17,6 @@ permissions:
     actions: read
     issues: write
     pull-requests: write
-    checks: write # needed for spotbugs
-
     # For reporting
     attestations: write
     checks: write
