@@ -26,11 +26,7 @@ jobs:
     build:
         strategy:
             matrix:
-<<<<<<< HEAD
-                os: [ ubuntu-latest,windows-latest ]
-=======
                 os: [ ubuntu-latest, windows-latest ]
->>>>>>> c2be3cebd992c72ccbc892168bec54f87d0a9ad8
                 java: [ 17, 21 ]
             fail-fast: false
 
@@ -74,7 +70,6 @@ jobs:
         needs:
             - build
         steps:
-<<<<<<< HEAD
             -   name: Check out
                 uses: actions/checkout@v3
                 with:
@@ -84,7 +79,6 @@ jobs:
                 with:
                     distribution: 'adopt'
                     java-version: 17
-=======
             -   run: exit 1
                 # see https://stackoverflow.com/a/67532120/4907315
                 if: >-
@@ -93,4 +87,3 @@ jobs:
                       || contains(needs.*.result, 'cancelled')
                           || contains(needs.*.result, 'skipped')
                           }}
->>>>>>> c2be3cebd992c72ccbc892168bec54f87d0a9ad8
