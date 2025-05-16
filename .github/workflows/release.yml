@@ -50,7 +50,6 @@ jobs:
                             "password": "${{ secrets.OSS_JENKINS_PASS }}"
                         }]
 
-
             -   name: Create release
                 id: create-release
                 env:
@@ -92,8 +91,6 @@ jobs:
                     draft: true
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
 
             -   name: Create Pull Request
                 id: create-pr
