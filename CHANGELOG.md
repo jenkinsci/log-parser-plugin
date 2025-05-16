@@ -1,8 +1,12 @@
-## [2.4.2](https://github.com/jenkinsci/log-parser-plugin/compare/v2.3.6...v2.4.2) (2025-05-10)
+## [](https://github.com/jenkinsci/log-parser-plugin/compare/v2.5.0...v) (2025-05-16)
+
+## [2.5.0](https://github.com/jenkinsci/log-parser-plugin/compare/v2.3.6...v2.5.0) (2025-05-16)
 
 
 ### Features
 
+* Add column to jobs list ([d4c87ef](https://github.com/jenkinsci/log-parser-plugin/commit/d4c87efc9939aa2c2d79a1fa275b2d035f0c48ef))
+* **java:** Require Jenkins core 2.492.3 and Java 17 ([2d96d37](https://github.com/jenkinsci/log-parser-plugin/commit/2d96d37d72bc7991659a6ca7115590d21f1e0e1b))
 * **Timestamper:** Adding support for Timestamper ([dcce20a](https://github.com/jenkinsci/log-parser-plugin/commit/dcce20ad6bb80a7b04daa56a929feb1618da4901))
 * upgrade to Jenkins LTS Core 2.462.3 for Java 11 support ([#150](https://github.com/jenkinsci/log-parser-plugin/issues/150)) ([5d5057e](https://github.com/jenkinsci/log-parser-plugin/commit/5d5057e0b52377af8e08d94f12f1a047c6eba280))
 
@@ -42,3 +46,4 @@
 * Jenkins Log Parser Debug Icon not shown  ([1e930e0](https://github.com/jenkinsci/log-parser-plugin/commit/1e930e00df73337ea75d8fe8d9caa38e3d7a792a))
 * **Memory:** Correct potential OOM when parsing logs in workflows ([#36](https://github.com/jenkinsci/log-parser-plugin/issues/36)) ([bff7f9f](https://github.com/jenkinsci/log-parser-plugin/commit/bff7f9f53820aade452a4c44441bbfabc905931e)), closes [/github.com/jenkinsci/workflow-job-plugin/blob/1551f82/src/main/java/org/jenkinsci/plugins/workflow/job/WorkflowRun.java#L1105](https://github.com/jenkinsci//github.com/jenkinsci/workflow-job-plugin/blob/1551f82/src/main/java/org/jenkinsci/plugins/workflow/job/WorkflowRun.java/issues/L1105)
 * Now Jenkins is available on port 8081 and boots ([f269c53](https://github.com/jenkinsci/log-parser-plugin/commit/f269c53fa0ddb5ae28ae3719afe6d6ee3ccc9d8e))
+
