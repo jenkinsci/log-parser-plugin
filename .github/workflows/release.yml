@@ -45,7 +45,7 @@ jobs:
                     override: true
                     servers: |
                         [{
-                            "id": "repo.jenkins-ci.org",
+                            "id": "maven.jenkins-ci.org",
                             "username": "${{ vars.OSS_JENKINS_USER }}",
                             "password": "${{ secrets.OSS_JENKINS_PASS }}"
                         }]

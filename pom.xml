@@ -167,6 +167,13 @@
         <tag>v2.4.2</tag>
     </scm>
 
+    <distributionManagement>
+      <repository>
+        <id>maven.jenkins-ci.org</id>
+        <url>https://repo.jenkins-ci.org/releases/</url>
+      </repository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
