@@ -84,7 +84,7 @@ jobs:
 
             -   name: tag-and-release
                 id: tag-and-release
-                uses: avakar/tag-and-release@v1
+                uses: avakar/tag-and-release@v1.0.0
                 with:
                     release_name: ${{ github.event.inputs.releaseversion }}
                     tag_name: v${{ github.event.inputs.releaseversion }}
