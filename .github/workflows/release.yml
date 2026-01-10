@@ -77,7 +77,7 @@ jobs:
 
             -   name: Conventional Changelog Action
                 id: create-changelog
-                uses: TriPSs/conventional-changelog-action@v5
+                uses: TriPSs/conventional-changelog-action@v6
                 with:
                     input-file: CHANGELOG.md
                     github-token: ${{ secrets.GITHUB_TOKEN }}
