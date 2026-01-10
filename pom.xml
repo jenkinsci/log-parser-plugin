@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>6.2111.v8b_6a_1d599df3</version>
+        <version>5.2099.v68c2f5e27299</version>
         <relativePath />
     </parent>
 
