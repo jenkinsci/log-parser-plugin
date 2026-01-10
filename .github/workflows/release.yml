@@ -18,6 +18,7 @@ jobs:
             contents: write
             attestations: write
             id-token: write
+            pull-requests: write
 
         steps:
             -   name: Check out
@@ -57,7 +58,12 @@ jobs:
                 run: |
                     export TZ="Europe/Berlin"
                     git checkout -b release/${{ inputs.releaseversion }}
-                    mvn release:prepare release:perform -B -DreleaseVersion=${{ inputs.releaseversion }} -DskipTests=true -DskipITs=true -DlocalCheckout=true -D"arguments=-DskipTests=true -DskipITs=true"
+                    # TODO: Workaround for maven release not updating
+                    ./mvnw versions:set -DnewVersion=${{ inputs.releaseversion }}
+                    git commit --amend -m "chore: Release ${{ inputs.releaseversion }}"
+                    ./mvnw deploy -DskipTests=true -DskipITs=true
+                    git tag v${{ inputs.releaseversion }}
+                    #./mvnw release:prepare release:perform -B -DreleaseVersion=${{ inputs.releaseversion }} -DskipTests=true -DskipITs=true -DlocalCheckout=true -Darguments="-DskipTests=true -DskipITs=true"
                     # manually push
                     git push --tags
                     git push origin release/${{ inputs.releaseversion }}
@@ -84,7 +90,7 @@ jobs:
 
             -   name: tag-and-release
                 id: tag-and-release
-                uses: avakar/tag-and-release@v1.0.0
+                uses: avakar/tag-and-release@v1
                 with:
                     release_name: ${{ github.event.inputs.releaseversion }}
                     tag_name: v${{ github.event.inputs.releaseversion }}
