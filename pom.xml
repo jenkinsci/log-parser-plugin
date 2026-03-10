@@ -151,17 +151,11 @@
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
     <scm>
-        <url>https://${GITHUB_TOKEN}@github.com/jenkinsci/log-parser-plugin.git</url>
+        <url>https://github.com/jenkinsci/log-parser-plugin.git</url>
         <connection>scm:git:${project.scm.url}</connection>
         <developerConnection>scm:git:${project.scm.url}</developerConnection>
         <tag>HEAD</tag>
