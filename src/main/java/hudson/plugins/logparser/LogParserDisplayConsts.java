@@ -1,7 +1,7 @@
 package hudson.plugins.logparser;
 
 import java.util.HashMap;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 public class LogParserDisplayConsts {
 

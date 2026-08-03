@@ -24,6 +24,7 @@
         <!-- Maven Plugins -->
         <maven-release-plugin.version>3.1.1</maven-release-plugin.version>
         <maven-site-plugin.version>3.3</maven-site-plugin.version>
+        <ban-commons-lang-2.skip>false</ban-commons-lang-2.skip>
     </properties>
 
     <licenses>
@@ -73,6 +74,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>commons-text-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>scm-api</artifactId>
