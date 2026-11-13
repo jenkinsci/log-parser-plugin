@@ -50,8 +50,13 @@ public class LogParserStatusComputer extends MasterToSlaveCallable<HashMap<Strin
     }
 
     public HashMap<String, String> call() {
-        try {
-            return computeStatusMatches(remoteLog, signature, charsetName);
+        // Close the log however the parsing ends. On an agent, the log arrives through a pipe that the
+        // controller fills (RemoteInputStream.Flag.GREEDY). If the parsing is interrupted, e.g. by an
+        // aborted build, and the pipe stays open, its buffer runs full and the agent's single pipe writer
+        // blocks for good. Every later pipe I/O of the channel then waits forever, and with it every remote
+        // call that depends on it.
+        try (InputStream log = remoteLog) {
+            return computeStatusMatches(log, signature, charsetName);
             // rethrow any exception here to report why the
             // parsing failed
         } catch (InterruptedException e) {
